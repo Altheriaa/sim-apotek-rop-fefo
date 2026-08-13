@@ -1,0 +1,87 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Edit Data Obat</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Perbarui informasi obat {{ $obat->nama_obat }}.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ route('obat.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80">
+                Kembali
+            </a>
+        </div>
+    </div>
+
+    @if($errors->any())
+    <div class="rounded-lg bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30">
+        <ul class="list-disc pl-5">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    <div class="rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-gray-dark">
+        <form action="{{ route('obat.update', $obat->id) }}" method="POST" class="p-6">
+            @csrf
+            @method('PUT')
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <!-- Kode Obat -->
+                <div>
+                    <label for="kode_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kode Obat</label>
+                    <input type="text" id="kode_obat" name="kode_obat" value="{{ old('kode_obat', $obat->kode_obat) }}" required
+                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                </div>
+
+                <!-- Nama Obat -->
+                <div>
+                    <label for="nama_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Obat</label>
+                    <input type="text" id="nama_obat" name="nama_obat" value="{{ old('nama_obat', $obat->nama_obat) }}" required
+                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                </div>
+
+                <!-- Kategori -->
+                <div>
+                    <label for="kategori" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kategori</label>
+                    <input type="text" id="kategori" name="kategori" value="{{ old('kategori', $obat->kategori) }}" required
+                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                </div>
+
+                <!-- Satuan -->
+                <div>
+                    <label for="satuan" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan</label>
+                    <input type="text" id="satuan" name="satuan" value="{{ old('satuan', $obat->satuan) }}" required
+                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                </div>
+
+                <!-- Harga -->
+                <div>
+                    <label for="harga" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga (Rp)</label>
+                    <input type="number" id="harga" name="harga" value="{{ old('harga', $obat->harga) }}" required min="0" step="100"
+                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                </div>
+
+                <!-- ROP Minimum -->
+                <div>
+                    <label for="rop_minimum" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Batas Minimal (ROP)</label>
+                    <input type="number" id="rop_minimum" name="rop_minimum" value="{{ old('rop_minimum', $obat->rop_minimum) }}" required min="0"
+                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3">
+                <a href="{{ route('obat.index') }}" class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80">
+                    Batal
+                </a>
+                <button type="submit" class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
+                    Perbarui Obat
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

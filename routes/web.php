@@ -1,106 +1,73 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ObatController;
+use App\Http\Controllers\ObatMasukController;
+use App\Http\Controllers\ObatKeluarController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\PenggunaController;
 
-// dashboard pages
+// ── Autentikasi ──
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ── Redirect root ke dashboard ──
 Route::get('/', function () {
-    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
-})->name('dashboard');
+    return redirect()->route('dashboard');
+});
 
-// calender pages
-Route::get('/calendar', function () {
-    return view('pages.calender', ['title' => 'Calendar']);
-})->name('calendar');
+// ── Rute yang memerlukan autentikasi ──
+Route::middleware(['auth'])->group(function () {
 
-// profile pages
-Route::get('/profile', function () {
-    return view('pages.profile', ['title' => 'Profile']);
-})->name('profile');
+    // Dashboard (semua role)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// form pages
-Route::get('/form-elements', function () {
-    return view('pages.form.form-elements', ['title' => 'Form Elements']);
-})->name('form-elements');
+    // ── Rute untuk admin & karyawan ──
+    Route::middleware(['role:admin,karyawan'])->group(function () {
+        // Data Obat (lihat saja untuk karyawan)
+        Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
+        Route::get('/obat/{obat}', [ObatController::class, 'show'])->name('obat.show');
 
-// tables pages
-Route::get('/basic-tables', function () {
-    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
-})->name('basic-tables');
+        // Obat Masuk (Batch)
+        Route::resource('obat-masuk', ObatMasukController::class)->only(['index', 'create', 'store', 'show']);
 
-// pages
+        // Obat Keluar (FEFO)
+        Route::resource('obat-keluar', ObatKeluarController::class)->only(['index', 'create', 'store']);
+    });
 
-Route::get('/blank', function () {
-    return view('pages.blank', ['title' => 'Blank']);
-})->name('blank');
+    // ── Rute khusus admin ──
+    Route::middleware(['role:admin'])->group(function () {
+        // CRUD Obat (create, edit, delete hanya admin)
+        Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
+        Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
+        Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->name('obat.edit');
+        Route::put('/obat/{obat}', [ObatController::class, 'update'])->name('obat.update');
+        Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->name('obat.destroy');
 
-// error pages
+        // Supplier
+        Route::resource('supplier', SupplierController::class);
+
+        // Pesanan
+        Route::resource('pesanan', PesananController::class)->except(['edit', 'update']);
+        Route::patch('/pesanan/{pesanan}/status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
+
+        // Laporan
+        Route::get('/laporan/obat-masuk', [LaporanController::class, 'obatMasuk'])->name('laporan.obat-masuk');
+        Route::get('/laporan/obat-keluar', [LaporanController::class, 'obatKeluar'])->name('laporan.obat-keluar');
+        Route::get('/laporan/obat-masuk/pdf', [LaporanController::class, 'obatMasukPdf'])->name('laporan.obat-masuk.pdf');
+        Route::get('/laporan/obat-keluar/pdf', [LaporanController::class, 'obatKeluarPdf'])->name('laporan.obat-keluar.pdf');
+
+        // Pengguna
+        Route::resource('pengguna', PenggunaController::class);
+    });
+});
+
+// ── Error pages ──
 Route::get('/error-404', function () {
     return view('pages.errors.error-404', ['title' => 'Error 404']);
 })->name('error-404');
-
-// chart pages
-Route::get('/line-chart', function () {
-    return view('pages.chart.line-chart', ['title' => 'Line Chart']);
-})->name('line-chart');
-
-Route::get('/bar-chart', function () {
-    return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
-})->name('bar-chart');
-
-
-// authentication pages
-Route::get('/signin', function () {
-    return view('pages.auth.signin', ['title' => 'Sign In']);
-})->name('signin');
-
-Route::get('/signup', function () {
-    return view('pages.auth.signup', ['title' => 'Sign Up']);
-})->name('signup');
-
-// ui elements pages
-Route::get('/alerts', function () {
-    return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
-})->name('alerts');
-
-Route::get('/avatars', function () {
-    return view('pages.ui-elements.avatars', ['title' => 'Avatars']);
-})->name('avatars');
-
-Route::get('/badge', function () {
-    return view('pages.ui-elements.badges', ['title' => 'Badges']);
-})->name('badges');
-
-Route::get('/buttons', function () {
-    return view('pages.ui-elements.buttons', ['title' => 'Buttons']);
-})->name('buttons');
-
-Route::get('/image', function () {
-    return view('pages.ui-elements.images', ['title' => 'Images']);
-})->name('images');
-
-Route::get('/videos', function () {
-    return view('pages.ui-elements.videos', ['title' => 'Videos']);
-})->name('videos');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
