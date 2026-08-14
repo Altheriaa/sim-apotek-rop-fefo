@@ -14,11 +14,41 @@ class ObatMasukController extends Controller
     {
         $query = ObatBatch::with(['obat', 'supplier']);
 
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('tanggal_masuk', [$request->start_date, $request->end_date]);
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_batch', 'like', "%{$search}%")
+                  ->orWhereHas('obat', function ($oq) use ($search) {
+                      $oq->where('nama_obat', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('supplier', function ($sq) use ($search) {
+                      $sq->where('nama_supplier', 'like', "%{$search}%");
+                  });
+            });
         }
 
-        $batches = $query->latest('tanggal_masuk')->paginate(15);
+        $tanggalDari = $request->tanggal_dari ?? $request->start_date;
+        $tanggalSampai = $request->tanggal_sampai ?? $request->end_date;
+
+        if ($tanggalDari) {
+            $query->where('tanggal_masuk', '>=', $tanggalDari);
+        }
+
+        if ($tanggalSampai) {
+            $query->where('tanggal_masuk', '<=', $tanggalSampai);
+        }
+
+        if ($request->filled('status_ed')) {
+            if ($request->status_ed === 'expired') {
+                $query->where('tanggal_kadaluwarsa', '<', now()->toDateString());
+            } elseif ($request->status_ed === 'expiring') {
+                $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(30)->toDateString()]);
+            } elseif ($request->status_ed === 'safe') {
+                $query->where('tanggal_kadaluwarsa', '>', now()->addDays(30)->toDateString());
+            }
+        }
+
+        $batches = $query->latest('tanggal_masuk')->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.obat-masuk.index', [
             'title'   => 'Obat Masuk (Batch)',

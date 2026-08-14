@@ -9,13 +9,25 @@ class ObatController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Obat::query();
+        $query = Obat::query()->withSum('batches as total_stok_sisa', 'stok_sisa');
 
         if ($request->filled('search')) {
-            $query->where('nama_obat', 'like', '%' . $request->search . '%');
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_obat', 'like', "%{$search}%")
+                  ->orWhere('satuan', 'like', "%{$search}%");
+            });
         }
 
-        $obats = $query->latest()->paginate(15);
+        if ($request->filled('status')) {
+            if ($request->status === 'rop') {
+                $query->havingRaw('COALESCE(total_stok_sisa, 0) <= obat.rop_minimum');
+            } elseif ($request->status === 'aman') {
+                $query->havingRaw('COALESCE(total_stok_sisa, 0) > obat.rop_minimum');
+            }
+        }
+
+        $obats = $query->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.obat.index', [
             'title' => 'Data Obat',

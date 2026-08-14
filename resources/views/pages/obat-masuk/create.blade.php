@@ -32,36 +32,50 @@
                 <!-- Obat -->
                 <div>
                     <label for="obat_id" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Obat</label>
-                    <select id="obat_id" name="obat_id" required
-                            class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800 dark:bg-gray-900">
-                        <option value="" disabled selected>Pilih Obat...</option>
-                        @foreach($obats as $obat)
-                            <option value="{{ $obat->id }}" {{ old('obat_id') == $obat->id ? 'selected' : '' }}>
-                                {{ $obat->kode_obat }} - {{ $obat->nama_obat }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="relative">
+                        <select id="obat_id" name="obat_id" required
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 pr-10 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150 cursor-pointer">
+                            <option value="" disabled selected class="dark:bg-gray-900">Pilih Obat...</option>
+                            @foreach($obats as $obat)
+                                <option value="{{ $obat->id }}" {{ old('obat_id') == $obat->id ? 'selected' : '' }} class="dark:bg-gray-900">
+                                    {{ $obat->kode_obat }} - {{ $obat->nama_obat }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Supplier -->
                 <div>
                     <label for="supplier_id" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier</label>
-                    <select id="supplier_id" name="supplier_id" required
-                            class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800 dark:bg-gray-900">
-                        <option value="" disabled selected>Pilih Supplier...</option>
-                        @foreach($suppliers as $supplier)
-                            <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                {{ $supplier->nama_supplier }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="relative">
+                        <select id="supplier_id" name="supplier_id" required
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 pr-10 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150 cursor-pointer">
+                            <option value="" disabled selected class="dark:bg-gray-900">Pilih Supplier...</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }} class="dark:bg-gray-900">
+                                    {{ $supplier->nama_supplier }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Nomor Batch -->
                 <div>
                     <label for="nomor_batch" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Nomor Batch</label>
                     <input type="text" id="nomor_batch" name="nomor_batch" value="{{ old('nomor_batch') }}" required
-                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800"
+                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
                            placeholder="Contoh: BATCH-001">
                 </div>
 
@@ -69,14 +83,14 @@
                 <div>
                     <label for="tanggal_kadaluwarsa" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Kadaluwarsa (ED)</label>
                     <input type="date" id="tanggal_kadaluwarsa" name="tanggal_kadaluwarsa" value="{{ old('tanggal_kadaluwarsa') }}" required min="{{ date('Y-m-d') }}"
-                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800">
+                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150">
                 </div>
 
                 <!-- Jumlah -->
                 <div>
                     <label for="jumlah" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Masuk</label>
                     <input type="number" id="jumlah" name="jumlah" value="{{ old('jumlah') }}" required min="1"
-                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800"
+                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
                            placeholder="Jumlah stok diterima">
                 </div>
 
@@ -84,16 +98,16 @@
                 <div>
                     <label for="harga_beli" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Beli Total (Rp)</label>
                     <input type="number" id="harga_beli" name="harga_beli" value="{{ old('harga_beli') }}" required min="0" step="100"
-                           class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800"
+                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
                            placeholder="Contoh: 1500000">
                 </div>
             </div>
 
             <div class="mt-8 flex justify-end gap-3">
-                <button type="reset" class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80">
+                <button type="reset" class="h-11 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80 transition duration-150">
                     Reset
                 </button>
-                <button type="submit" class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
+                <button type="submit" class="h-11 inline-flex items-center justify-center rounded-lg bg-brand-500 px-6 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
                     Simpan Transaksi
                 </button>
             </div>

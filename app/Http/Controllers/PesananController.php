@@ -14,11 +14,34 @@ class PesananController extends Controller
     {
         $query = Pesanan::with(['supplier', 'user', 'detailPesanan.obat']);
 
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $cleanId = ltrim($search, '#');
+            $query->where(function ($q) use ($search, $cleanId) {
+                if (is_numeric($cleanId)) {
+                    $q->orWhere('id', $cleanId);
+                }
+                $q->orWhereHas('supplier', function ($sq) use ($search) {
+                    $sq->where('nama_supplier', 'like', "%{$search}%");
+                })->orWhereHas('detailPesanan.obat', function ($oq) use ($search) {
+                    $oq->where('nama_obat', 'like', "%{$search}%");
+                });
+            });
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $pesanans = $query->latest()->paginate(15);
+        if ($request->filled('tanggal_dari')) {
+            $query->where('tanggal_pesan', '>=', $request->tanggal_dari);
+        }
+
+        if ($request->filled('tanggal_sampai')) {
+            $query->where('tanggal_pesan', '<=', $request->tanggal_sampai);
+        }
+
+        $pesanans = $query->latest('tanggal_pesan')->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.pesanan.index', [
             'title'    => 'Data Pesanan',

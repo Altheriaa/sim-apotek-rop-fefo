@@ -86,17 +86,24 @@
                         <div class="space-y-4">
                             <div>
                                 <label for="status" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Pilih Status Baru</label>
-                                <select id="status" name="status" required
-                                        class="w-full rounded-lg border border-gray-200 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-800 dark:text-white/90 dark:focus:border-brand-800 dark:bg-gray-900">
-                                    <option value="draft" {{ $pesanan->status == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="diproses" {{ $pesanan->status == 'diproses' ? 'selected' : '' }}>Diproses Supplier</option>
-                                    <option value="dikirim" {{ $pesanan->status == 'dikirim' ? 'selected' : '' }}>Dikirim (Dalam Perjalanan)</option>
-                                    <option value="batal" {{ $pesanan->status == 'batal' ? 'selected' : '' }}>Batal</option>
-                                </select>
+                                <div class="relative">
+                                    <select id="status" name="status" required
+                                            class="h-11 w-full appearance-none rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 pr-10 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150 cursor-pointer">
+                                        <option value="draft" {{ $pesanan->status == 'draft' ? 'selected' : '' }} class="dark:bg-gray-900">Draft</option>
+                                        <option value="diproses" {{ $pesanan->status == 'diproses' ? 'selected' : '' }} class="dark:bg-gray-900">Diproses Supplier</option>
+                                        <option value="dikirim" {{ $pesanan->status == 'dikirim' ? 'selected' : '' }} class="dark:bg-gray-900">Dikirim (Dalam Perjalanan)</option>
+                                        <option value="batal" {{ $pesanan->status == 'batal' ? 'selected' : '' }} class="dark:bg-gray-900">Batal</option>
+                                    </select>
+                                    <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </span>
+                                </div>
                             </div>
                             
                             <div class="pt-2">
-                                <button type="submit" class="w-full rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
+                                <button type="submit" class="h-11 w-full inline-flex items-center justify-center rounded-lg bg-brand-500 px-5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
                                     Simpan Perubahan
                                 </button>
                             </div>

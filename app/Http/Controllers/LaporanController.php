@@ -24,13 +24,20 @@ class LaporanController extends Controller
             $query->where('tanggal_masuk', '<=', $request->tanggal_sampai);
         }
 
-        if ($request->filled('obat_search')) {
-            $query->whereHas('obat', function ($q) use ($request) {
-                $q->where('nama_obat', 'like', '%' . $request->obat_search . '%');
+        $search = $request->search ?? $request->obat_search;
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_batch', 'like', "%{$search}%")
+                  ->orWhereHas('obat', function ($oq) use ($search) {
+                      $oq->where('nama_obat', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('supplier', function ($sq) use ($search) {
+                      $sq->where('nama_supplier', 'like', "%{$search}%");
+                  });
             });
         }
 
-        $data = $query->orderBy('tanggal_masuk', 'desc')->get();
+        $data = $query->orderBy('tanggal_masuk', 'desc')->paginate(15)->withQueryString();
 
         return view('pages.laporan.obat-masuk', [
             'title'     => 'Laporan Obat Masuk',
@@ -50,6 +57,19 @@ class LaporanController extends Controller
 
         if ($request->filled('end_date')) {
             $query->where('tanggal_masuk', '<=', $request->end_date);
+        }
+
+        $search = $request->search ?? $request->obat_search;
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_batch', 'like', "%{$search}%")
+                  ->orWhereHas('obat', function ($oq) use ($search) {
+                      $oq->where('nama_obat', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('supplier', function ($sq) use ($search) {
+                      $sq->where('nama_supplier', 'like', "%{$search}%");
+                  });
+            });
         }
 
         $data = $query->orderBy('tanggal_masuk', 'desc')->get();
@@ -78,13 +98,20 @@ class LaporanController extends Controller
             $query->where('tanggal_keluar', '<=', $request->tanggal_sampai);
         }
 
-        if ($request->filled('obat_search')) {
-            $query->whereHas('obat', function ($q) use ($request) {
-                $q->where('nama_obat', 'like', '%' . $request->obat_search . '%');
+        $search = $request->search ?? $request->obat_search;
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('obat', function ($oq) use ($search) {
+                    $oq->where('nama_obat', 'like', "%{$search}%");
+                })->orWhereHas('obatBatch', function ($bq) use ($search) {
+                    $bq->where('nomor_batch', 'like', "%{$search}%");
+                })->orWhereHas('user', function ($uq) use ($search) {
+                    $uq->where('nama_user', 'like', "%{$search}%");
+                });
             });
         }
 
-        $data = $query->orderBy('tanggal_keluar', 'desc')->get();
+        $data = $query->orderBy('tanggal_keluar', 'desc')->paginate(15)->withQueryString();
 
         return view('pages.laporan.obat-keluar', [
             'title'     => 'Laporan Obat Keluar',

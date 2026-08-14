@@ -18,8 +18,15 @@ class ObatKeluarController extends Controller
         $query = ObatKeluar::with(['obat', 'obatBatch', 'user']);
 
         if ($request->filled('search')) {
-            $query->whereHas('obat', function ($q) use ($request) {
-                $q->where('nama_obat', 'like', '%' . $request->search . '%');
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('obat', function ($oq) use ($search) {
+                    $oq->where('nama_obat', 'like', "%{$search}%");
+                })->orWhereHas('obatBatch', function ($bq) use ($search) {
+                    $bq->where('nomor_batch', 'like', "%{$search}%");
+                })->orWhereHas('user', function ($uq) use ($search) {
+                    $uq->where('nama_user', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -31,7 +38,7 @@ class ObatKeluarController extends Controller
             $query->where('tanggal_keluar', '<=', $request->tanggal_sampai);
         }
 
-        $obatKeluars = $query->latest()->paginate(15);
+        $obatKeluars = $query->latest('tanggal_keluar')->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.obat-keluar.index', [
             'title'       => 'Obat Keluar',

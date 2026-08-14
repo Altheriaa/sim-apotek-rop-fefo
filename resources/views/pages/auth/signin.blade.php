@@ -9,17 +9,17 @@
         <div
             class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-theme-sm dark:border-gray-800 dark:bg-white/[0.03] dark:backdrop-blur-md relative z-10">
             <!-- Header/Logo -->
-            <div class="mb-8 text-center">
-                <div class="mb-3 inline-flex items-center gap-2">
-                    <span class="text-2xl">💊</span>
-                    <span class="text-xl font-bold text-gray-800 dark:text-white">Apotek Tabah Farma</span>
+            <div class="mb-8">
+                <div class="mb-3 flex items-center gap-2">
+                    <img src="images/Logo Apotek Tabah Farma.png" alt="" width="58">
+                    <div>
+                        <span class="text-md sm:text-xl space-x-0.3 font-bold text-gray-800 dark:text-white">Sistem
+                            Informasi
+                            Manajemen Apotek
+                            Tabah
+                            Farma</span>
+                    </div>
                 </div>
-                <h1 class="text-xl font-semibold text-gray-800 dark:text-white/90">
-                    Login ke Sistem
-                </h1>
-                <p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
-                    Masukkan Email dan password Anda
-                </p>
             </div>
 
             {{-- Error Messages --}}
@@ -79,7 +79,7 @@
                                     <input type="checkbox" id="remember" name="remember" class="sr-only"
                                         @change="checkboxToggle = !checkboxToggle" />
                                     <div :class="checkboxToggle ? 'border-brand-500 bg-brand-500' :
-                                                                                'bg-transparent border-gray-300 dark:border-gray-700'"
+                                                                                                                                                                                                    'bg-transparent border-gray-300 dark:border-gray-700'"
                                         class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
                                         <span :class="checkboxToggle ? '' : 'opacity-0'">
                                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"

@@ -12,10 +12,15 @@ class SupplierController extends Controller
         $query = Supplier::query();
 
         if ($request->filled('search')) {
-            $query->where('nama_supplier', 'like', '%' . $request->search . '%');
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_supplier', 'like', "%{$search}%")
+                  ->orWhere('kontak', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%");
+            });
         }
 
-        $suppliers = $query->latest()->paginate(15);
+        $suppliers = $query->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.supplier.index', [
             'title'     => 'Data Supplier',

@@ -24,7 +24,7 @@ class PenggunaController extends Controller
             $query->where('role', $request->role);
         }
 
-        $penggunas = $query->latest()->paginate(15);
+        $penggunas = $query->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.pengguna.index', [
             'title'     => 'Data Pengguna',
@@ -44,7 +44,7 @@ class PenggunaController extends Controller
         $validated = $request->validate([
             'nama_user' => 'required|string|max:255',
             'username'  => 'required|string|max:100|unique:users,username',
-            'password'  => 'required|string|min:6|confirmed',
+            'password'  => 'required|string|min:6',
             'role'      => 'required|in:admin,karyawan',
         ]);
 
@@ -61,6 +61,7 @@ class PenggunaController extends Controller
         return view('pages.pengguna.edit', [
             'title'    => 'Edit Pengguna',
             'pengguna' => $pengguna,
+            'user'     => $pengguna,
         ]);
     }
 
@@ -69,9 +70,16 @@ class PenggunaController extends Controller
         $validated = $request->validate([
             'nama_user' => 'required|string|max:255',
             'username'  => ['required', 'string', 'max:100', Rule::unique('users')->ignore($pengguna->id)],
-            'password'  => 'nullable|string|min:6|confirmed',
+            'password'  => 'nullable|string|min:6',
             'role'      => 'required|in:admin,karyawan',
         ]);
+
+        if ($pengguna->id === auth()->id()) {
+            if ($validated['role'] !== $pengguna->role) {
+                return back()->withErrors(['role' => 'Anda tidak dapat mengubah role akun Anda sendiri.'])->withInput();
+            }
+            $validated['role'] = $pengguna->role;
+        }
 
         if (empty($validated['password'])) {
             unset($validated['password']);
