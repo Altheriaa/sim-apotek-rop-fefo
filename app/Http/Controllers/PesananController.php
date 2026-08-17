@@ -21,11 +21,12 @@ class PesananController extends Controller
                 if (is_numeric($cleanId)) {
                     $q->orWhere('id', $cleanId);
                 }
-                $q->orWhereHas('supplier', function ($sq) use ($search) {
-                    $sq->where('nama_supplier', 'like', "%{$search}%");
-                })->orWhereHas('detailPesanan.obat', function ($oq) use ($search) {
-                    $oq->where('nama_obat', 'like', "%{$search}%");
-                });
+                $q->orWhere('kode_pesanan', 'like', "%{$search}%")
+                  ->orWhereHas('supplier', function ($sq) use ($search) {
+                      $sq->where('nama_supplier', 'like', "%{$search}%");
+                  })->orWhereHas('detailPesanan.obat', function ($oq) use ($search) {
+                      $oq->where('nama_obat', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -71,7 +72,10 @@ class PesananController extends Controller
             'items.*.jumlah_pesan' => 'required|integer|min:1',
         ]);
 
+        $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad(Pesanan::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+
         $pesanan = Pesanan::create([
+            'kode_pesanan'  => $kodePesanan,
             'supplier_id'   => $validated['supplier_id'],
             'user_id'       => auth()->id(),
             'tanggal_pesan' => $validated['tanggal_pesan'],

@@ -31,10 +31,16 @@
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <!-- Kode Obat -->
                 <div>
-                    <label for="kode_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kode Obat</label>
-                    <input type="text" id="kode_obat" name="kode_obat" value="{{ old('kode_obat') }}" required
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
-                           placeholder="Contoh: OB001">
+                    <div class="mb-2">
+                        <label for="kode_obat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Kode Obat <span class="text-xs font-normal text-brand-600 dark:text-brand-400 font-mono">(Otomatis oleh Sistem)</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="kode_obat" name="kode_obat" value="{{ old('kode_obat', $kodeOtomatis) }}" readonly
+                               class="h-11 w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2.5 text-sm font-mono font-bold text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 cursor-not-allowed transition duration-150"
+                               placeholder="Contoh: OBT-001">
+                    </div>
                 </div>
 
                 <!-- Nama Obat -->

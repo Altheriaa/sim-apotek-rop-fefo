@@ -28,7 +28,8 @@
         @endif
 
         <!-- Table Card with Integrated Toolbar -->
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
+        <div
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <!-- Toolbar / Filter Header -->
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
                 <form action="{{ route('obat.index') }}" method="GET"
@@ -36,7 +37,8 @@
                     <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                         <!-- Search Input -->
                         <div class="relative flex-1 max-w-md">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
+                            <span
+                                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -52,12 +54,16 @@
                             <select name="status" onchange="this.form.submit()"
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150 cursor-pointer">
                                 <option value="" class="dark:bg-gray-900">Semua Status Stok</option>
-                                <option value="rop" {{ request('status') === 'rop' ? 'selected' : '' }} class="dark:bg-gray-900">⚠️ Perlu Reorder (≤ ROP)</option>
-                                <option value="aman" {{ request('status') === 'aman' ? 'selected' : '' }} class="dark:bg-gray-900">✅ Stok Aman (> ROP)</option>
+                                <option value="rop" {{ request('status') === 'rop' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">⚠️ Perlu Reorder (≤ ROP)</option>
+                                <option value="aman" {{ request('status') === 'aman' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">✅ Stok Aman (> ROP)</option>
                             </select>
-                            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <span
+                                class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </div>
@@ -85,24 +91,33 @@
                     <thead>
                         <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">#</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Kode Obat</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Nama Obat</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Satuan</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Stok Total</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">ROP Minimum</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Status Stok</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Harga</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($obats as $obat)
                             @php
-                                $stokTotal = $obat->total_stok_sisa ?? $obat->stok_total;
+                                $stokGudang = (int) ($obat->total_stok_gudang ?? 0);
+                                $stokRak = (int) ($obat->total_stok_rak ?? 0);
+                                $stokTotal = $stokGudang + $stokRak;
                                 $isRop = $stokTotal <= $obat->rop_minimum;
                             @endphp
                             <tr
                                 class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $loop->iteration + ($obats->currentPage() - 1) * $obats->perPage() }}
+                                </td>
+                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                                    <a href="{{ route('obat.show', $obat->id) }}" class="hover:text-brand-500 transition">
+                                        {{ $obat->kode_obat }}
+                                    </a>
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
                                     <a href="{{ route('obat.show', $obat->id) }}" class="hover:text-brand-500 transition">
@@ -123,6 +138,9 @@
                                         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $isRop ? 'bg-error-100 text-error-700 dark:bg-error-900/30 dark:text-error-400' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400' }}">
                                         {{ $isRop ? ' Perlu Reorder' : ' Aman' }}
                                     </span>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                    Rp {{ $obat->harga }}
                                 </td>
                                 <td class="px-5 py-4 text-sm">
                                     <div class="flex items-center gap-1.5">

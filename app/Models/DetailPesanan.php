@@ -13,6 +13,7 @@ class DetailPesanan extends Model
         'pesanan_id',
         'obat_id',
         'jumlah_pesan',
+        'estimasi_harga',
     ];
 
     // ── Relations ──

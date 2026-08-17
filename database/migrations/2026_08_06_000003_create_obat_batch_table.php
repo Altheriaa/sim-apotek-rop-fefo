@@ -14,9 +14,11 @@ return new class extends Migration
             $table->foreignId('supplier_id')->nullable()->constrained('supplier')->nullOnDelete();
             $table->string('nomor_batch')->nullable();
             $table->date('tanggal_masuk');
-            $table->date('tanggal_kadaluwarsa');
+            $table->date('tanggal_kadaluwarsa');          // Kunci utama FEFO
             $table->integer('stok_awal');
-            $table->integer('stok_sisa');
+            $table->integer('stok_gudang')->default(0);   // Sisa stok di gudang fisik
+            $table->integer('stok_rak')->default(0);      // Sisa stok di display rak
+            $table->decimal('harga_beli', 12, 2)->default(0);
             $table->timestamps();
         });
     }

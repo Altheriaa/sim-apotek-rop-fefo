@@ -30,7 +30,27 @@ class Notifikasi extends Model
         return $this->belongsTo(Obat::class);
     }
 
-    // ── Helpers ──
+    // ── Helpers & UI Formatters ──
+
+    public function getJudulAttribute(): string
+    {
+        return match ($this->jenis_notifikasi) {
+            'stok_menipis'          => 'Peringatan ROP (Stok Menipis)',
+            'restock_rak'           => 'Restock Rak Dibutuhkan',
+            'mendekati_kadaluwarsa' => 'Mendekati Kadaluwarsa',
+            'kadaluwarsa'           => 'Obat Kadaluwarsa',
+            default                 => 'Pemberitahuan Stok',
+        };
+    }
+
+    public function getPesanRapiAttribute(): string
+    {
+        // Hilangkan judul baris pertama jika duplikat
+        $clean = preg_replace('/^\*?[^\n]+\*\n+/u', '', $this->pesan);
+        // Bersihkan tanda format WhatsApp
+        $clean = str_replace(['*'], '', $clean);
+        return trim($clean);
+    }
 
     public function isPending(): bool
     {

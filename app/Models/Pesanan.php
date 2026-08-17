@@ -11,10 +11,12 @@ class Pesanan extends Model
     protected $table = 'pesanan';
 
     protected $fillable = [
+        'kode_pesanan',
         'supplier_id',
         'user_id',
         'tanggal_pesan',
         'status',
+        'catatan',
     ];
 
     protected $casts = [

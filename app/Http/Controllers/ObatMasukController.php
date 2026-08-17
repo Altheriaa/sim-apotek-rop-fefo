@@ -27,8 +27,8 @@ class ObatMasukController extends Controller
             });
         }
 
-        $tanggalDari = $request->tanggal_dari ?? $request->start_date;
-        $tanggalSampai = $request->tanggal_sampai ?? $request->end_date;
+        $tanggalDari   = $request->tanggal_dari;
+        $tanggalSampai = $request->tanggal_sampai;
 
         if ($tanggalDari) {
             $query->where('tanggal_masuk', '>=', $tanggalDari);
@@ -51,7 +51,7 @@ class ObatMasukController extends Controller
         $batches = $query->latest('tanggal_masuk')->latest('id')->paginate(10)->withQueryString();
 
         return view('pages.obat-masuk.index', [
-            'title'   => 'Obat Masuk (Batch)',
+            'title'   => 'Obat Masuk (Gudang)',
             'batches' => $batches,
         ]);
     }
@@ -68,38 +68,62 @@ class ObatMasukController extends Controller
         ]);
     }
 
+    public function generateBatchNumber(Request $request)
+    {
+        $obatId = $request->query('obat_id');
+        $nomorBatch = ObatBatch::generateNomorBatch($obatId ? (int) $obatId : null);
+
+        return response()->json([
+            'nomor_batch' => $nomorBatch,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'obat_id'              => 'required|exists:obat,id',
-            'supplier_id'          => 'required|exists:supplier,id',
-            'nomor_batch'          => 'required|string|max:100',
-            'tanggal_kadaluwarsa'  => 'required|date|after:today',
-            'jumlah'               => 'required|integer|min:1',
-            'harga_beli'           => 'required|numeric|min:0',
+            'obat_id'             => 'required|exists:obat,id',
+            'supplier_id'         => 'required|exists:supplier,id',
+            'nomor_batch'         => 'nullable|string|max:100',
+            'tanggal_kadaluwarsa' => 'required|date|after:today',
+            'jumlah'              => 'required|integer|min:1',
+            'harga_beli'          => 'required|numeric|min:0',
         ]);
+
+        if (empty($validated['nomor_batch'])) {
+            $validated['nomor_batch'] = ObatBatch::generateNomorBatch((int) $validated['obat_id']);
+        }
 
         DB::beginTransaction();
         try {
             ObatBatch::create([
-                'obat_id' => $validated['obat_id'],
-                'supplier_id' => $validated['supplier_id'],
-                'nomor_batch' => $validated['nomor_batch'],
-                'tanggal_masuk' => now()->toDateString(),
+                'obat_id'             => $validated['obat_id'],
+                'supplier_id'         => $validated['supplier_id'],
+                'nomor_batch'         => $validated['nomor_batch'],
+                'tanggal_masuk'       => now()->toDateString(),
                 'tanggal_kadaluwarsa' => $validated['tanggal_kadaluwarsa'],
-                'stok_awal' => $validated['jumlah'],
-                'stok_sisa' => $validated['jumlah'],
-                // Add harga_beli to ObatBatch if it's there, but wait, is harga_beli in ObatBatch? 
-                // Let's check ObatBatch migration. It wasn't there. So I'll ignore harga_beli or log it elsewhere if needed.
-                // Or maybe just let it be ignored by Eloquent.
+                'stok_awal'           => $validated['jumlah'],
+                'stok_gudang'         => $validated['jumlah'],  // Masuk ke GUDANG
+                'stok_rak'            => 0,                     // Rak mulai dari 0
+                'harga_beli'          => $validated['harga_beli'],
             ]);
+
             DB::commit();
 
             return redirect()->route('obat-masuk.index')
-                ->with('success', 'Transaksi obat masuk berhasil dicatat.');
+                ->with('success', "Obat masuk berhasil dicatat. Stok masuk ke gudang sebanyak {$validated['jumlah']} {$validated['nomor_batch']}.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
+    }
+
+    public function show($id)
+    {
+        $batch = ObatBatch::with(['obat', 'supplier'])->findOrFail($id);
+
+        return view('pages.obat-masuk.show', [
+            'title' => 'Detail Obat Masuk',
+            'batch' => $batch,
+        ]);
     }
 }

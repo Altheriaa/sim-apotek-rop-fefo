@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('notifikasi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('obat_id')->nullable()->constrained('obat')->nullOnDelete();
-            $table->string('jenis_notifikasi'); // stok_menipis | mendekati_kadaluwarsa
+            $table->foreignId('obat_id')->nullable()->constrained('obat');
+            $table->enum('jenis_notifikasi', ['stok_menipis', 'mendekati_kadaluwarsa', 'restock_rak']);
             $table->text('pesan');
             $table->string('target_nomor');
-            $table->string('status')->default('pending'); // pending | terkirim | gagal
+            $table->enum('status', ['pending', 'terkirim', 'gagal'])->default('pending');
             $table->string('fonnte_id')->nullable();
             $table->timestamp('dikirim_at')->nullable();
             $table->timestamps();

@@ -49,9 +49,10 @@
             </button>
 
             <!-- Logo (mobile only) -->
-            <a href="/" class="xl:hidden">
-                <img class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" />
-                <img class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" />
+            <a href="/" class="xl:hidden flex items-center gap-2">
+                <img class="dark:hidden" width="40px" src="images/Logo Apotek Tabah Farma.png" alt="Logo" />
+                <h1 class="font-bold">Apotek Tabah Farma</h1>
+                <img class="hidden dark:block" width="40px" src="images/Logo Apotek Tabah Farma.png" alt="Logo" />
             </a>
 
             <!-- Application Menu Toggle (mobile only) -->

@@ -45,9 +45,14 @@ class User extends Authenticatable
 
     // ── Relations ──
 
-    public function obatKeluar(): HasMany
+    public function transferRak(): HasMany
     {
-        return $this->hasMany(ObatKeluar::class);
+        return $this->hasMany(TransferRak::class);
+    }
+
+    public function penjualan(): HasMany
+    {
+        return $this->hasMany(Penjualan::class);
     }
 
     public function pesanan(): HasMany

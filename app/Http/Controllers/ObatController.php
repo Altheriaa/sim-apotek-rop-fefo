@@ -9,21 +9,27 @@ class ObatController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Obat::query()->withSum('batches as total_stok_sisa', 'stok_sisa');
+        // Gabung stok_gudang + stok_rak sebagai total stok
+        $query = Obat::query()
+            ->withSum('batches as total_stok_gudang', 'stok_gudang')
+            ->withSum('batches as total_stok_rak', 'stok_rak');
 
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('nama_obat', 'like', "%{$search}%")
+                  ->orWhere('kode_obat', 'like', "%{$search}%")
+                  ->orWhere('kategori', 'like', "%{$search}%")
                   ->orWhere('satuan', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('status')) {
             if ($request->status === 'rop') {
-                $query->havingRaw('COALESCE(total_stok_sisa, 0) <= obat.rop_minimum');
+                // Total stok (gudang+rak) ≤ ROP minimum
+                $query->whereRaw('(SELECT COALESCE(SUM(stok_gudang)+SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) <= obat.rop_minimum');
             } elseif ($request->status === 'aman') {
-                $query->havingRaw('COALESCE(total_stok_sisa, 0) > obat.rop_minimum');
+                $query->whereRaw('(SELECT COALESCE(SUM(stok_gudang)+SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) > obat.rop_minimum');
             }
         }
 
@@ -37,18 +43,29 @@ class ObatController extends Controller
 
     public function create()
     {
+        $kodeOtomatis = Obat::generateKodeObat();
+
         return view('pages.obat.create', [
-            'title' => 'Tambah Obat',
+            'title'        => 'Tambah Obat',
+            'kodeOtomatis' => $kodeOtomatis,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'kode_obat'    => 'nullable|string|max:50|unique:obat,kode_obat',
             'nama_obat'    => 'required|string|max:255',
+            'kategori'     => 'nullable|string|max:100',
             'satuan'       => 'required|string|max:50',
+            'harga'        => 'required|numeric|min:0',
             'rop_minimum'  => 'required|integer|min:0',
+            'min_stok_rak' => 'required|integer|min:0',
         ]);
+
+        if (empty($validated['kode_obat'])) {
+            $validated['kode_obat'] = Obat::generateKodeObat();
+        }
 
         Obat::create($validated);
 
@@ -58,9 +75,12 @@ class ObatController extends Controller
 
     public function show(Obat $obat)
     {
-        $obat->load(['batches' => function ($query) {
-            $query->orderBy('tanggal_kadaluwarsa', 'asc');
-        }, 'batches.supplier']);
+        $obat->load([
+            'batches' => function ($query) {
+                $query->orderBy('tanggal_kadaluwarsa', 'asc');
+            },
+            'batches.supplier',
+        ]);
 
         return view('pages.obat.show', [
             'title' => 'Detail Obat: ' . $obat->nama_obat,
@@ -79,9 +99,13 @@ class ObatController extends Controller
     public function update(Request $request, Obat $obat)
     {
         $validated = $request->validate([
+            'kode_obat'    => 'nullable|string|max:50|unique:obat,kode_obat,' . $obat->id,
             'nama_obat'    => 'required|string|max:255',
+            'kategori'     => 'nullable|string|max:100',
             'satuan'       => 'required|string|max:50',
+            'harga'        => 'required|numeric|min:0',
             'rop_minimum'  => 'required|integer|min:0',
+            'min_stok_rak' => 'required|integer|min:0',
         ]);
 
         $obat->update($validated);

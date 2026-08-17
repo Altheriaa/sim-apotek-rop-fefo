@@ -10,10 +10,12 @@ return new class extends Migration
     {
         Schema::create('pesanan', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_pesanan')->unique();
             $table->foreignId('supplier_id')->constrained('supplier');
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->date('tanggal_pesan');
-            $table->string('status')->default('draft'); // draft, diproses, dikirim, selesai
+            $table->enum('status', ['draft', 'diproses', 'dikirim', 'selesai', 'batal'])->default('draft');
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
 
@@ -22,6 +24,7 @@ return new class extends Migration
             $table->foreignId('pesanan_id')->constrained('pesanan')->cascadeOnDelete();
             $table->foreignId('obat_id')->constrained('obat');
             $table->integer('jumlah_pesan');
+            $table->decimal('estimasi_harga', 12, 2)->default(0);
             $table->timestamps();
         });
     }

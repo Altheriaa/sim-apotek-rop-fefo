@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Obat Keluar</h1>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Transfer ke Rak</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Pilih rentang tanggal untuk melihat atau mengunduh
                     laporan.</p>
             </div>
@@ -81,8 +81,9 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Obat</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Petugas</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Jumlah Keluar</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Batch FEFO</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Jumlah Transfer</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Batch (FEFO)</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,7 +94,7 @@
                                     {{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
-                                    {{ \Carbon\Carbon::parse($row->tanggal_keluar)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($row->tanggal_transfer)->format('d M Y') }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
                                     {{ $row->obat->nama_obat ?? '-' }}
@@ -101,17 +102,23 @@
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $row->user->nama_user ?? '-' }}
                                 </td>
-                                <td class="px-5 py-4 text-sm font-bold text-error-600 dark:text-error-400">
-                                    -{{ $row->jumlah }} {{ $row->obat->satuan ?? '' }}
+                                <td class="px-5 py-4 text-sm font-bold text-brand-600 dark:text-brand-400">
+                                    {{ $row->jumlah }} {{ $row->obat->satuan ?? '' }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-mono text-gray-600 dark:text-gray-400">
                                     {{ $row->obatBatch->nomor_batch ?? '-' }}
+                                    @if($row->obatBatch)
+                                        <div class="text-xs text-gray-400">ED: {{ $row->obatBatch->tanggal_kadaluwarsa->format('d/m/Y') }}</div>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $row->keterangan ?? '-' }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    Tidak ada data pada rentang tanggal atau filter ini.
+                                <td colspan="7" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    Tidak ada data transfer rak pada rentang tanggal atau filter ini.
                                 </td>
                             </tr>
                         @endforelse

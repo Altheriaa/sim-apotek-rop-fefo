@@ -10,9 +10,13 @@ return new class extends Migration
     {
         Schema::create('obat', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_obat')->unique()->nullable();
             $table->string('nama_obat');
+            $table->string('kategori')->nullable();
             $table->string('satuan');
-            $table->integer('rop_minimum')->default(0);
+            $table->decimal('harga', 12, 2)->default(0);       // Harga jual ke pasien
+            $table->integer('rop_minimum')->default(10);        // Titik pemesanan ulang ke supplier
+            $table->integer('min_stok_rak')->default(5);        // Batas minimum stok di display rak
             $table->timestamps();
         });
     }

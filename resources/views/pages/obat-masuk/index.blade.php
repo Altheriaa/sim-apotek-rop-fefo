@@ -32,10 +32,11 @@
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <!-- Toolbar / Filter Header -->
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
-                <form action="{{ route('obat-masuk.index') }}" method="GET" class="flex flex-col gap-3.5">
-                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <form action="{{ route('obat-masuk.index') }}" method="GET"
+                    class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                    <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center flex-wrap">
                         <!-- Search Input -->
-                        <div class="relative">
+                        <div class="relative flex-1 min-w-[200px]">
                             <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -48,10 +49,10 @@
                         </div>
 
                         <!-- Status ED Filter with Custom Chevron -->
-                        <div class="relative">
+                        <div class="relative w-full sm:w-52">
                             <select name="status_ed" onchange="this.form.submit()"
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150 cursor-pointer">
-                                <option value="" class="dark:bg-gray-900">Semua Status Kadaluwarsa</option>
+                                <option value="" class="dark:bg-gray-900">Semua Status ED</option>
                                 <option value="safe" {{ request('status_ed') === 'safe' ? 'selected' : '' }} class="dark:bg-gray-900">✅ Aman (> 30 hari)</option>
                                 <option value="expiring" {{ request('status_ed') === 'expiring' ? 'selected' : '' }} class="dark:bg-gray-900">⏰ Mendekati ED (≤ 30 hari)</option>
                                 <option value="expired" {{ request('status_ed') === 'expired' ? 'selected' : '' }} class="dark:bg-gray-900">❌ Sudah Kadaluwarsa</option>
@@ -64,29 +65,29 @@
                         </div>
 
                         <!-- Tanggal Dari -->
-                        <div>
+                        <div class="w-full sm:w-36">
                             <input type="date" name="tanggal_dari" value="{{ request('tanggal_dari', request('start_date')) }}"
-                                class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150"
+                                class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3 text-xs text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150"
                                 title="Tanggal Masuk Dari">
                         </div>
 
                         <!-- Tanggal Sampai -->
-                        <div>
+                        <div class="w-full sm:w-36">
                             <input type="date" name="tanggal_sampai"
                                 value="{{ request('tanggal_sampai', request('end_date')) }}"
-                                class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:focus:border-brand-800 dark:focus:bg-gray-900 transition duration-150"
+                                class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3 text-xs text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:focus:border-brand-800 dark:focus:bg-gray-900 transition duration-150"
                                 title="Tanggal Masuk Sampai">
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
+                    <div class="flex items-center gap-2">
                         <button type="submit"
-                            class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
-                            Filter Data
+                            class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
+                            Filter
                         </button>
                         @if(request()->hasAny(['search', 'status_ed', 'tanggal_dari', 'tanggal_sampai', 'start_date', 'end_date']))
                             <a href="{{ route('obat-masuk.index') }}"
-                                class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150"
+                                class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150"
                                 title="Reset Filter">
                                 Reset
                             </a>
@@ -107,7 +108,8 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">No. Batch</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Tgl. ED</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Stok Masuk</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Sisa Stok</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Di Gudang</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Di Rak</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -143,8 +145,11 @@
                                 <td class="px-5 py-4 text-sm font-bold text-success-600 dark:text-success-400">
                                     +{{ $trx->stok_awal }} {{ $trx->obat->satuan ?? '' }}
                                 </td>
-                                <td class="px-5 py-4 text-sm font-semibold text-gray-800 dark:text-white/90">
-                                    {{ $trx->stok_sisa }} {{ $trx->obat->satuan ?? '' }}
+                                <td class="px-5 py-4 text-center text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                    {{ $trx->stok_gudang }} {{ $trx->obat->satuan ?? '' }}
+                                </td>
+                                <td class="px-5 py-4 text-center text-sm font-semibold text-green-600 dark:text-green-400">
+                                    {{ $trx->stok_rak }} {{ $trx->obat->satuan ?? '' }}
                                 </td>
                             </tr>
                         @empty

@@ -8,19 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('obat_keluar', function (Blueprint $table) {
+        // Tabel riwayat transfer stok dari Gudang ke Display Rak (FEFO Gudang)
+        Schema::create('transfer_rak', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('obat_id')->constrained('obat')->cascadeOnDelete();
-            $table->foreignId('obat_batch_id')->constrained('obat_batch')->cascadeOnDelete();
+            $table->foreignId('obat_id')->constrained('obat');
+            $table->foreignId('obat_batch_id')->constrained('obat_batch');
             $table->foreignId('user_id')->constrained('users');
-            $table->date('tanggal_keluar');
             $table->integer('jumlah');
+            $table->date('tanggal_transfer');
+            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('obat_keluar');
+        Schema::dropIfExists('transfer_rak');
     }
 };

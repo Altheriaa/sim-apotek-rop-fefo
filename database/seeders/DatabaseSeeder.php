@@ -10,16 +10,13 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         // ── Users ──
         User::create([
             'nama_user' => 'Administrator',
             'username'  => 'admin',
-            'email'  => 'admin@gmail.com',
+            'email'     => 'admin@gmail.com',
             'password'  => 'password',
             'role'      => 'admin',
         ]);
@@ -27,7 +24,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'nama_user' => 'Karyawan Apotek',
             'username'  => 'karyawan',
-            'email'  => 'karyawan@gmail.com',
+            'email'     => 'karyawan@gmail.com',
             'password'  => 'password',
             'role'      => 'karyawan',
         ]);
@@ -51,39 +48,59 @@ class DatabaseSeeder extends Seeder
             'kontak'        => '022-2034567',
         ]);
 
-        // ── Obat ──
+        // ── Master Obat ──
         $obat1 = Obat::create([
-            'nama_obat'   => 'Paracetamol 500mg',
-            'satuan'      => 'Tablet',
-            'rop_minimum' => 50,
+            'kode_obat'    => 'OBT-001',
+            'nama_obat'    => 'Paracetamol 500mg',
+            'kategori'     => 'Analgesik',
+            'satuan'       => 'Tablet',
+            'harga'        => 2500,
+            'rop_minimum'  => 50,
+            'min_stok_rak' => 10,
         ]);
 
         $obat2 = Obat::create([
-            'nama_obat'   => 'Amoxicillin 500mg',
-            'satuan'      => 'Kapsul',
-            'rop_minimum' => 30,
+            'kode_obat'    => 'OBT-002',
+            'nama_obat'    => 'Amoxicillin 500mg',
+            'kategori'     => 'Antibiotik',
+            'satuan'       => 'Kapsul',
+            'harga'        => 4500,
+            'rop_minimum'  => 30,
+            'min_stok_rak' => 8,
         ]);
 
         $obat3 = Obat::create([
-            'nama_obat'   => 'Omeprazole 20mg',
-            'satuan'      => 'Kapsul',
-            'rop_minimum' => 20,
+            'kode_obat'    => 'OBT-003',
+            'nama_obat'    => 'Omeprazole 20mg',
+            'kategori'     => 'Lambung',
+            'satuan'       => 'Kapsul',
+            'harga'        => 5000,
+            'rop_minimum'  => 20,
+            'min_stok_rak' => 5,
         ]);
 
         $obat4 = Obat::create([
-            'nama_obat'   => 'Cetirizine 10mg',
-            'satuan'      => 'Tablet',
-            'rop_minimum' => 25,
+            'kode_obat'    => 'OBT-004',
+            'nama_obat'    => 'Cetirizine 10mg',
+            'kategori'     => 'Antihistamin',
+            'satuan'       => 'Tablet',
+            'harga'        => 3500,
+            'rop_minimum'  => 25,
+            'min_stok_rak' => 5,
         ]);
 
         $obat5 = Obat::create([
-            'nama_obat'   => 'Metformin 500mg',
-            'satuan'      => 'Tablet',
-            'rop_minimum' => 40,
+            'kode_obat'    => 'OBT-005',
+            'nama_obat'    => 'Metformin 500mg',
+            'kategori'     => 'Diabetes',
+            'satuan'       => 'Tablet',
+            'harga'        => 3000,
+            'rop_minimum'  => 40,
+            'min_stok_rak' => 10,
         ]);
 
-        // ── Obat Batch (contoh data FEFO) ──
-        // Paracetamol: 2 batch dengan ED berbeda
+        // ── Obat Batch (Multi-Lokasi: stok_gudang + stok_rak) ──
+        // Paracetamol: 2 batch, ED berbeda. Batch 1 lebih dekat ED → FEFO prioritas
         ObatBatch::create([
             'obat_id'             => $obat1->id,
             'supplier_id'         => $supplier1->id,
@@ -91,7 +108,9 @@ class DatabaseSeeder extends Seeder
             'tanggal_masuk'       => '2026-07-01',
             'tanggal_kadaluwarsa' => '2027-07-01',
             'stok_awal'           => 100,
-            'stok_sisa'           => 80,
+            'stok_gudang'         => 60,  // Masih di gudang
+            'stok_rak'            => 20,  // Sudah di rak
+            'harga_beli'          => 2000,
         ]);
 
         ObatBatch::create([
@@ -101,18 +120,22 @@ class DatabaseSeeder extends Seeder
             'tanggal_masuk'       => '2026-08-01',
             'tanggal_kadaluwarsa' => '2028-02-01',
             'stok_awal'           => 100,
-            'stok_sisa'           => 100,
+            'stok_gudang'         => 100,
+            'stok_rak'            => 0,
+            'harga_beli'          => 2000,
         ]);
 
-        // Amoxicillin: 1 batch mendekati ED
+        // Amoxicillin: 1 batch, mendekati ED (August 2026)
         ObatBatch::create([
             'obat_id'             => $obat2->id,
             'supplier_id'         => $supplier2->id,
             'nomor_batch'         => 'AMX-2025-010',
             'tanggal_masuk'       => '2025-12-15',
-            'tanggal_kadaluwarsa' => '2026-09-01',
+            'tanggal_kadaluwarsa' => '2026-09-15',
             'stok_awal'           => 50,
-            'stok_sisa'           => 35,
+            'stok_gudang'         => 25,
+            'stok_rak'            => 10,
+            'harga_beli'          => 3500,
         ]);
 
         // Omeprazole
@@ -123,10 +146,12 @@ class DatabaseSeeder extends Seeder
             'tanggal_masuk'       => '2026-06-01',
             'tanggal_kadaluwarsa' => '2028-06-01',
             'stok_awal'           => 60,
-            'stok_sisa'           => 45,
+            'stok_gudang'         => 35,
+            'stok_rak'            => 10,
+            'harga_beli'          => 4000,
         ]);
 
-        // Cetirizine: stok mendekati ROP
+        // Cetirizine: stok rak kritis (stok_rak ≤ min_stok_rak=5)
         ObatBatch::create([
             'obat_id'             => $obat4->id,
             'supplier_id'         => $supplier3->id,
@@ -134,7 +159,9 @@ class DatabaseSeeder extends Seeder
             'tanggal_masuk'       => '2026-05-01',
             'tanggal_kadaluwarsa' => '2027-11-01',
             'stok_awal'           => 40,
-            'stok_sisa'           => 10, // di bawah ROP 25!
+            'stok_gudang'         => 5,   // Hampir habis di gudang
+            'stok_rak'            => 3,   // Kritis! ≤ min_stok_rak (5)
+            'harga_beli'          => 2800,
         ]);
 
         // Metformin
@@ -145,7 +172,9 @@ class DatabaseSeeder extends Seeder
             'tanggal_masuk'       => '2026-07-15',
             'tanggal_kadaluwarsa' => '2028-01-15',
             'stok_awal'           => 200,
-            'stok_sisa'           => 150,
+            'stok_gudang'         => 130,
+            'stok_rak'            => 20,
+            'harga_beli'          => 2500,
         ]);
     }
 }
