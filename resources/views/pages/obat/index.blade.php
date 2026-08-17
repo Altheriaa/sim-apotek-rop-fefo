@@ -144,7 +144,7 @@
                                 </td>
                                 <td class="px-5 py-4 text-sm">
                                     <div class="flex items-center gap-1.5">
-                                        <a href="{{ route('obat.show', $obat->id) }}"
+                                        {{-- <a href="{{ route('obat.show', $obat->id) }}"
                                             class="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-brand-50 dark:text-gray-400 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 transition"
                                             title="Lihat Detail & Batch">
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,7 +153,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                        </a>
+                                        </a> --}}
                                         <a href="{{ route('obat.edit', $obat->id) }}"
                                             class="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-brand-50 dark:text-gray-400 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 transition"
                                             title="Edit Obat">

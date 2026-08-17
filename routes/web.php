@@ -49,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Data Obat (lihat saja untuk karyawan)
         Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
-        Route::get('/obat/{obat}', [ObatController::class, 'show'])->name('obat.show');
+        Route::get('/obat/{obat}', [ObatController::class, 'show'])->whereNumber('obat')->name('obat.show');
 
         // Stok Gudang (lihat saja)
         Route::get('/stok-gudang', [StokGudangController::class, 'index'])->name('stok-gudang.index');
@@ -69,12 +69,12 @@ Route::middleware(['auth'])->group(function () {
     // ─────────────────────────────────────────────────────────────────
     Route::middleware(['role:admin'])->group(function () {
 
-        // CRUD Obat Master
+        // CRUD Obat Master (Admin)
         Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
         Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
-        Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->name('obat.edit');
-        Route::put('/obat/{obat}', [ObatController::class, 'update'])->name('obat.update');
-        Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->name('obat.destroy');
+        Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->whereNumber('obat')->name('obat.edit');
+        Route::put('/obat/{obat}', [ObatController::class, 'update'])->whereNumber('obat')->name('obat.update');
+        Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->whereNumber('obat')->name('obat.destroy');
 
         // Supplier
         Route::resource('supplier', SupplierController::class);
