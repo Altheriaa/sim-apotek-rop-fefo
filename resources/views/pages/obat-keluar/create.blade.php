@@ -44,7 +44,7 @@
                             <option value="" disabled selected class="dark:bg-gray-900">Pilih Obat...</option>
                             @foreach($obats as $obat)
                                 <option value="{{ $obat->id }}" {{ old('obat_id') == $obat->id ? 'selected' : '' }} class="dark:bg-gray-900">
-                                    {{ $obat->kode_obat }} - {{ $obat->nama_obat }} (Stok: {{ $obat->stok_total }} {{ $obat->satuan }})
+                                    {{ $obat->kode_obat }} - {{ $obat->nama_obat }} (Stok: {{ $obat->stok_total }} {{ $obat->satuan_jual }})
                                 </option>
                             @endforeach
                         </select>

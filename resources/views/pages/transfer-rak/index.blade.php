@@ -93,8 +93,12 @@
                                     {{ $tr->obatBatch ? $tr->obatBatch->tanggal_kadaluwarsa->format('d M Y') : '-' }}
                                 </td>
                                 <td class="px-5 py-4 text-center">
-                                    <span class="font-bold text-brand-600 dark:text-brand-400">{{ $tr->jumlah }}</span>
-                                    <span class="text-xs text-gray-400 ml-0.5">{{ $tr->obat->satuan ?? '' }}</span>
+                                    <div class="font-bold text-brand-600 dark:text-brand-400">
+                                        {{ $tr->jumlah_keluar }} <span class="text-xs font-normal text-gray-500">{{ $tr->obat->satuan_beli ?? '' }}</span>
+                                    </div>
+                                    <div class="text-xs text-green-600 dark:text-green-400 font-medium">
+                                        → {{ $tr->jumlah_masuk_rak }} {{ $tr->obat->satuan_jual ?? '' }}
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $tr->user->nama_user ?? '-' }}

@@ -20,11 +20,11 @@ class DashboardController extends Controller
         $totalStokRak   = (int) ObatBatch::sum('stok_rak');
         $totalStok      = $totalStokGudang + $totalStokRak;
 
-        // Obat kritis: Total Apotek (gudang+rak) ≤ ROP
+        // Obat kritis: Total Apotek (satuan_jual) ≤ ROP Minimum (satuan_beli × isi_per_kemasan)
         $obatKritisCount = 0;
         $obatList        = Obat::where('rop_minimum', '>', 0)->get();
         foreach ($obatList as $obat) {
-            if ($obat->stok_total <= $obat->rop_minimum) {
+            if ($obat->stok_total <= ($obat->rop_minimum * $obat->isi_per_kemasan)) {
                 $obatKritisCount++;
             }
         }
@@ -50,7 +50,7 @@ class DashboardController extends Controller
             ->get();
 
         // Transfer rak hari ini
-        $transferHariIni = TransferRak::whereDate('tanggal_transfer', today())->sum('jumlah');
+        $transferHariIni = TransferRak::whereDate('tanggal_transfer', today())->sum('jumlah_masuk_rak');
 
         // Notifikasi terbaru
         $notifikasiTerbaru = Notifikasi::with('obat')

@@ -106,8 +106,9 @@
                             @php
                                 $stokGudang = (int) ($obat->total_stok_gudang ?? 0);
                                 $stokRak = (int) ($obat->total_stok_rak ?? 0);
-                                $stokTotal = $stokGudang + $stokRak;
-                                $isRop = $stokTotal <= $obat->rop_minimum;
+                                $stokTotal = ($stokGudang * ($obat->isi_per_kemasan ?? 1)) + $stokRak;
+                                $batasRopSatuanJual = $obat->rop_minimum * ($obat->isi_per_kemasan ?? 1);
+                                $isRop = $obat->rop_minimum > 0 && $stokTotal <= $batasRopSatuanJual;
                             @endphp
                             <tr
                                 class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
@@ -115,23 +116,32 @@
                                     {{ $loop->iteration + ($obats->currentPage() - 1) * $obats->perPage() }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
-                                    <a href="{{ route('obat.show', $obat->id) }}" class="hover:text-brand-500 transition">
+                                    <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
                                         {{ $obat->kode_obat }}
                                     </a>
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
-                                    <a href="{{ route('obat.show', $obat->id) }}" class="hover:text-brand-500 transition">
+                                    <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
                                         {{ $obat->nama_obat }}
                                     </a>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $obat->satuan }}
+                                    <div class="font-medium text-gray-700 dark:text-gray-300">{{ $obat->satuan_jual }}</div>
+                                    @if($obat->isi_per_kemasan > 1)
+                                        <div class="text-[11px] text-gray-400">1 {{ $obat->satuan_beli }} = {{ $obat->isi_per_kemasan }} {{ $obat->satuan_jual }}</div>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90">
-                                    {{ $stokTotal }} {{ $obat->satuan }}
+                                    {{ $stokTotal }} {{ $obat->satuan_jual }}
+                                    <div class="text-[11px] font-normal text-gray-400">
+                                        ({{ $stokGudang }} {{ $obat->satuan_beli }} + {{ $stokRak }} {{ $obat->satuan_jual }})
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $obat->rop_minimum }} {{ $obat->satuan }}
+                                    <div class="font-semibold text-gray-800 dark:text-white/90">{{ $obat->rop_minimum }} {{ $obat->satuan_beli }}</div>
+                                    @if($obat->isi_per_kemasan > 1)
+                                        <div class="text-[11px] text-gray-400">(= {{ $batasRopSatuanJual }} {{ $obat->satuan_jual }})</div>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm">
                                     <span
@@ -140,7 +150,7 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    Rp {{ $obat->harga }}
+                                    Rp {{ number_format($obat->harga_jual, 0, ',', '.') }} / {{ $obat->satuan_jual }}
                                 </td>
                                 <td class="px-5 py-4 text-sm">
                                     <div class="flex items-center gap-1.5">

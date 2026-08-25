@@ -55,7 +55,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Jumlah Dipesan</p>
-                        <p class="font-medium text-gray-800 dark:text-white/90">{{ $pesanan->jumlah_pesan }} {{ $pesanan->obat->satuan }}</p>
+                        <p class="font-medium text-gray-800 dark:text-white/90">{{ $pesanan->jumlah_pesan }} {{ $pesanan->obat->satuan_beli ?? 'Box' }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Estimasi Total Harga</p>

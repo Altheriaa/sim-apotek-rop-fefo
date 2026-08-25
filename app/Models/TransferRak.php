@@ -13,7 +13,8 @@ class TransferRak extends Model
         'obat_id',
         'obat_batch_id',
         'user_id',
-        'jumlah',
+        'jumlah_keluar',      // Jumlah diambil dari gudang (dalam satuan_beli: Box)
+        'jumlah_masuk_rak',   // Hasil konversi ke rak (dalam satuan_jual: Strip/Botol)
         'tanggal_transfer',
         'keterangan',
     ];

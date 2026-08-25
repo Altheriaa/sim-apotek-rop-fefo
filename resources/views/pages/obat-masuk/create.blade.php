@@ -113,13 +113,13 @@
                             placeholder="Jumlah stok diterima">
                     </div>
 
-                    <!-- Harga Beli -->
+                    <!-- Harga Beli Satuan -->
                     <div>
                         <label for="harga_beli"
-                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Beli Total
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Beli Satuan
                             (Rp)</label>
-                        <input type="number" id="harga_beli" name="harga_beli" value="{{ old('harga_beli') }}" required
-                            min="0" step="100"
+                        <input type="number" id="harga_beli_satuan" name="harga_beli_satuan"
+                            value="{{ old('harga_beli_satuan') }}" required min="0"
                             class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
                             placeholder="Contoh: 1500000">
                     </div>

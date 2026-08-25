@@ -152,13 +152,13 @@
                                     <span class="text-lg font-bold {{ $isKosong ? 'text-error-600 dark:text-error-400' : ($isKritis ? 'text-warning-600 dark:text-warning-400' : 'text-success-600 dark:text-success-400') }}">
                                         {{ $stokRak }}
                                     </span>
-                                    <span class="text-xs text-gray-400 ml-0.5">{{ $obat->satuan }}</span>
+                                    <span class="text-xs text-gray-400 ml-0.5">{{ $obat->satuan_jual }}</span>
                                 </td>
                                 <td class="px-5 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $obat->min_stok_rak }} {{ $obat->satuan }}
+                                    {{ $obat->min_stok_rak }} {{ $obat->satuan_jual }}
                                 </td>
                                 <td class="px-5 py-4 text-center text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $stokGudang }} {{ $obat->satuan }}
+                                    {{ $stokGudang }} {{ $obat->satuan_beli }}
                                 </td>
                                 <td class="px-5 py-4 text-center">
                                     @if($isKosong)

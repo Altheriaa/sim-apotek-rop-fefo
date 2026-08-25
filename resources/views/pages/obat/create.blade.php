@@ -59,27 +59,67 @@
                     <div>
                         <label for="kategori"
                             class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kategori</label>
-                        <input type="text" id="kategori" name="kategori" value="{{ old('kategori') }}" required
-                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
-                            placeholder="Contoh: Tablet, Sirup, Injeksi">
+                        <select id="kategori" name="kategori" value="{{ old('kategori') }}" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                            <option value="">Pilih Kategori</option>
+                            <option value="Obat Keras">Obat Keras</option>
+                            <option value="Obat Bebas">Obat Bebas</option>
+                            <option value="Obat Prekursor">Obat Prekursor</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Contoh: Obat Keras, Obat Bebas, Obat Prekursor</p>
                     </div>
 
-                    <!-- Satuan -->
+                    <!-- Satuan Beli -->
                     <div>
-                        <label for="satuan"
-                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan</label>
-                        <input type="text" id="satuan" name="satuan" value="{{ old('satuan') }}" required
-                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
-                            placeholder="Contoh: Pcs, Box, Botol">
+                        <label for="satuan_beli"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan Beli
+                            (Gudang)</label>
+                        <select id="satuan_beli" name="satuan_beli" value="{{ old('satuan_beli') }}" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                            <option value="">Pilih Satuan Beli</option>
+                            <option value="Box">Box</option>
+                            <option value="Botol">Botol</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Contoh: Jika anda beli per dus/kardus, pilih Box</p>
                     </div>
 
-                    <!-- Harga -->
+                    <!-- Satuan Jual -->
                     <div>
-                        <label for="harga" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga
-                            (Rp)</label>
-                        <input type="number" id="harga" name="harga" value="{{ old('harga') }}" required min="0" step="100"
+                        <label for="satuan_jual"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan Jual
+                            (Rak/Kasir)</label>
+                        <select id="satuan_jual" name="satuan_jual" value="{{ old('satuan_jual') }}" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                            <option value="">Pilih Satuan Jual</option>
+                            <option value="Strip">Strip</option>
+                            <option value="Botol">Botol</option>
+                            <option value="Sachet">Sachet</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Contoh: Jika anda jual per strip/pcs, pilih strip</p>
+                    </div>
+
+                    <!-- Isi per Kemasan -->
+                    <div>
+                        <label for="isi_per_kemasan"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Isi per Kemasan</label>
+                        <input type="number" id="isi_per_kemasan" name="isi_per_kemasan"
+                            value="{{ old('isi_per_kemasan', 1) }}" required min="1"
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
+                            placeholder="Contoh: 10 (1 Box = 10 Strip)">
+                        <p class="mt-1 text-xs text-gray-400">Berapa satuan jual dalam 1 satuan beli. Contoh: 1 Box = 10
+                            Strip → isi 10</p>
+                    </div>
+
+                    <!-- Harga Jual -->
+                    <div>
+                        <label for="harga_jual"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Jual
+                            per Satuan Jual (Rp)</label>
+                        <input type="number" id="harga_jual" name="harga_jual" value="{{ old('harga_jual') }}" required
+                            min="0"
                             class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
                             placeholder="Contoh: 15000">
+                        <p class="mt-1 text-xs text-gray-400">Harga per Strip/Sachet/Botol</p>
                     </div>
 
                     <!-- ROP Minimum -->
@@ -87,10 +127,22 @@
                         <label for="rop_minimum"
                             class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Batas Minimal
                             (ROP)</label>
-                        <input type="number" id="rop_minimum" name="rop_minimum" value="{{ old('rop_minimum', 10) }}"
-                            required min="0"
+                        <input type="number" id="rop_minimum" name="rop_minimum" value="{{ old('rop_minimum') }}" required
+                            min="0"
                             class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
                             placeholder="Minimal stok sebelum dipesan">
+                        <p class="mt-1 text-xs text-gray-400">Dihitung dalam satuan beli (cth: 5 Box/Botol)</p>
+                    </div>
+
+                    <!-- Min Stok Rak -->
+                    <div>
+                        <label for="min_stok_rak"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Min Stok Rak</label>
+                        <input type="number" id="min_stok_rak" name="min_stok_rak" value="{{ old('min_stok_rak', 5) }}"
+                            required min="0"
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
+                            placeholder="Minimal stok di rak display">
+                        <p class="mt-1 text-xs text-gray-400">Dihitung dalam satuan jual</p>
                     </div>
                 </div>
 

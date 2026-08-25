@@ -45,10 +45,12 @@
                                     @foreach($obats as $obat)
                                         @php $stokGudang = $obat->batches->sum('stok_gudang'); @endphp
                                         <option value="{{ $obat->id }}" data-stok="{{ $stokGudang }}"
-                                            data-satuan="{{ $obat->satuan }}"
+                                            data-satuan-beli="{{ $obat->satuan_beli }}"
+                                            data-satuan-jual="{{ $obat->satuan_jual }}"
+                                            data-isi="{{ $obat->isi_per_kemasan }}"
                                             data-batches="{{ $obat->batches->map(fn($b) => ['batch' => $b->nomor_batch, 'stok' => $b->stok_gudang, 'ed' => $b->tanggal_kadaluwarsa->format('d/m/Y')])->toJson() }}"
                                             {{ old('obat_id', request('obat_id')) == $obat->id ? 'selected' : '' }}>
-                                            {{ $obat->nama_obat }} — Gudang: {{ $stokGudang }} {{ $obat->satuan }}
+                                            {{ $obat->nama_obat }} — Gudang: {{ $stokGudang }} {{ $obat->satuan_beli }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -74,6 +76,15 @@
                             <div id="fefo-list" class="space-y-1 text-xs text-blue-700 dark:text-blue-300"></div>
                         </div>
 
+                        {{-- Info Konversi --}}
+                        <div id="konversi-info"
+                            class="hidden rounded-lg border border-green-100 bg-green-50/70 p-3 dark:border-green-900/20 dark:bg-green-900/10">
+                            <p class="text-xs text-green-700 dark:text-green-300">
+                                <i class="ti ti-transform text-green-500 mr-1"></i>
+                                <span id="konversi-text"></span>
+                            </p>
+                        </div>
+
                         {{-- Jumlah --}}
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -87,6 +98,7 @@
                                     class="text-sm text-gray-500 dark:text-gray-400 min-w-[3rem]"></span>
                             </div>
                             <p id="stok-info" class="mt-1 text-xs text-gray-400"></p>
+                            <p id="hasil-konversi" class="mt-0.5 text-xs text-green-600 dark:text-green-400 font-medium hidden"></p>
                             @error('jumlah')
                             <p class="mt-1 text-xs text-error-500">{{ $message }}</p> @enderror
                         </div>
@@ -150,21 +162,43 @@
         const fefoList = document.getElementById('fefo-list');
         const stokInfo = document.getElementById('stok-info');
         const satuanLabel = document.getElementById('satuan-label');
+        const konversiInfo = document.getElementById('konversi-info');
+        const konversiText = document.getElementById('konversi-text');
+        const jumlahInput = document.getElementById('jumlah');
+        const hasilKonversi = document.getElementById('hasil-konversi');
+
+        let currentIsi = 1;
+        let currentSatuanBeli = '';
+        let currentSatuanJual = '';
 
         function updateInfo() {
             const option = select.options[select.selectedIndex];
             const stok = option.dataset.stok || 0;
-            const satuan = option.dataset.satuan || '';
+            const satuanBeli = option.dataset.satuanBeli || '';
+            const satuanJual = option.dataset.satuanJual || '';
+            const isi = parseInt(option.dataset.isi) || 1;
             const batches = option.dataset.batches ? JSON.parse(option.dataset.batches) : [];
 
-            satuanLabel.textContent = satuan;
-            stokInfo.textContent = stok > 0 ? `Stok gudang tersedia: ${stok} ${satuan}` : '';
+            currentIsi = isi;
+            currentSatuanBeli = satuanBeli;
+            currentSatuanJual = satuanJual;
+
+            satuanLabel.textContent = satuanBeli;
+            stokInfo.textContent = stok > 0 ? `Stok gudang tersedia: ${stok} ${satuanBeli}` : '';
+
+            // Show conversion info
+            if (satuanBeli && satuanJual && isi > 0) {
+                konversiText.textContent = `Konversi: 1 ${satuanBeli} = ${isi} ${satuanJual}`;
+                konversiInfo.classList.remove('hidden');
+            } else {
+                konversiInfo.classList.add('hidden');
+            }
 
             if (batches.length > 0) {
                 fefoList.innerHTML = batches.map((b, i) =>
                     `<div class="flex items-center gap-2">
                                 <span class="font-bold text-blue-600 dark:text-blue-400">${i + 1}.</span>
-                                Batch <strong>${b.batch}</strong> — ED: ${b.ed} — Stok: ${b.stok} ${satuan}
+                                Batch <strong>${b.batch}</strong> — ED: ${b.ed} — Stok: ${b.stok} ${satuanBeli}
                                 ${i === 0 ? '<span class="ml-auto rounded-full bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 text-[10px] text-blue-700 dark:text-blue-300">Diambil Pertama</span>' : ''}
                             </div>`
                 ).join('');
@@ -172,9 +206,23 @@
             } else {
                 fefoPreview.classList.add('hidden');
             }
+
+            updateHasilKonversi();
+        }
+
+        function updateHasilKonversi() {
+            const qty = parseInt(jumlahInput.value) || 0;
+            if (qty > 0 && currentIsi > 0 && currentSatuanBeli && currentSatuanJual) {
+                const hasil = qty * currentIsi;
+                hasilKonversi.textContent = `→ Akan masuk ke rak: ${hasil} ${currentSatuanJual} (${qty} ${currentSatuanBeli} × ${currentIsi})`;
+                hasilKonversi.classList.remove('hidden');
+            } else {
+                hasilKonversi.classList.add('hidden');
+            }
         }
 
         select.addEventListener('change', updateInfo);
+        jumlahInput.addEventListener('input', updateHasilKonversi);
         if (select.value) updateInfo();
     </script>
 @endpush

@@ -41,10 +41,10 @@
             @forelse($data as $index => $row)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ \Carbon\Carbon::parse($row->tanggal_keluar)->format('d/m/Y') }}</td>
-                    <td>{{ $row->obat->nama_obat }}</td>
+                    <td>{{ \Carbon\Carbon::parse($row->tanggal_transfer)->format('d/m/Y') }}</td>
+                    <td>{{ $row->obat->nama_obat ?? '-' }}</td>
                     <td>{{ $row->user->nama_user ?? '-' }}</td>
-                    <td class="text-right">{{ $row->jumlah }}</td>
+                    <td class="text-right">{{ $row->jumlah_keluar }} {{ $row->obat->satuan_beli ?? '' }} (→ {{ $row->jumlah_masuk_rak }} {{ $row->obat->satuan_jual ?? '' }})</td>
                     <td>{{ $row->obatBatch->nomor_batch ?? '-' }}</td>
                 </tr>
             @empty

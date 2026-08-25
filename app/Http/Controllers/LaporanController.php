@@ -139,7 +139,10 @@ class LaporanController extends Controller
 
         if ($request->filled('status_rop')) {
             if ($request->status_rop === 'kritis') {
-                $query->whereRaw('(SELECT COALESCE(SUM(stok_gudang)+SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) <= obat.rop_minimum');
+                $query->whereRaw('(
+                    (SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) * obat.isi_per_kemasan
+                    + (SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id)
+                ) <= (obat.rop_minimum * obat.isi_per_kemasan)');
             }
         }
 

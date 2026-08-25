@@ -47,7 +47,7 @@
                     <td>{{ $row->supplier->nama_supplier ?? '-' }}</td>
                     <td>{{ $row->nomor_batch ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($row->tanggal_kadaluwarsa)->format('d/m/Y') }}</td>
-                    <td class="text-right">{{ $row->stok_awal }}</td>
+                    <td class="text-right">{{ $row->stok_gudang }} {{ $row->obat->satuan_beli ?? '' }}</td>
                 </tr>
             @empty
                 <tr>

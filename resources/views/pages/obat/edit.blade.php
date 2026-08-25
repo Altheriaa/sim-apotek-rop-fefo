@@ -1,87 +1,158 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Edit Data Obat</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Perbarui informasi obat {{ $obat->nama_obat }}.</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="{{ route('obat.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80">
-                Kembali
-            </a>
-        </div>
-    </div>
-
-    @if($errors->any())
-    <div class="rounded-lg bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30">
-        <ul class="list-disc pl-5">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
-    <div class="rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-gray-dark">
-        <form action="{{ route('obat.update', $obat->id) }}" method="POST" class="p-6">
-            @csrf
-            @method('PUT')
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <!-- Kode Obat -->
-                <div>
-                    <label for="kode_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kode Obat</label>
-                    <input type="text" id="kode_obat" name="kode_obat" value="{{ old('kode_obat', $obat->kode_obat) }}" required
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                </div>
-
-                <!-- Nama Obat -->
-                <div>
-                    <label for="nama_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Obat</label>
-                    <input type="text" id="nama_obat" name="nama_obat" value="{{ old('nama_obat', $obat->nama_obat) }}" required
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                </div>
-
-                <!-- Kategori -->
-                <div>
-                    <label for="kategori" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kategori</label>
-                    <input type="text" id="kategori" name="kategori" value="{{ old('kategori', $obat->kategori) }}" required
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                </div>
-
-                <!-- Satuan -->
-                <div>
-                    <label for="satuan" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan</label>
-                    <input type="text" id="satuan" name="satuan" value="{{ old('satuan', $obat->satuan) }}" required
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                </div>
-
-                <!-- Harga -->
-                <div>
-                    <label for="harga" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga (Rp)</label>
-                    <input type="number" id="harga" name="harga" value="{{ old('harga', $obat->harga) }}" required min="0" step="100"
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                </div>
-
-                <!-- ROP Minimum -->
-                <div>
-                    <label for="rop_minimum" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Batas Minimal (ROP)</label>
-                    <input type="number" id="rop_minimum" name="rop_minimum" value="{{ old('rop_minimum', $obat->rop_minimum) }}" required min="0"
-                           class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                </div>
+    <div class="space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Edit Data Obat</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Perbarui informasi obat {{ $obat->nama_obat }}.</p>
             </div>
-
-            <div class="mt-8 flex justify-end gap-3">
-                <a href="{{ route('obat.index') }}" class="h-11 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80 transition duration-150">
-                    Batal
+            <div class="flex gap-2">
+                <a href="{{ route('obat.index') }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80">
+                    Kembali
                 </a>
-                <button type="submit" class="h-11 inline-flex items-center justify-center rounded-lg bg-brand-500 px-6 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
-                    Perbarui Obat
-                </button>
             </div>
-        </form>
+        </div>
+
+        @if($errors->any())
+            <div
+                class="rounded-lg bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30">
+                <ul class="list-disc pl-5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-gray-dark">
+            <form action="{{ route('obat.update', $obat->id) }}" method="POST" class="p-6">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <!-- Kode Obat -->
+                    <div>
+                        <label for="kode_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kode
+                            Obat</label>
+                        <input type="text" id="kode_obat" name="kode_obat" value="{{ old('kode_obat', $obat->kode_obat) }}"
+                            required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                    </div>
+
+                    <!-- Nama Obat -->
+                    <div>
+                        <label for="nama_obat" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Nama
+                            Obat</label>
+                        <input type="text" id="nama_obat" name="nama_obat" value="{{ old('nama_obat', $obat->nama_obat) }}"
+                            required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                    </div>
+
+                    <!-- Kategori -->
+                    <div>
+                        <label for="kategori"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Kategori</label>
+                        <select id="kategori" name="kategori" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150 cursor-pointer">
+                            <option value="" disabled class="dark:bg-gray-900">Pilih Kategori</option>
+                            <option value="Obat Keras" {{ old('kategori', $obat->kategori) == 'Obat Keras' ? 'selected' : '' }} class="dark:bg-gray-900">Obat Keras</option>
+                            <option value="Obat Bebas" {{ old('kategori', $obat->kategori) == 'Obat Bebas' ? 'selected' : '' }} class="dark:bg-gray-900">Obat Bebas</option>
+                            <option value="Obat Prekursor" {{ old('kategori', $obat->kategori) == 'Obat Prekursor' ? 'selected' : '' }} class="dark:bg-gray-900">Obat Prekursor</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Contoh: Obat Keras, Obat Bebas, Obat Prekursor</p>
+                    </div>
+
+                    <!-- Satuan Beli -->
+                    <div>
+                        <label for="satuan_beli"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan Beli
+                            (Gudang)</label>
+                        <select id="satuan_beli" name="satuan_beli" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150 cursor-pointer">
+                            <option value="" disabled class="dark:bg-gray-900">Pilih Satuan Beli</option>
+                            <option value="Box" {{ old('satuan_beli', $obat->satuan_beli) == 'Box' ? 'selected' : '' }}
+                                class="dark:bg-gray-900">Box</option>
+                            <option value="Botol" {{ old('satuan_beli', $obat->satuan_beli) == 'Botol' ? 'selected' : '' }}
+                                class="dark:bg-gray-900">Botol</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Contoh: Jika anda beli per dus/kardus, pilih Box</p>
+                    </div>
+
+                    <!-- Satuan Jual -->
+                    <div>
+                        <label for="satuan_jual"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan Jual
+                            (Rak/Kasir)</label>
+                        <select id="satuan_jual" name="satuan_jual" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition duration-150 cursor-pointer">
+                            <option value="" disabled class="dark:bg-gray-900">Pilih Satuan Jual</option>
+                            <option value="Strip" {{ old('satuan_jual', $obat->satuan_jual) == 'Strip' ? 'selected' : '' }}
+                                class="dark:bg-gray-900">Strip</option>
+                            <option value="Botol" {{ old('satuan_jual', $obat->satuan_jual) == 'Botol' ? 'selected' : '' }}
+                                class="dark:bg-gray-900">Botol</option>
+                            <option value="Sachet" {{ old('satuan_jual', $obat->satuan_jual) == 'Sachet' ? 'selected' : '' }}
+                                class="dark:bg-gray-900">Sachet</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Contoh: Jika anda jual per strip/pcs, pilih strip</p>
+                    </div>
+
+                    <!-- Isi per Kemasan -->
+                    <div>
+                        <label for="isi_per_kemasan"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Isi per Box</label>
+                        <input type="number" id="isi_per_kemasan" name="isi_per_kemasan"
+                            value="{{ old('isi_per_kemasan', $obat->isi_per_kemasan) }}" required min="1"
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
+                            placeholder="Contoh: 10 (1 Box = 10 Strip)">
+                        <p class="mt-1 text-xs text-gray-400">Berapa satuan jual dalam 1 satuan beli. Contoh: 1 Box = 10
+                            Strip → isi 10</p>
+                    </div>
+
+                    <!-- Harga Jual -->
+                    <div>
+                        <label for="harga_jual"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Jual per Satuan
+                            Jual (Rp)</label>
+                        <input type="number" id="harga_jual" name="harga_jual"
+                            value="{{ old('harga_jual', $obat->harga_jual) }}" required min="0"
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                    </div>
+
+                    <!-- ROP Minimum -->
+                    <div>
+                        <label for="rop_minimum"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Batas Minimal
+                            (ROP)</label>
+                        <input type="number" id="rop_minimum" name="rop_minimum"
+                            value="{{ old('rop_minimum', $obat->rop_minimum) }}" required min="0"
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                        <p class="mt-1 text-xs text-gray-400">Dihitung dalam satuan beli (cth: 5 Box/Botol)</p>
+                    </div>
+
+                    <!-- Min Stok Rak -->
+                    <div>
+                        <label for="min_stok_rak"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Min Stok Rak</label>
+                        <input type="number" id="min_stok_rak" name="min_stok_rak"
+                            value="{{ old('min_stok_rak', $obat->min_stok_rak) }}" required min="0"
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
+                        <p class="mt-1 text-xs text-gray-400">Dihitung dalam satuan jual</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end gap-3">
+                    <a href="{{ route('obat.index') }}"
+                        class="h-11 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80 transition duration-150">
+                        Batal
+                    </a>
+                    <button type="submit"
+                        class="h-11 inline-flex items-center justify-center rounded-lg bg-brand-500 px-6 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
+                        Perbarui Obat
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 @endsection

@@ -62,8 +62,9 @@
                             @php
                                 $stokGudang = (int) $obat->stok_gudang_total;
                                 $stokRak    = (int) $obat->stok_rak_total;
-                                $totalApot  = $stokGudang + $stokRak;
-                                $isBawahRop = $obat->rop_minimum > 0 && $totalApot <= $obat->rop_minimum;
+                                $totalApot  = ($stokGudang * ($obat->isi_per_kemasan ?? 1)) + $stokRak;
+                                $batasRopSatuanJual = $obat->rop_minimum * ($obat->isi_per_kemasan ?? 1);
+                                $isBawahRop = $obat->rop_minimum > 0 && $totalApot <= $batasRopSatuanJual;
                             @endphp
                             <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20 {{ $isBawahRop ? 'bg-error-50/20' : '' }}">
                                 <td class="px-5 py-4 text-sm text-gray-500">{{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
@@ -72,10 +73,10 @@
                                     @if($obat->kode_obat)<div class="text-xs font-mono text-gray-400">{{ $obat->kode_obat }}</div>@endif
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $obat->kategori ?? '-' }}</td>
-                                <td class="px-5 py-4 text-center text-sm font-semibold text-blue-600 dark:text-blue-400">{{ $stokGudang }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan }}</span></td>
-                                <td class="px-5 py-4 text-center text-sm font-semibold text-green-600 dark:text-green-400">{{ $stokRak }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan }}</span></td>
-                                <td class="px-5 py-4 text-center text-sm font-bold text-gray-800 dark:text-white/90">{{ $totalApot }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan }}</span></td>
-                                <td class="px-5 py-4 text-center text-sm text-gray-500 dark:text-gray-400">{{ $obat->rop_minimum }}</td>
+                                <td class="px-5 py-4 text-center text-sm font-semibold text-blue-600 dark:text-blue-400">{{ $stokGudang }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan_beli }}</span></td>
+                                <td class="px-5 py-4 text-center text-sm font-semibold text-green-600 dark:text-green-400">{{ $stokRak }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan_jual }}</span></td>
+                                <td class="px-5 py-4 text-center text-sm font-bold text-gray-800 dark:text-white/90">{{ $totalApot }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan_jual }}</span></td>
+                                <td class="px-5 py-4 text-center text-sm text-gray-500 dark:text-gray-400">{{ $obat->rop_minimum }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan_beli }}</span></td>
                                 <td class="px-5 py-4 text-center">
                                     @if($isBawahRop)
                                         <span class="inline-flex items-center rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-semibold text-error-700 dark:bg-error-900/30 dark:text-error-400">⚠️ Kritis</span>

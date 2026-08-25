@@ -116,7 +116,7 @@
                                 </td>
                                 <td class="px-5 py-4">
                                     <div class="font-semibold text-sm text-gray-800 dark:text-white/90">{{ $batch->obat->nama_obat ?? '-' }}</div>
-                                    <div class="text-xs text-gray-400">{{ $batch->obat->satuan ?? '' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $batch->obat->satuan_beli ?? '' }}</div>
                                 </td>
                                 <td class="px-5 py-4 text-sm font-mono text-gray-700 dark:text-gray-300">{{ $batch->nomor_batch ?? '-' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $batch->supplier->nama_supplier ?? '-' }}</td>
@@ -124,8 +124,8 @@
                                 <td class="px-5 py-4 text-sm font-semibold {{ $isExpired ? 'text-error-600 dark:text-error-400' : ($isNear ? 'text-warning-600 dark:text-warning-400' : 'text-gray-800 dark:text-white/90') }}">
                                     {{ $ed->format('d M Y') }}
                                 </td>
-                                <td class="px-5 py-4 text-center font-bold text-blue-600 dark:text-blue-400">{{ $batch->stok_gudang }}</td>
-                                <td class="px-5 py-4 text-center font-semibold text-gray-600 dark:text-gray-300">{{ $batch->stok_rak }}</td>
+                                <td class="px-5 py-4 text-center font-bold text-blue-600 dark:text-blue-400">{{ $batch->stok_gudang }} {{ $batch->obat->satuan_beli }}</td>
+                                <td class="px-5 py-4 text-center font-semibold text-gray-600 dark:text-gray-300">{{ $batch->stok_rak }} {{ $batch->obat->satuan_jual }}</td>
                                 <td class="px-5 py-4 text-center">
                                     @if($isExpired)
                                         <span class="inline-flex items-center rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-semibold text-error-700 dark:bg-error-900/30 dark:text-error-400">Expired</span>

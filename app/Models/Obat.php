@@ -14,23 +14,29 @@ class Obat extends Model
         'kode_obat',
         'nama_obat',
         'kategori',
-        'satuan',
-        'harga',
-        'rop_minimum',
-        'min_stok_rak',
+        'satuan_beli',       // Satuan saat beli dari supplier (Box, Dus, Botol)
+        'satuan_jual',       // Satuan saat jual ke pasien (Strip, Sachet, Botol)
+        'isi_per_kemasan',   // 1 satuan_beli = N satuan_jual (misal 1 Box = 10 Strip)
+        'harga_jual',        // Harga jual per satuan_jual
+        'rop_minimum',       // ROP dihitung dalam satuan_beli (Box, Botol)
+        'min_stok_rak',      // Min stok rak dalam satuan_jual (Strip, Sachet, Botol)
     ];
 
     protected $appends = ['stok_total', 'stok_gudang_total', 'stok_rak_total'];
 
-    // ── Accessor: Total stok keseluruhan apotek (gudang + rak) ──
+    // ── Accessor: Total stok apotek dinormalisasi ke satuan_jual ──
+    // Formula: (stok_gudang × isi_per_kemasan) + stok_rak
     protected function stokTotal(): Attribute
     {
         return Attribute::make(
-            get: fn () => (int) ($this->batches()->sum('stok_gudang') + $this->batches()->sum('stok_rak')),
+            get: fn () => (int) (
+                ($this->batches()->sum('stok_gudang') * $this->isi_per_kemasan)
+                + $this->batches()->sum('stok_rak')
+            ),
         );
     }
 
-    // ── Accessor: Total stok di gudang fisik ──
+    // ── Accessor: Total stok di gudang fisik (dalam satuan_beli) ──
     protected function stokGudangTotal(): Attribute
     {
         return Attribute::make(
@@ -38,7 +44,7 @@ class Obat extends Model
         );
     }
 
-    // ── Accessor: Total stok di display rak ──
+    // ── Accessor: Total stok di display rak (dalam satuan_jual) ──
     protected function stokRakTotal(): Attribute
     {
         return Attribute::make(

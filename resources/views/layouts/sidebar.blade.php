@@ -111,7 +111,7 @@
                                             <!-- Icon -->
                                             <span
                                                 :class="isSubmenuOpen({{ $groupIndex }}, {{ $itemIndex }}) ?
-                                                                                                                                                                                                                                                                                        'menu-item-icon-active' : 'menu-item-icon-inactive'">
+                                                'menu-item-icon-active' : 'menu-item-icon-inactive'">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>
 

@@ -143,13 +143,13 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-success-600 dark:text-success-400">
-                                    +{{ $trx->stok_awal }} {{ $trx->obat->satuan ?? '' }}
+                                    {{ $trx->stok_gudang }} {{ $trx->obat->satuan_beli ?? '' }}
                                 </td>
                                 <td class="px-5 py-4 text-center text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                    {{ $trx->stok_gudang }} {{ $trx->obat->satuan ?? '' }}
+                                    {{ $trx->stok_gudang }} {{ $trx->obat->satuan_beli ?? '' }}
                                 </td>
                                 <td class="px-5 py-4 text-center text-sm font-semibold text-green-600 dark:text-green-400">
-                                    {{ $trx->stok_rak }} {{ $trx->obat->satuan ?? '' }}
+                                    {{ $trx->stok_rak }} {{ $trx->obat->satuan_jual ?? '' }}
                                 </td>
                             </tr>
                         @empty

@@ -62,13 +62,15 @@ class TransferRakController extends Controller
         try {
             $batchDipindahkan = $this->stokService->transferKeRak(
                 obatId:     $validated['obat_id'],
-                jumlah:     $validated['jumlah'],
+                jumlahBox:  $validated['jumlah'],
                 userId:     auth()->id(),
                 keterangan: $validated['keterangan'] ?? null,
             );
 
-            $obat     = Obat::find($validated['obat_id']);
-            $ringkasan = collect($batchDipindahkan)->map(fn ($b) => "Batch {$b['nomor_batch']} ({$b['jumlah']} {$obat->satuan}, ED: {$b['ed']})")->implode(', ');
+            $obat      = Obat::find($validated['obat_id']);
+            $ringkasan = collect($batchDipindahkan)->map(
+                fn ($b) => "Batch {$b['nomor_batch']} ({$b['jumlah_box']} {$b['satuan_beli']} → {$b['jumlah_satuan']} {$b['satuan_jual']}, ED: {$b['ed']})"
+            )->implode(', ');
 
             return redirect()->route('transfer-rak.index')
                 ->with('success', "Transfer berhasil! {$ringkasan}");

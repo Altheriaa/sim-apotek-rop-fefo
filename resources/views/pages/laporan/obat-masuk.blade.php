@@ -105,7 +105,7 @@
                                     {{ $row->nomor_batch ?? '-' }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-success-600 dark:text-success-400">
-                                    +{{ $row->stok_awal }} {{ $row->obat->satuan ?? '' }}
+                                    {{ $row->stok_gudang }} {{ $row->obat->satuan_beli ?? '' }}
                                 </td>
                             </tr>
                         @empty

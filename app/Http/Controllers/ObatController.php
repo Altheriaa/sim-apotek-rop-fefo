@@ -20,16 +20,23 @@ class ObatController extends Controller
                 $q->where('nama_obat', 'like', "%{$search}%")
                   ->orWhere('kode_obat', 'like', "%{$search}%")
                   ->orWhere('kategori', 'like', "%{$search}%")
-                  ->orWhere('satuan', 'like', "%{$search}%");
+                  ->orWhere('satuan_jual', 'like', "%{$search}%")
+                  ->orWhere('satuan_beli', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('status')) {
             if ($request->status === 'rop') {
-                // Total stok (gudang+rak) ≤ ROP minimum
-                $query->whereRaw('(SELECT COALESCE(SUM(stok_gudang)+SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) <= obat.rop_minimum');
+                // Total stok apotek (satuan_jual) ≤ Batas ROP (rop_minimum dalam satuan_beli × isi_per_kemasan)
+                $query->whereRaw('(
+                    (SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) * obat.isi_per_kemasan
+                    + (SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id)
+                ) <= (obat.rop_minimum * obat.isi_per_kemasan)');
             } elseif ($request->status === 'aman') {
-                $query->whereRaw('(SELECT COALESCE(SUM(stok_gudang)+SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) > obat.rop_minimum');
+                $query->whereRaw('(
+                    (SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) * obat.isi_per_kemasan
+                    + (SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id)
+                ) > (obat.rop_minimum * obat.isi_per_kemasan)');
             }
         }
 
@@ -54,13 +61,15 @@ class ObatController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode_obat'    => 'nullable|string|max:50|unique:obat,kode_obat',
-            'nama_obat'    => 'required|string|max:255',
-            'kategori'     => 'nullable|string|max:100',
-            'satuan'       => 'required|string|max:50',
-            'harga'        => 'required|numeric|min:0',
-            'rop_minimum'  => 'required|integer|min:0',
-            'min_stok_rak' => 'required|integer|min:0',
+            'kode_obat'       => 'nullable|string|max:50|unique:obat,kode_obat',
+            'nama_obat'       => 'required|string|max:255',
+            'kategori'        => 'nullable|string|max:100',
+            'satuan_beli'     => 'required|string|max:50',
+            'satuan_jual'     => 'required|string|max:50',
+            'isi_per_kemasan' => 'required|integer|min:1',
+            'harga_jual'      => 'required|numeric|min:0',
+            'rop_minimum'     => 'required|integer|min:0',
+            'min_stok_rak'    => 'required|integer|min:0',
         ]);
 
         if (empty($validated['kode_obat'])) {
@@ -99,13 +108,15 @@ class ObatController extends Controller
     public function update(Request $request, Obat $obat)
     {
         $validated = $request->validate([
-            'kode_obat'    => 'nullable|string|max:50|unique:obat,kode_obat,' . $obat->id,
-            'nama_obat'    => 'required|string|max:255',
-            'kategori'     => 'nullable|string|max:100',
-            'satuan'       => 'required|string|max:50',
-            'harga'        => 'required|numeric|min:0',
-            'rop_minimum'  => 'required|integer|min:0',
-            'min_stok_rak' => 'required|integer|min:0',
+            'kode_obat'       => 'nullable|string|max:50|unique:obat,kode_obat,' . $obat->id,
+            'nama_obat'       => 'required|string|max:255',
+            'kategori'        => 'nullable|string|max:100',
+            'satuan_beli'     => 'required|string|max:50',
+            'satuan_jual'     => 'required|string|max:50',
+            'isi_per_kemasan' => 'required|integer|min:1',
+            'harga_jual'      => 'required|numeric|min:0',
+            'rop_minimum'     => 'required|integer|min:0',
+            'min_stok_rak'    => 'required|integer|min:0',
         ]);
 
         $obat->update($validated);

@@ -86,7 +86,7 @@ class ObatMasukController extends Controller
             'nomor_batch'         => 'nullable|string|max:100',
             'tanggal_kadaluwarsa' => 'required|date|after:today',
             'jumlah'              => 'required|integer|min:1',
-            'harga_beli'          => 'required|numeric|min:0',
+            'harga_beli_satuan'   => 'required|numeric|min:0',
         ]);
 
         if (empty($validated['nomor_batch'])) {
@@ -95,22 +95,24 @@ class ObatMasukController extends Controller
 
         DB::beginTransaction();
         try {
+            $obat = Obat::findOrFail($validated['obat_id']);
+
             ObatBatch::create([
                 'obat_id'             => $validated['obat_id'],
                 'supplier_id'         => $validated['supplier_id'],
                 'nomor_batch'         => $validated['nomor_batch'],
                 'tanggal_masuk'       => now()->toDateString(),
                 'tanggal_kadaluwarsa' => $validated['tanggal_kadaluwarsa'],
-                'stok_awal'           => $validated['jumlah'],
-                'stok_gudang'         => $validated['jumlah'],  // Masuk ke GUDANG
-                'stok_rak'            => 0,                     // Rak mulai dari 0
-                'harga_beli'          => $validated['harga_beli'],
+                'stok_gudang'         => $validated['jumlah'],
+                'stok_rak'            => 0,
+                'harga_beli_satuan'   => $validated['harga_beli_satuan'],
+                'harga_beli'          => $validated['harga_beli_satuan'] * $validated['jumlah'],
             ]);
 
             DB::commit();
 
             return redirect()->route('obat-masuk.index')
-                ->with('success', "Obat masuk berhasil dicatat. Stok masuk ke gudang sebanyak {$validated['jumlah']} {$validated['nomor_batch']}.");
+                ->with('success', "Obat masuk berhasil dicatat. Stok masuk ke gudang sebanyak {$validated['jumlah']} {$obat->satuan_beli}.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();

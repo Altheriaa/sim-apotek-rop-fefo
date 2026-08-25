@@ -109,7 +109,7 @@
                             id="card-obat-{{ $obat->id }}" data-id="{{ $obat->id }}"
                             data-nama="{{ strtolower($obat->nama_obat) }}" data-kode="{{ strtolower($obat->kode_obat ?? '') }}"
                             data-kategori="{{ strtolower($obat->kategori ?? '') }}" data-stok="{{ $stokRak }}"
-                            data-harga="{{ (float) $obat->harga }}" data-satuan="{{ $obat->satuan }}"
+                            data-harga="{{ (float) $obat->harga_jual }}" data-satuan="{{ $obat->satuan_jual }}"
                             data-nama-real="{{ $obat->nama_obat }}">
 
                             {{-- Badge In Cart --}}
@@ -137,7 +137,7 @@
                                     <span class="text-gray-500 dark:text-gray-400">Stok Rak:</span>
                                     <span
                                         class="font-bold px-2 py-0.5 rounded-md {{ $stokRak > 5 ? 'bg-success-50 text-success-700 dark:bg-success-900/20 dark:text-success-400' : 'bg-warning-50 text-warning-700 dark:bg-warning-900/20 dark:text-warning-400' }}">
-                                        {{ $stokRak }} {{ $obat->satuan }}
+                                        {{ $stokRak }} {{ $obat->satuan_jual }}
                                     </span>
                                 </div>
                             </div>
@@ -145,7 +145,7 @@
                             <div
                                 class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
                                 <div class="text-sm font-bold dark:text-brand-400">
-                                    Rp {{ number_format($obat->harga, 0, ',', '.') }}
+                                    Rp {{ number_format($obat->harga_jual, 0, ',', '.') }}
                                 </div>
                                 <button type="button" onclick="handleTambahClick({{ $obat->id }})"
                                     class="btn-tambah inline-flex items-center gap-1 rounded-lg bg-brand-50 hover:bg-brand-500 hover:text-white px-2.5 py-1.5 text-xs font-semibold dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-500 dark:hover:text-white transition">
@@ -562,45 +562,45 @@
                 total += subtotal;
 
                 html += `
-                                                                                                <div class="flex flex-col gap-2 rounded-lg border border-gray-100 bg-white p-3 shadow-xs dark:border-gray-700/60 dark:bg-gray-800/80">
-                                                                                                    <div class="flex items-start justify-between gap-2">
-                                                                                                        <div class="min-w-0 flex-1">
-                                                                                                            <h4 class="text-xs font-bold text-gray-800 dark:text-white/90 truncate" title="${item.nama}">
-                                                                                                                ${item.nama}
-                                                                                                            </h4>
-                                                                                                            <div class="text-[11px] text-gray-400">
-                                                                                                                Rp ${item.harga.toLocaleString('id-ID')} / ${item.satuan}
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <button type="button" onclick="hapusItem(${item.id})"
-                                                                                                            class="text-gray-400 hover:text-error-500 transition p-1 rounded-md hover:bg-error-50 dark:hover:bg-error-900/20"
-                                                                                                            title="Hapus item">
-                                                                                                            <i class="ti ti-trash text-sm"></i>
-                                                                                                        </button>
-                                                                                                    </div>
+                    <div class="flex flex-col gap-2 rounded-lg border border-gray-100 bg-white p-3 shadow-xs dark:border-gray-700/60 dark:bg-gray-800/80">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-xs font-bold text-gray-800 dark:text-white/90 truncate" title="${item.nama}">
+                                    ${item.nama}
+                                </h4>
+                                <div class="text-[11px] text-gray-400">
+                                    Rp ${item.harga.toLocaleString('id-ID')} / ${item.satuan}
+                                </div>
+                            </div>
+                            <button type="button" onclick="hapusItem(${item.id})"
+                                class="text-gray-400 hover:text-error-500 transition p-1 rounded-md hover:bg-error-50 dark:hover:bg-error-900/20"
+                                title="Hapus item">
+                                <i class="ti ti-trash text-sm"></i>
+                            </button>
+                        </div>
 
-                                                                                                    <div class="flex items-center justify-between pt-1 border-t border-gray-50 dark:border-gray-700/40">
-                                                                                                        <div class="flex items-center gap-1">
-                                                                                                            <button type="button" onclick="ubahQty(${item.id}, -1)"
-                                                                                                                class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs">
-                                                                                                                <i class="ti ti-minus"></i>
-                                                                                                            </button>
-                                                                                                            <input type="number" value="${item.qty}" min="1" max="${item.stok}"
-                                                                                                                onchange="setQtyDirect(${item.id}, this)"
-                                                                                                                class="h-7 w-12 rounded-md border border-gray-200 text-center text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-white focus:border-brand-500 focus:outline-none">
-                                                                                                            <button type="button" onclick="ubahQty(${item.id}, 1)"
-                                                                                                                class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs ${item.qty >= item.stok ? 'opacity-40 cursor-not-allowed' : ''}">
-                                                                                                                <i class="ti ti-plus"></i>
-                                                                                                            </button>
-                                                                                                        </div>
-                                                                                                        <div class="text-right">
-                                                                                                            <span class="text-xs font-bold text-brand-600 dark:text-brand-400">
-                                                                                                                Rp ${subtotal.toLocaleString('id-ID')}
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            `;
+                        <div class="flex items-center justify-between pt-1 border-t border-gray-50 dark:border-gray-700/40">
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="ubahQty(${item.id}, -1)"
+                                    class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs">
+                                    <i class="ti ti-minus"></i>
+                                </button>
+                                <input type="number" value="${item.qty}" min="1" max="${item.stok}"
+                                    onchange="setQtyDirect(${item.id}, this)"
+                                    class="h-7 w-12 rounded-md border border-gray-200 text-center text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-white focus:border-brand-500 focus:outline-none">
+                                <button type="button" onclick="ubahQty(${item.id}, 1)"
+                                    class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs ${item.qty >= item.stok ? 'opacity-40 cursor-not-allowed' : ''}">
+                                    <i class="ti ti-plus"></i>
+                                </button>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-brand-600 dark:text-brand-400">
+                                    Rp ${subtotal.toLocaleString('id-ID')}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
                 inputsHtml += `<input type="hidden" name="items[${index}][obat_id]" value="${item.id}">`;
                 inputsHtml += `<input type="hidden" name="items[${index}][jumlah]" value="${item.qty}">`;

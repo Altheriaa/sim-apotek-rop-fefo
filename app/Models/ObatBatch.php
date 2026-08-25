@@ -16,10 +16,10 @@ class ObatBatch extends Model
         'nomor_batch',
         'tanggal_masuk',
         'tanggal_kadaluwarsa',
-        'stok_awal',
-        'stok_gudang',   // Stok di gudang fisik
-        'stok_rak',      // Stok di display rak
-        'harga_beli',
+        'stok_gudang',   
+        'stok_rak',      
+        'harga_beli_satuan', 
+        'harga_beli',   // harga total
     ];
 
     protected $casts = [

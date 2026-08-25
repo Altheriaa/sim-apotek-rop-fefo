@@ -103,7 +103,8 @@
                                     {{ $row->user->nama_user ?? '-' }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-brand-600 dark:text-brand-400">
-                                    {{ $row->jumlah }} {{ $row->obat->satuan ?? '' }}
+                                    {{ $row->jumlah_keluar }} {{ $row->obat->satuan_beli ?? '' }}
+                                    <div class="text-xs text-green-600 dark:text-green-400 font-medium">→ {{ $row->jumlah_masuk_rak }} {{ $row->obat->satuan_jual ?? '' }}</div>
                                 </td>
                                 <td class="px-5 py-4 text-sm font-mono text-gray-600 dark:text-gray-400">
                                     {{ $row->obatBatch->nomor_batch ?? '-' }}

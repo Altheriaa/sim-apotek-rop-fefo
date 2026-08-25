@@ -49,7 +49,7 @@ class KasirController extends Controller
         $totalHarga = 0;
         foreach ($request->items as $item) {
             $obat        = Obat::find($item['obat_id']);
-            $totalHarga += $obat->harga * $item['jumlah'];
+            $totalHarga += $obat->harga_jual * $item['jumlah'];
         }
 
         $nominalBayar = (float) $request->nominal_bayar;

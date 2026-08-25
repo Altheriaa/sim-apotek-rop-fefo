@@ -54,7 +54,7 @@
                             <div>
                                 <div class="font-semibold text-gray-800 dark:text-white/90">{{ $detail->obat->nama_obat ?? '-' }}</div>
                                 <div class="text-xs text-gray-400 mt-0.5">
-                                    {{ $detail->jumlah }} {{ $detail->obat->satuan ?? '' }} × Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}
+                                    {{ $detail->jumlah }} {{ $detail->obat->satuan_jual ?? '' }} × Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}
                                 </div>
                                 <div class="text-xs text-gray-300 dark:text-gray-600">
                                     Batch: {{ $detail->obatBatch->nomor_batch ?? '-' }}
