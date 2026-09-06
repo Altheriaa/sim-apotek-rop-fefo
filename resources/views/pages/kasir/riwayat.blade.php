@@ -7,10 +7,12 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Riwayat Penjualan</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Seluruh riwayat transaksi kasir yang telah diproses.</p>
             </div>
-            <a href="{{ route('kasir.index') }}"
-                class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
-                <i class="ti ti-plus text-base"></i> Transaksi Baru
-            </a>
+            @if(!auth()->user()->isOwner())
+                <a href="{{ route('kasir.index') }}"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
+                    <i class="ti ti-plus text-base"></i> Transaksi Baru
+                </a>
+            @endif
         </div>
 
         {{-- Stats --}}
@@ -72,9 +74,11 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Pembeli</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Item</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Total Harga</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Total Omzet</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Modal (HPP)</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Laba (Untung)</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Kasir</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Detail</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,6 +101,12 @@
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90 text-right">
                                     Rp {{ number_format($trx->total_harga, 0, ',', '.') }}
+                                </td>
+                                <td class="px-5 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400 text-right">
+                                    Rp {{ number_format($trx->total_hpp, 0, ',', '.') }}
+                                </td>
+                                <td class="px-5 py-4 text-sm font-bold text-success-600 dark:text-success-400 text-right">
+                                    +Rp {{ number_format($trx->total_laba, 0, ',', '.') }}
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $trx->user->nama_user ?? '-' }}

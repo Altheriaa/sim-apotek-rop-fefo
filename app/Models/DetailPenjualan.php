@@ -34,4 +34,37 @@ class DetailPenjualan extends Model
     {
         return $this->belongsTo(ObatBatch::class);
     }
+
+    // ── Accessors Laba / HPP ──
+
+    /**
+     * HPP / Modal beli per satuan_jual (misal per Strip)
+     */
+    public function getHppSatuanAttribute(): float
+    {
+        if (! $this->obatBatch) {
+            return 0;
+        }
+
+        $isiPerKemasan = max(1, (int) ($this->obat->isi_per_kemasan ?? 1));
+        $hargaBeliBox  = (float) ($this->obatBatch->harga_beli_satuan ?? 0);
+
+        return $hargaBeliBox / $isiPerKemasan;
+    }
+
+    /**
+     * Total Modal (HPP) untuk baris item ini
+     */
+    public function getTotalHppAttribute(): float
+    {
+        return $this->hpp_satuan * (int) $this->jumlah;
+    }
+
+    /**
+     * Laba / Keuntungan Bersih untuk baris item ini
+     */
+    public function getLabaAttribute(): float
+    {
+        return (float) $this->subtotal - $this->total_hpp;
+    }
 }

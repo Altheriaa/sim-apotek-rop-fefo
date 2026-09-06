@@ -23,29 +23,35 @@
         </div>
 
         <!-- Table Card with Integrated Toolbar -->
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
+        <div
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <!-- Toolbar / Filter Header -->
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
                 <form action="{{ route('laporan.obat-masuk') }}" method="GET" class="flex flex-col gap-3.5">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label for="tanggal_dari"
-                                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tanggal Mulai</label>
+                                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tanggal
+                                Mulai</label>
                             <input type="date" id="tanggal_dari" name="tanggal_dari"
                                 value="{{ request('tanggal_dari', $startDate) }}" required
                                 class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150">
                         </div>
                         <div>
                             <label for="tanggal_sampai"
-                                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tanggal Selesai</label>
+                                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tanggal
+                                Selesai</label>
                             <input type="date" id="tanggal_sampai" name="tanggal_sampai"
                                 value="{{ request('tanggal_sampai', $endDate) }}" required
                                 class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150">
                         </div>
                         <div>
-                            <label for="search" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Cari Obat / Batch / Supplier</label>
+                            <label for="search"
+                                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Cari
+                                Obat / Batch / Supplier</label>
                             <div class="relative">
-                                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
+                                <span
+                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -59,12 +65,12 @@
                     </div>
                     <div class="flex justify-end gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
                         <button type="submit"
-                            class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
+                            class="mt-2 h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
                             Filter Laporan
                         </button>
                         @if(request()->filled('search'))
                             <a href="{{ route('laporan.obat-masuk', ['tanggal_dari' => request('tanggal_dari', $startDate), 'tanggal_sampai' => request('tanggal_sampai', $endDate)]) }}"
-                                class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150">
+                                class="mt-2 h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150">
                                 Reset Pencarian
                             </a>
                         @endif

@@ -6,7 +6,9 @@ class MenuHelper
 {
     public static function getMenuGroups()
     {
-        $isAdmin = auth()->check() && auth()->user()->isAdmin();
+        $isAdminOrOwner = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOwner());
+        $isAdminOrKaryawan = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isKaryawan());
+        $isAdmin = auth()->check() && (auth()->user()->isAdmin());
 
         $groups = [];
 
@@ -22,6 +24,7 @@ class MenuHelper
             ],
         ];
 
+        // 2. Stok Rak (Semua role)
         $groups[] = [
             'title' => 'Stok Rak',
             'items' => [
@@ -33,24 +36,27 @@ class MenuHelper
             ],
         ];
 
-        // 2. Kasir
-        $groups[] = [
-            'title' => 'Kasir',
-            'items' => [
-                [
-                    'name' => 'Kasir',
-                    'icon' => 'transaction',
-                    'path' => '/kasir',
-                ],
-                [
-                    'name' => 'Riwayat Penjualan',
-                    'icon' => 'receipt',
-                    'path' => '/riwayat-penjualan',
-                ],
-            ],
+        // 3. Kasir / Penjualan
+        $kasirItems = [];
+        if (!auth()->user()->isOwner()) {
+            $kasirItems[] = [
+                'name' => 'Kasir',
+                'icon' => 'transaction',
+                'path' => '/kasir',
+            ];
+        }
+        $kasirItems[] = [
+            'name' => 'Riwayat Penjualan',
+            'icon' => 'receipt',
+            'path' => '/riwayat-penjualan',
         ];
 
-        // 2. Data Master
+        $groups[] = [
+            'title' => auth()->user()->isOwner() ? 'Penjualan' : 'Kasir',
+            'items' => $kasirItems,
+        ];
+
+        // 4. Data Master
         $masterItems = [
             [
                 'name' => 'Data Obat',
@@ -58,42 +64,55 @@ class MenuHelper
                 'path' => '/obat',
             ],
         ];
-        if ($isAdmin) {
-            $masterItems[] = [
-                'name' => 'Data Supplier',
-                'icon' => 'supplier',
-                'path' => '/supplier',
-            ];
-        }
+
+        $masterItems[] = [
+            'name' => 'Data Supplier',
+            'icon' => 'supplier',
+            'path' => '/supplier',
+        ];
+
         $groups[] = [
             'title' => 'Data Master',
             'items' => $masterItems,
         ];
 
-        // 3. Gudang (FEFO)
-        $groups[] = [
-            'title' => 'Gudang (FEFO)',
-            'items' => [
-                [
-                    'name' => 'Stok Gudang',
-                    'icon' => 'building-warehouse',
-                    'path' => '/stok-gudang',
+        // 5. Gudang (FEFO)
+        if($isAdminOrKaryawan) {
+            $groups[] = [
+                'title' => 'Gudang (FEFO)',
+                'items' => [
+                    [
+                        'name' => 'Stok Gudang',
+                        'icon' => 'building-warehouse',
+                        'path' => '/stok-gudang',
+                    ],
+                    [
+                        'name' => 'Obat Masuk',
+                        'icon' => 'inbox-in',
+                        'path' => '/obat-masuk',
+                    ],
+                    [
+                        'name' => 'Transfer ke Rak',
+                        'icon' => 'inbox-right',
+                        'path' => '/transfer-rak',
+                    ],
                 ],
-                [
-                    'name' => 'Obat Masuk',
-                    'icon' => 'inbox-in',
-                    'path' => '/obat-masuk',
+            ];
+        }else{
+            $groups[] = [
+                'title' => 'Gudang (FEFO)',
+                'items' => [
+                    [
+                        'name' => 'Stok Gudang',
+                        'icon' => 'building-warehouse',
+                        'path' => '/stok-gudang',
+                    ],
                 ],
-                [
-                    'name' => 'Transfer ke Rak',
-                    'icon' => 'inbox-right',
-                    'path' => '/transfer-rak',
-                ],
-            ],
-        ];
+            ];
+        }
 
-        // 4. Pemesanan (ROP)
-        if ($isAdmin) {
+        // 6. Pemesanan (ROP)
+        if ($isAdminOrOwner) {
             $groups[] = [
                 'title' => 'Pemesanan (ROP)',
                 'items' => [
@@ -106,8 +125,8 @@ class MenuHelper
             ];
         }
 
-        // 5. Laporan
-        if ($isAdmin) {
+        // 7. Laporan
+        if ($isAdminOrOwner) {
             $groups[] = [
                 'title' => 'Laporan',
                 'items' => [
@@ -130,7 +149,7 @@ class MenuHelper
             ];
         }
 
-        // 6. Pengaturan
+        // 8. Pengaturan
         if ($isAdmin) {
             $groups[] = [
                 'title' => 'Pengaturan',

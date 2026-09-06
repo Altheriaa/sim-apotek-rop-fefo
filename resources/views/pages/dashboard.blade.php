@@ -66,7 +66,7 @@
         </div>
 
         <!-- Card 4 -->
-        <div class="rounded-2xl border border-error-200 bg-error-50 p-5  dark:border-error-800/30 dark:bg-error-900/10">
+        <div class="rounded-2xl border border-error-200 bg-error-50 p-5 dark:border-error-800/30 dark:bg-error-900/10">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-error-600 dark:text-error-400">Mendekati ED (< 30 Hari)</p>
@@ -77,6 +77,53 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ringkasan Penjualan & Keuntungan -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6">
+        <div class="rounded-2xl border border-brand-200 bg-brand-50/50 p-5 dark:border-brand-900/30 dark:bg-brand-900/10 flex items-center justify-between">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Hari Ini</span>
+                    <span class="text-xs text-gray-400">({{ now()->format('d M Y') }})</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-3">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Omzet</p>
+                        <h4 class="text-xl font-bold text-gray-800 dark:text-white/90">Rp {{ number_format($omzetHariIni, 0, ',', '.') }}</h4>
+                    </div>
+                    <div class="border-l border-gray-200 dark:border-gray-700 pl-3">
+                        <p class="text-xs text-success-600 dark:text-success-400 font-medium">Laba / Untung</p>
+                        <h4 class="text-xl font-bold text-success-600 dark:text-success-400">+Rp {{ number_format($labaHariIni, 0, ',', '.') }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400">
+                <i class="ti ti-cash text-2xl"></i>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-success-200 bg-success-50/50 p-5 dark:border-success-900/30 dark:bg-success-900/10 flex items-center justify-between">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-success-700 dark:text-success-400">Bulan Ini</span>
+                    <span class="text-xs text-gray-400">({{ now()->isoFormat('MMMM Y') }})</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-3">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Omzet</p>
+                        <h4 class="text-xl font-bold text-gray-800 dark:text-white/90">Rp {{ number_format($omzetBulanIni, 0, ',', '.') }}</h4>
+                    </div>
+                    <div class="border-l border-gray-200 dark:border-gray-700 pl-3">
+                        <p class="text-xs text-success-700 dark:text-success-400 font-medium">Total Laba</p>
+                        <h4 class="text-xl font-bold text-success-700 dark:text-success-300">+Rp {{ number_format($labaBulanIni, 0, ',', '.') }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-900/40 dark:text-success-300">
+                <i class="ti ti-trending-up text-2xl"></i>
             </div>
         </div>
     </div>

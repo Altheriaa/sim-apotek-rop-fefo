@@ -52,6 +52,21 @@ class DashboardController extends Controller
         // Transfer rak hari ini
         $transferHariIni = TransferRak::whereDate('tanggal_transfer', today())->sum('jumlah_masuk_rak');
 
+        // Omzet & Laba Hari Ini
+        $penjualanHariIniData = Penjualan::with(['details.obat', 'details.obatBatch'])
+            ->whereDate('tanggal_transaksi', today())
+            ->get();
+        $omzetHariIni = (float) $penjualanHariIniData->sum('total_harga');
+        $labaHariIni  = (float) $penjualanHariIniData->sum(fn ($p) => $p->total_laba);
+
+        // Omzet & Laba Bulan Ini
+        $penjualanBulanIniData = Penjualan::with(['details.obat', 'details.obatBatch'])
+            ->whereMonth('tanggal_transaksi', now()->month)
+            ->whereYear('tanggal_transaksi', now()->year)
+            ->get();
+        $omzetBulanIni = (float) $penjualanBulanIniData->sum('total_harga');
+        $labaBulanIni  = (float) $penjualanBulanIniData->sum(fn ($p) => $p->total_laba);
+
         // Notifikasi terbaru
         $notifikasiTerbaru = Notifikasi::with('obat')
             ->latest()
@@ -71,7 +86,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $penjualanTerakhir = Penjualan::with(['user', 'details.obat'])
+        $penjualanTerakhir = Penjualan::with(['user', 'details.obat', 'details.obatBatch'])
             ->latest()
             ->take(5)
             ->get();
@@ -87,6 +102,10 @@ class DashboardController extends Controller
             'batchEdCount'       => $batchEdCount,
             'penjualanChart'     => $penjualanChart,
             'transferHariIni'    => $transferHariIni,
+            'omzetHariIni'       => $omzetHariIni,
+            'labaHariIni'        => $labaHariIni,
+            'omzetBulanIni'      => $omzetBulanIni,
+            'labaBulanIni'       => $labaBulanIni,
             'notifikasiTerbaru'  => $notifikasiTerbaru,
             'pesananAktif'       => $pesananAktif,
             'transferTerakhir'   => $transferTerakhir,

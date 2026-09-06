@@ -25,10 +25,11 @@
     </div>
     @endif
     
+    @if(session('success'))
+        <x-common.flash-alert type="success" :message="session('success')" />
+    @endif
     @if(session('error'))
-    <div class="rounded-lg bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30">
-        {{ session('error') }}
-    </div>
+        <x-common.flash-alert type="error" :message="session('error')" />
     @endif
 
     <div class="rounded-2xl border border-gray-200 bg-white shadow-theme-sm dark:border-gray-800 dark:bg-gray-dark">

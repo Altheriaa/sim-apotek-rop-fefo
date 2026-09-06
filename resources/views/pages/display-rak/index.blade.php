@@ -8,20 +8,21 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Display Rak Obat</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Monitor stok obat yang tersedia di display rak penjualan.</p>
             </div>
-            @if(auth()->user()->isAdmin())
+            @if (Auth::user()->isAdmin() || Auth::user()->isAdmin())    
                 <a href="{{ route('transfer-rak.create') }}"
                     class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
                     <i class="ti ti-circle-arrow-right text-base"></i>
                     Transfer dari Gudang
-                </a>
+                </a> 
             @endif
         </div>
 
         {{-- Alerts --}}
         @if(session('success'))
-            <div class="rounded-lg bg-success-50 p-4 text-success-800 border border-success-200 dark:bg-success-900/20 dark:text-success-400 dark:border-success-800/30">
-                {{ session('success') }}
-            </div>
+            <x-common.flash-alert type="success" :message="session('success')" />
+        @endif
+        @if(session('error'))
+            <x-common.flash-alert type="error" :message="session('error')" />
         @endif
 
         {{-- Stats Cards --}}
@@ -122,7 +123,7 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Min. Rak</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Stok Gudang</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Status</th>
-                            @if(auth()->user()->isAdmin())
+                            @if (Auth::user()->isAdmin() || Auth::user()->isAdmin())  
                                 <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Aksi</th>
                             @endif
                         </tr>
@@ -175,22 +176,22 @@
                                         </span>
                                     @endif
                                 </td>
-                                @if(auth()->user()->isAdmin())
-                                <td class="px-5 py-4 text-center">
-                                    @if($isKosong || $isKritis)
-                                        <a href="{{ route('transfer-rak.create', ['obat_id' => $obat->id]) }}"
-                                            class="inline-flex items-center gap-1 rounded-lg bg-warning-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-warning-600 transition">
-                                            <i class="ti ti-circle-arrow-right text-sm"></i> Transfer
-                                        </a>
-                                    @else
-                                        <span class="text-xs text-gray-400">—</span>
-                                    @endif
-                                </td>
+                                @if (Auth::user()->isAdmin() || Auth::user()->isAdmin())  
+                                    <td class="px-5 py-4 text-center">
+                                        @if($isKosong || $isKritis)
+                                            <a href="{{ route('transfer-rak.create', ['obat_id' => $obat->id]) }}"
+                                                class="inline-flex items-center gap-1 rounded-lg bg-warning-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-warning-600 transition">
+                                                <i class="ti ti-circle-arrow-right text-sm"></i> Transfer
+                                            </a>
+                                        @else
+                                            <span class="text-xs text-gray-400">—</span>
+                                        @endif
+                                    </td>
                                 @endif
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ auth()->user()->isAdmin() ? 8 : 7 }}" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="8" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     Tidak ada data obat yang ditemukan.
                                 </td>
                             </tr>

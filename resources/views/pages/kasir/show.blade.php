@@ -27,13 +27,15 @@
                     ['Tanggal', $penjualan->tanggal_transaksi->format('d M Y, H:i')],
                     ['Kasir', $penjualan->user->nama_user ?? '-'],
                     ['Pembeli', $penjualan->nama_pembeli ?? 'Umum'],
-                    ['Total Harga', 'Rp ' . number_format($penjualan->total_harga, 0, ',', '.')],
+                    ['Total Omzet (Penjualan)', 'Rp ' . number_format($penjualan->total_harga, 0, ',', '.')],
+                    ['Total Modal (HPP)', 'Rp ' . number_format($penjualan->total_hpp, 0, ',', '.')],
+                    ['Laba / Untung Bersih', '+Rp ' . number_format($penjualan->total_laba, 0, ',', '.')],
                     ['Nominal Bayar', 'Rp ' . number_format($penjualan->nominal_bayar, 0, ',', '.')],
                     ['Kembalian', 'Rp ' . number_format($penjualan->kembalian, 0, ',', '.')],
                 ] as [$label, $value])
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500 dark:text-gray-400">{{ $label }}</span>
-                        <span class="font-semibold text-gray-800 dark:text-white/90">{{ $value }}</span>
+                    <div class="flex justify-between text-sm {{ str_contains($label, 'Laba') ? 'bg-success-50 dark:bg-success-900/20 p-2 rounded-lg text-success-700 dark:text-success-300 font-bold' : '' }}">
+                        <span class="{{ str_contains($label, 'Laba') ? 'text-success-700 dark:text-success-300' : 'text-gray-500 dark:text-gray-400' }}">{{ $label }}</span>
+                        <span class="font-semibold {{ str_contains($label, 'Laba') ? 'text-success-700 dark:text-success-300 font-bold' : 'text-gray-800 dark:text-white/90' }}">{{ $value }}</span>
                     </div>
                 @endforeach
                 @if($penjualan->catatan)
@@ -56,14 +58,23 @@
                                 <div class="text-xs text-gray-400 mt-0.5">
                                     {{ $detail->jumlah }} {{ $detail->obat->satuan_jual ?? '' }} × Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}
                                 </div>
+                                <div class="text-xs text-gray-400">
+                                    HPP: Rp {{ number_format($detail->hpp_satuan, 0, ',', '.') }}/{{ $detail->obat->satuan_jual ?? '' }}
+                                    (Modal: Rp {{ number_format($detail->total_hpp, 0, ',', '.') }})
+                                </div>
                                 <div class="text-xs text-gray-300 dark:text-gray-600">
                                     Batch: {{ $detail->obatBatch->nomor_batch ?? '-' }}
                                     | ED: {{ $detail->obatBatch ? $detail->obatBatch->tanggal_kadaluwarsa->format('d/m/Y') : '-' }}
                                 </div>
                             </div>
-                            <span class="font-bold text-gray-800 dark:text-white/90 shrink-0 ml-4">
-                                Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
-                            </span>
+                            <div class="text-right shrink-0 ml-4">
+                                <div class="font-bold text-gray-800 dark:text-white/90">
+                                    Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
+                                </div>
+                                <div class="text-xs font-semibold text-success-600 dark:text-success-400">
+                                    +Rp {{ number_format($detail->laba, 0, ',', '.') }}
+                                </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>

@@ -25,7 +25,7 @@
                             <select name="status_rop" onchange="this.form.submit()"
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 transition cursor-pointer">
                                 <option value="">Semua Status ROP</option>
-                                <option value="kritis" {{ request('status_rop') === 'kritis' ? 'selected' : '' }}>⚠️ Dibawah ROP</option>
+                                <option value="kritis" {{ request('status_rop') === 'kritis' ? 'selected' : '' }}>Dibawah ROP</option>
                             </select>
                             <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,9 +35,9 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-end gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
-                        <button type="submit" class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white hover:bg-brand-600 transition">Filter</button>
+                        <button type="submit" class="mt-2 h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white hover:bg-brand-600 transition">Filter</button>
                         @if(request()->hasAny(['search', 'status_rop']))
-                            <a href="{{ route('laporan.stok-obat') }}" class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition">Reset</a>
+                            <a href="{{ route('laporan.stok-obat') }}" class="mt-2 h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition">Reset</a>
                         @endif
                     </div>
                 </form>
@@ -79,9 +79,9 @@
                                 <td class="px-5 py-4 text-center text-sm text-gray-500 dark:text-gray-400">{{ $obat->rop_minimum }} <span class="text-xs font-normal text-gray-400">{{ $obat->satuan_beli }}</span></td>
                                 <td class="px-5 py-4 text-center">
                                     @if($isBawahRop)
-                                        <span class="inline-flex items-center rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-semibold text-error-700 dark:bg-error-900/30 dark:text-error-400">⚠️ Kritis</span>
+                                        <span class="inline-flex items-center rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-semibold text-error-700 dark:bg-error-900/30 dark:text-error-400">Kritis</span>
                                     @else
-                                        <span class="inline-flex items-center rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">✅ Aman</span>
+                                        <span class="inline-flex items-center rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">Aman</span>
                                     @endif
                                 </td>
                             </tr>

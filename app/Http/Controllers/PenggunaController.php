@@ -42,10 +42,11 @@ class PenggunaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'email' => 'required|email|unique:users,email',
             'nama_user' => 'required|string|max:255',
             'username'  => 'required|string|max:100|unique:users,username',
             'password'  => 'required|string|min:6',
-            'role'      => 'required|in:admin,karyawan',
+            'role'      => 'required|in:owner,admin,karyawan',
         ]);
 
         $validated['password'] = $validated['password']; // Will be hashed by cast
@@ -68,10 +69,11 @@ class PenggunaController extends Controller
     public function update(Request $request, User $pengguna)
     {
         $validated = $request->validate([
+            'email' => 'required|email|unique:users,email',
             'nama_user' => 'required|string|max:255',
             'username'  => ['required', 'string', 'max:100', Rule::unique('users')->ignore($pengguna->id)],
             'password'  => 'nullable|string|min:6',
-            'role'      => 'required|in:admin,karyawan',
+            'role'      => 'required|in:owner,admin,karyawan',
         ]);
 
         if ($pengguna->id === auth()->id()) {

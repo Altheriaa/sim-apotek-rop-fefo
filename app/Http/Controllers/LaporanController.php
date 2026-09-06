@@ -160,7 +160,7 @@ class LaporanController extends Controller
 
     public function penjualan(Request $request)
     {
-        $query = Penjualan::with(['user', 'details.obat']);
+        $query = Penjualan::with(['user', 'details.obat', 'details.obatBatch']);
 
         $startDate = $request->tanggal_dari ?? now()->startOfMonth()->toDateString();
         $endDate   = $request->tanggal_sampai ?? now()->toDateString();
@@ -179,10 +179,17 @@ class LaporanController extends Controller
             });
         }
 
-        $data            = $query->latest('tanggal_transaksi')->paginate(15)->withQueryString();
-        $totalPendapatan = Penjualan::when($request->tanggal_dari, fn ($q) => $q->whereDate('tanggal_transaksi', '>=', $request->tanggal_dari))
+        $data = $query->latest('tanggal_transaksi')->paginate(15)->withQueryString();
+
+        // Hitung akumulasi omzet, HPP modal, dan laba untuk periode filter
+        $semuaTrx = Penjualan::with(['details.obat', 'details.obatBatch'])
+            ->when($request->tanggal_dari, fn ($q) => $q->whereDate('tanggal_transaksi', '>=', $request->tanggal_dari))
             ->when($request->tanggal_sampai, fn ($q) => $q->whereDate('tanggal_transaksi', '<=', $request->tanggal_sampai))
-            ->sum('total_harga');
+            ->get();
+
+        $totalPendapatan = (float) $semuaTrx->sum('total_harga');
+        $totalHpp        = (float) $semuaTrx->sum(fn ($trx) => $trx->total_hpp);
+        $totalLaba       = (float) ($totalPendapatan - $totalHpp);
 
         return view('pages.laporan.penjualan', [
             'title'           => 'Laporan Penjualan',
@@ -190,6 +197,8 @@ class LaporanController extends Controller
             'startDate'       => $startDate,
             'endDate'         => $endDate,
             'totalPendapatan' => $totalPendapatan,
+            'totalHpp'        => $totalHpp,
+            'totalLaba'       => $totalLaba,
         ]);
     }
 }

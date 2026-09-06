@@ -35,29 +35,72 @@
         {{-- Flash Alerts --}}
         @if(session('success'))
             <div
+                x-data="{ 
+                    show: true,
+                    timeout: null,
+                    startTimer() {
+                        this.timeout = setTimeout(() => this.show = false, 5000);
+                    },
+                    pauseTimer() {
+                        if (this.timeout) clearTimeout(this.timeout);
+                    }
+                }"
+                x-init="startTimer()"
+                x-show="show"
+                @mouseenter="pauseTimer()"
+                @mouseleave="startTimer()"
+                x-transition:leave="transition ease-out duration-300"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-2"
                 class="rounded-xl bg-success-50 p-4 text-success-800 border border-success-200 dark:bg-success-900/20 dark:text-success-400 dark:border-success-800/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <i class="ti ti-circle-check text-2xl text-success-500 shrink-0"></i>
                     <div>
                         <p class="text-sm font-bold">{{ session('success') }}</p>
-                        <p class="text-xs text-success-600 dark:text-success-400">Struk penjualan otomatis dibuka di tab baru.
-                        </p>
+                        <p class="text-xs text-success-600 dark:text-success-400">Struk penjualan otomatis dibuka di tab baru.</p>
                     </div>
                 </div>
-                @if(session('struk_id'))
-                    <a href="{{ route('kasir.struk', session('struk_id')) }}" target="_blank"
-                        class="inline-flex items-center gap-1.5 rounded-lg bg-success-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-success-700 transition shadow-sm self-start sm:self-auto">
-                        <i class="ti ti-printer text-sm"></i> Buka Struk (Tab Baru)
-                    </a>
-                @endif
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    @if(session('struk_id'))
+                        <a href="{{ route('kasir.struk', session('struk_id')) }}" target="_blank"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-success-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-success-700 transition shadow-sm">
+                            <i class="ti ti-printer text-sm"></i> Buka Struk (Tab Baru)
+                        </a>
+                    @endif
+                    <button @click="show = false" type="button" class="p-1 rounded-lg hover:bg-success-100 dark:hover:bg-success-800/40 text-success-700 dark:text-success-300 transition" title="Tutup">
+                        <i class="ti ti-x text-base"></i>
+                    </button>
+                </div>
             </div>
         @endif
 
         @if(session('error'))
             <div
-                class="rounded-xl bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30 flex items-start gap-3">
-                <i class="ti ti-alert-circle text-xl text-error-500 shrink-0 mt-0.5"></i>
-                <div class="text-sm font-medium">{{ session('error') }}</div>
+                x-data="{ 
+                    show: true,
+                    timeout: null,
+                    startTimer() {
+                        this.timeout = setTimeout(() => this.show = false, 6000);
+                    },
+                    pauseTimer() {
+                        if (this.timeout) clearTimeout(this.timeout);
+                    }
+                }"
+                x-init="startTimer()"
+                x-show="show"
+                @mouseenter="pauseTimer()"
+                @mouseleave="startTimer()"
+                x-transition:leave="transition ease-out duration-300"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-2"
+                class="rounded-xl bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30 flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                    <i class="ti ti-alert-circle text-xl text-error-500 shrink-0 mt-0.5"></i>
+                    <div class="text-sm font-medium">{{ session('error') }}</div>
+                </div>
+                <button @click="show = false" type="button" class="p-1 rounded-lg hover:bg-error-100 dark:hover:bg-error-800/40 text-error-700 dark:text-error-300 transition" title="Tutup">
+                    <i class="ti ti-x text-base"></i>
+                </button>
             </div>
         @endif
 
@@ -263,8 +306,7 @@
                                             class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-bold text-gray-400 dark:text-gray-500 select-none">
                                             Rp
                                         </span>
-                                        <input type="number" name="nominal_bayar" id="nominal-bayar" min="0" step="500"
-                                            oninput="hitungKembalian()"
+                                        <input type="number" name="nominal_bayar" id="nominal-bayar" min="0"                                        oninput="hitungKembalian()"
                                             class="h-11 w-full rounded-lg border border-gray-200 bg-white pl-12 pr-4 text-base font-bold text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white transition"
                                             placeholder="0">
                                     </div>
@@ -562,45 +604,45 @@
                 total += subtotal;
 
                 html += `
-                    <div class="flex flex-col gap-2 rounded-lg border border-gray-100 bg-white p-3 shadow-xs dark:border-gray-700/60 dark:bg-gray-800/80">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0 flex-1">
-                                <h4 class="text-xs font-bold text-gray-800 dark:text-white/90 truncate" title="${item.nama}">
-                                    ${item.nama}
-                                </h4>
-                                <div class="text-[11px] text-gray-400">
-                                    Rp ${item.harga.toLocaleString('id-ID')} / ${item.satuan}
+                        <div class="flex flex-col gap-2 rounded-lg border border-gray-100 bg-white p-3 shadow-xs dark:border-gray-700/60 dark:bg-gray-800/80">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="text-xs font-bold text-gray-800 dark:text-white/90 truncate" title="${item.nama}">
+                                        ${item.nama}
+                                    </h4>
+                                    <div class="text-[11px] text-gray-400">
+                                        Rp ${item.harga.toLocaleString('id-ID')} / ${item.satuan}
+                                    </div>
+                                </div>
+                                <button type="button" onclick="hapusItem(${item.id})"
+                                    class="text-gray-400 hover:text-error-500 transition p-1 rounded-md hover:bg-error-50 dark:hover:bg-error-900/20"
+                                    title="Hapus item">
+                                    <i class="ti ti-trash text-sm"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-1 border-t border-gray-50 dark:border-gray-700/40">
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="ubahQty(${item.id}, -1)"
+                                        class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs">
+                                        <i class="ti ti-minus"></i>
+                                    </button>
+                                    <input type="number" value="${item.qty}" min="1" max="${item.stok}"
+                                        onchange="setQtyDirect(${item.id}, this)"
+                                        class="h-7 w-12 rounded-md border border-gray-200 text-center text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-white focus:border-brand-500 focus:outline-none">
+                                    <button type="button" onclick="ubahQty(${item.id}, 1)"
+                                        class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs ${item.qty >= item.stok ? 'opacity-40 cursor-not-allowed' : ''}">
+                                        <i class="ti ti-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-bold text-brand-600 dark:text-brand-400">
+                                        Rp ${subtotal.toLocaleString('id-ID')}
+                                    </span>
                                 </div>
                             </div>
-                            <button type="button" onclick="hapusItem(${item.id})"
-                                class="text-gray-400 hover:text-error-500 transition p-1 rounded-md hover:bg-error-50 dark:hover:bg-error-900/20"
-                                title="Hapus item">
-                                <i class="ti ti-trash text-sm"></i>
-                            </button>
                         </div>
-
-                        <div class="flex items-center justify-between pt-1 border-t border-gray-50 dark:border-gray-700/40">
-                            <div class="flex items-center gap-1">
-                                <button type="button" onclick="ubahQty(${item.id}, -1)"
-                                    class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs">
-                                    <i class="ti ti-minus"></i>
-                                </button>
-                                <input type="number" value="${item.qty}" min="1" max="${item.stok}"
-                                    onchange="setQtyDirect(${item.id}, this)"
-                                    class="h-7 w-12 rounded-md border border-gray-200 text-center text-xs font-bold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-white focus:border-brand-500 focus:outline-none">
-                                <button type="button" onclick="ubahQty(${item.id}, 1)"
-                                    class="h-7 w-7 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-200 transition font-bold text-xs ${item.qty >= item.stok ? 'opacity-40 cursor-not-allowed' : ''}">
-                                    <i class="ti ti-plus"></i>
-                                </button>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs font-bold text-brand-600 dark:text-brand-400">
-                                    Rp ${subtotal.toLocaleString('id-ID')}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    `;
 
                 inputsHtml += `<input type="hidden" name="items[${index}][obat_id]" value="${item.id}">`;
                 inputsHtml += `<input type="hidden" name="items[${index}][jumlah]" value="${item.qty}">`;

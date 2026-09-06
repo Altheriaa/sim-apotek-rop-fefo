@@ -60,9 +60,13 @@
         'justify-start px-6'">
         <a href="/" class="flex items-center gap-3">
             <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="dark:hidden" src="/images/Logo Apotek Tabah Farma.png" alt="Logo" width="50" />
+                class="dark:hidden" src="{{ asset('images/Logo Apotek Tabah Farma.png') }}" alt="Logo" width="50" />
+            <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
+                class="hidden dark:block" src="{{ asset('images/Logo Apotek Tabah Farma Dark.png') }}" alt="Logo" width="50" />
             <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
-                src="/images/Logo Apotek Tabah Farma.png" alt="Logo" width="32" height="32" />
+                class="dark:hidden" src="{{ asset('images/Logo Apotek Tabah Farma.png') }}" alt="Logo" width="32" height="32" />
+            <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
+                class="hidden dark:block" src="{{ asset('images/Logo Apotek Tabah Farma Dark.png') }}" alt="Logo" width="32" height="32" />
             <h1 x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                 class="text-lg font-bold text-gray-800 dark:text-white leading-tight">Apotek<br>Tabah Farma</h1>
         </a>

@@ -50,9 +50,9 @@
 
             <!-- Logo (mobile only) -->
             <a href="/" class="xl:hidden flex items-center gap-2">
-                <img class="dark:hidden" width="40px" src="images/Logo Apotek Tabah Farma.png" alt="Logo" />
-                <h1 class="font-bold">Apotek Tabah Farma</h1>
-                <img class="hidden dark:block" width="40px" src="images/Logo Apotek Tabah Farma.png" alt="Logo" />
+                <img class="dark:hidden" width="40px" src="{{ asset('images/Logo Apotek Tabah Farma.png') }}" alt="Logo" />
+                <img class="hidden dark:block" width="40px" src="{{ asset('images/Logo Apotek Tabah Farma Dark.png') }}" alt="Logo" />
+                <h1 class="font-bold text-gray-800 dark:text-white">Apotek Tabah Farma</h1>
             </a>
 
             <!-- Application Menu Toggle (mobile only) -->

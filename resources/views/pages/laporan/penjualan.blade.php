@@ -3,35 +3,81 @@
 @section('content')
     <div class="space-y-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Penjualan</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Rekap seluruh transaksi kasir dalam periode tertentu.</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Penjualan & Laba</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Rekap transaksi kasir, modal pokok (HPP), dan keuntungan
+                bersih.</p>
         </div>
 
-        @if($totalPendapatan > 0)
-            <div class="rounded-xl border border-brand-200 bg-brand-50/70 p-4 dark:border-brand-800/30 dark:bg-brand-900/10 flex items-center justify-between">
+        {{-- Ringkasan Keuangan (Omzet, HPP, Laba) --}}
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <!-- Card 1: Total Pendapatan / Omzet -->
+            <div
+                class="rounded-xl border border-brand-200 bg-brand-50/70 p-4 dark:border-brand-800/30 dark:bg-brand-900/10 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/30">
-                        <i class="ti ti-currency-rupiah text-xl text-brand-500"></i>
+                        <i class="ti ti-cash text-xl text-brand-500"></i>
                     </div>
                     <div>
-                        <p class="text-xs text-brand-600 dark:text-brand-400">Total Pendapatan Periode</p>
-                        <p class="text-2xl font-bold text-brand-700 dark:text-brand-300">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
+                        <p class="text-xs font-medium text-brand-600 dark:text-brand-400">Total Omzet / Pendapatan</p>
+                        <p class="text-xl font-bold text-brand-700 dark:text-brand-300">Rp
+                            {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
                     </div>
                 </div>
-                <div class="text-right text-xs text-brand-500 dark:text-brand-400">
-                    {{ $startDate }} — {{ $endDate }}
+            </div>
+
+            <!-- Card 2: Total Modal (HPP) -->
+            <div
+                class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-dark flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                        <i class="ti ti-receipt-2 text-xl text-gray-500 dark:text-gray-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Modal Pokok (HPP)</p>
+                        <p class="text-xl font-bold text-gray-700 dark:text-gray-200">Rp
+                            {{ number_format($totalHpp, 0, ',', '.') }}</p>
+                    </div>
                 </div>
             </div>
-        @endif
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
+            <!-- Card 3: Total Laba / Keuntungan Bersih -->
+            @php
+                $marginPersen = $totalPendapatan > 0 ? round(($totalLaba / $totalPendapatan) * 100, 1) : 0;
+            @endphp
+            <div
+                class="rounded-xl border border-success-200 bg-success-50/70 p-4 dark:border-success-800/30 dark:bg-success-900/10 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-success-100 dark:bg-success-900/30">
+                        <i class="ti ti-trending-up text-xl text-success-600 dark:text-success-400"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <p class="text-xs font-medium text-success-700 dark:text-success-400">Total Laba / Untung Bersih
+                            </p>
+                            @if($totalPendapatan > 0)
+                                <span
+                                    class="rounded-full bg-success-200/80 dark:bg-success-800 px-1.5 py-0.2 text-[10px] font-bold text-success-800 dark:text-success-200">+{{ $marginPersen }}%</span>
+                            @endif
+                        </div>
+                        <p class="text-xl font-bold text-success-700 dark:text-success-300">Rp
+                            {{ number_format($totalLaba, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
                 <form action="{{ route('laporan.penjualan') }}" method="GET" class="flex flex-col gap-3.5">
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         <div class="relative lg:col-span-2">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                            <span
+                                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}"
@@ -50,47 +96,92 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-end gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
-                        <button type="submit" class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white hover:bg-brand-600 transition">Filter</button>
+                        <button type="submit"
+                            class="mt-2 h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white hover:bg-brand-600 transition">Filter</button>
                         @if(request()->hasAny(['search', 'tanggal_dari', 'tanggal_sampai']))
-                            <a href="{{ route('laporan.penjualan') }}" class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition">Reset</a>
+                            <a href="{{ route('laporan.penjualan') }}"
+                                class="mt-2 h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition">Reset</a>
                         @endif
                     </div>
                 </form>
             </div>
 
             <div class="max-w-full overflow-x-auto custom-scrollbar">
-                <table class="w-full min-w-[800px] text-left">
+                <table class="w-full min-w-[950px] text-left">
                     <thead>
                         <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">#</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">No. Transaksi</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Pembeli</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Item</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Total</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Item Terjual</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Omzet Jual
+                            </th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Modal
+                                (HPP)</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Laba
+                                (Untung)</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Kasir</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($data as $trx)
-                            <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
-                                <td class="px-5 py-4 text-sm text-gray-500">{{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
-                                <td class="px-5 py-4 text-sm font-mono font-semibold text-brand-600 dark:text-brand-400">{{ $trx->no_transaksi }}</td>
-                                <td class="px-5 py-4 text-sm text-gray-700 dark:text-gray-300">{{ $trx->tanggal_transaksi->format('d M Y, H:i') }}</td>
-                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">{{ $trx->nama_pembeli ?? 'Umum' }}</td>
+                            @php
+                                $trxHpp = $trx->total_hpp;
+                                $trxLaba = $trx->total_laba;
+                            @endphp
+                            <tr
+                                class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
+                                <td class="px-5 py-4 text-sm text-gray-500">
+                                    {{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
+                                <td class="px-5 py-4 text-sm font-mono font-semibold text-brand-600 dark:text-brand-400">
+                                    {{ $trx->no_transaksi }}</td>
+                                <td class="px-5 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                    {{ $trx->tanggal_transaksi->format('d M Y, H:i') }}</td>
+                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                    {{ $trx->nama_pembeli ?? 'Umum' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     @foreach($trx->details->take(2) as $d)
-                                        <div class="text-xs">{{ $d->obat->nama_obat ?? '-' }} ({{ $d->jumlah }})</div>
+                                        <div class="text-xs">
+                                            {{ $d->obat->nama_obat ?? '-' }} ({{ $d->jumlah }} {{ $d->obat->satuan_jual ?? '' }})
+                                        </div>
                                     @endforeach
                                     @if($trx->details->count() > 2)
                                         <div class="text-xs text-gray-400">+{{ $trx->details->count() - 2 }} lainnya</div>
                                     @endif
                                 </td>
-                                <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90 text-right">Rp {{ number_format($trx->total_harga, 0, ',', '.') }}</td>
-                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $trx->user->nama_user ?? '-' }}</td>
+                                <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90 text-right">
+                                    Rp {{ number_format($trx->total_harga, 0, ',', '.') }}
+                                </td>
+                                <td class="px-5 py-4 text-sm font-semibold text-gray-600 dark:text-gray-400 text-right">
+                                    Rp {{ number_format($trxHpp, 0, ',', '.') }}
+                                </td>
+                                <td class="px-5 py-4 text-sm font-bold text-success-600 dark:text-success-400 text-right">
+                                    +Rp {{ number_format($trxLaba, 0, ',', '.') }}
+                                </td>
+                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $trx->user->nama_user ?? '-' }}</td>
+                                <td class="px-5 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <a href="{{ route('riwayat-penjualan.show', $trx->id) }}"
+                                            class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition"
+                                            title="Lihat Detail">
+                                            <i class="ti ti-eye text-base"></i>
+                                        </a>
+                                        <a href="{{ route('kasir.struk', $trx->id) }}" target="_blank"
+                                            class="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition"
+                                            title="Cetak Struk">
+                                            <i class="ti ti-printer text-base"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Tidak ada transaksi penjualan pada periode ini.</td></tr>
+                            <tr>
+                                <td colspan="10" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Tidak
+                                    ada transaksi penjualan pada periode ini.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>

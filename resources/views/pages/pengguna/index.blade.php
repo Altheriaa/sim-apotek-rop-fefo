@@ -20,16 +20,17 @@
             </div>
         </div>
 
-        <!-- Alert Success -->
+        <!-- Alert Notification -->
         @if(session('success'))
-            <div
-                class="rounded-lg bg-success-50 p-4 text-success-800 border border-success-200 dark:bg-success-900/20 dark:text-success-400 dark:border-success-800/30">
-                {{ session('success') }}
-            </div>
+            <x-common.flash-alert type="success" :message="session('success')" />
+        @endif
+        @if(session('error'))
+            <x-common.flash-alert type="error" :message="session('error')" />
         @endif
 
         <!-- Table Card with Integrated Toolbar -->
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
+        <div
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <!-- Toolbar / Filter Header -->
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
                 <form action="{{ route('pengguna.index') }}" method="GET"
@@ -37,7 +38,8 @@
                     <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                         <!-- Search Input -->
                         <div class="relative flex-1 max-w-md">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
+                            <span
+                                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -53,12 +55,18 @@
                             <select name="role" onchange="this.form.submit()"
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150 cursor-pointer">
                                 <option value="" class="dark:bg-gray-900">Semua Role</option>
-                                <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }} class="dark:bg-gray-900">Admin</option>
-                                <option value="karyawan" {{ request('role') === 'karyawan' ? 'selected' : '' }} class="dark:bg-gray-900">Karyawan</option>
+                                <option value="owner" {{ request('role') === 'owner' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Owner</option>
+                                <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Admin</option>
+                                <option value="karyawan" {{ request('role') === 'karyawan' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Karyawan</option>
                             </select>
-                            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <span
+                                class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </div>
@@ -86,6 +94,7 @@
                     <thead>
                         <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">#</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Email</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Nama Pengguna</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Username</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Role</th>
@@ -99,6 +108,9 @@
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $loop->iteration + ($penggunas->currentPage() - 1) * $penggunas->perPage() }}
                                 </td>
+                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $user->email }}
+                                </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
                                     {{ $user->nama_user }}
                                     @if($user->id === auth()->id())
@@ -109,8 +121,14 @@
                                     {{ $user->username }}
                                 </td>
                                 <td class="px-5 py-4 text-sm">
-                                    <span
-                                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400' }}">
+                                    @php
+                                        $badgeClass = match($user->role) {
+                                            'owner' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+                                            'admin' => 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                            default => 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400',
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
                                 </td>

@@ -11,7 +11,8 @@
             <!-- Header/Logo -->
             <div class="mb-8">
                 <div class="mb-3 flex items-center gap-2">
-                    <img src="images/Logo Apotek Tabah Farma.png" alt="" width="58">
+                    <img class="dark:hidden" src="{{ asset('images/Logo Apotek Tabah Farma.png') }}" alt="Logo" width="58">
+                    <img class="hidden dark:block" src="{{ asset('images/Logo Apotek Tabah Farma Dark.png') }}" alt="Logo" width="58">
                     <div>
                         <span class="text-md sm:text-xl space-x-0.3 font-bold text-gray-800 dark:text-white">Sistem
                             Informasi

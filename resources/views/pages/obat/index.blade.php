@@ -8,23 +8,25 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Data Obat</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Kelola master data obat dan informasi ROP.</p>
             </div>
-            <div class="flex gap-2">
-                <a href="{{ route('obat.create') }}"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Obat
-                </a>
-            </div>
+            @if(auth()->user()->isAdmin())
+                <div class="flex gap-2">
+                    <a href="{{ route('obat.create') }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Obat
+                    </a>
+                </div>
+            @endif
         </div>
 
-        <!-- Alert Success -->
+        <!-- Alert Notification -->
         @if(session('success'))
-            <div
-                class="rounded-lg bg-success-50 p-4 text-success-800 border border-success-200 dark:bg-success-900/20 dark:text-success-400 dark:border-success-800/30">
-                {{ session('success') }}
-            </div>
+            <x-common.flash-alert type="success" :message="session('success')" />
+        @endif
+        @if(session('error'))
+            <x-common.flash-alert type="error" :message="session('error')" />
         @endif
 
         <!-- Table Card with Integrated Toolbar -->
@@ -55,9 +57,9 @@
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150 cursor-pointer">
                                 <option value="" class="dark:bg-gray-900">Semua Status Stok</option>
                                 <option value="rop" {{ request('status') === 'rop' ? 'selected' : '' }}
-                                    class="dark:bg-gray-900">⚠️ Perlu Reorder (≤ ROP)</option>
+                                    class="dark:bg-gray-900">Perlu Reorder (≤ ROP)</option>
                                 <option value="aman" {{ request('status') === 'aman' ? 'selected' : '' }}
-                                    class="dark:bg-gray-900">✅ Stok Aman (> ROP)</option>
+                                    class="dark:bg-gray-900">Stok Aman (> ROP)</option>
                             </select>
                             <span
                                 class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
@@ -98,7 +100,9 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">ROP Minimum</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Status Stok</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Harga</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Aksi</th>
+                            @if(auth()->user()->isAdmin())
+                                <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -116,19 +120,28 @@
                                     {{ $loop->iteration + ($obats->currentPage() - 1) * $obats->perPage() }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
-                                    <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
+                                    @if(auth()->user()->isAdminOrOwner())
+                                        <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
+                                            {{ $obat->kode_obat }}
+                                        </a>
+                                    @else
                                         {{ $obat->kode_obat }}
-                                    </a>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
-                                    <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
+                                    @if(auth()->user()->isAdminOrOwner())
+                                        <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
+                                            {{ $obat->nama_obat }}
+                                        </a>
+                                    @else
                                         {{ $obat->nama_obat }}
-                                    </a>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     <div class="font-medium text-gray-700 dark:text-gray-300">{{ $obat->satuan_jual }}</div>
                                     @if($obat->isi_per_kemasan > 1)
-                                        <div class="text-[11px] text-gray-400">1 {{ $obat->satuan_beli }} = {{ $obat->isi_per_kemasan }} {{ $obat->satuan_jual }}</div>
+                                        <div class="text-[11px] text-gray-400">1 {{ $obat->satuan_beli }} =
+                                            {{ $obat->isi_per_kemasan }} {{ $obat->satuan_jual }}</div>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90">
@@ -138,9 +151,11 @@
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <div class="font-semibold text-gray-800 dark:text-white/90">{{ $obat->rop_minimum }} {{ $obat->satuan_beli }}</div>
+                                    <div class="font-semibold text-gray-800 dark:text-white/90">{{ $obat->rop_minimum }}
+                                        {{ $obat->satuan_beli }}</div>
                                     @if($obat->isi_per_kemasan > 1)
-                                        <div class="text-[11px] text-gray-400">(= {{ $batasRopSatuanJual }} {{ $obat->satuan_jual }})</div>
+                                        <div class="text-[11px] text-gray-400">(= {{ $batasRopSatuanJual }}
+                                            {{ $obat->satuan_jual }})</div>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm">
@@ -152,45 +167,37 @@
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     Rp {{ number_format($obat->harga_jual, 0, ',', '.') }} / {{ $obat->satuan_jual }}
                                 </td>
-                                <td class="px-5 py-4 text-sm">
-                                    <div class="flex items-center gap-1.5">
-                                        {{-- <a href="{{ route('obat.show', $obat->id) }}"
-                                            class="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-brand-50 dark:text-gray-400 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 transition"
-                                            title="Lihat Detail & Batch">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </a> --}}
-                                        <a href="{{ route('obat.edit', $obat->id) }}"
-                                            class="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-brand-50 dark:text-gray-400 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 transition"
-                                            title="Edit Obat">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </a>
-                                        <form action="{{ route('obat.destroy', $obat->id) }}" method="POST" class="inline"
-                                            onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="p-1.5 rounded-lg text-gray-500 hover:text-error-500 hover:bg-error-50 dark:text-gray-400 dark:hover:bg-error-900/20 dark:hover:text-error-400 transition"
-                                                title="Hapus Obat">
+                                @if(auth()->user()->isAdmin())
+                                    <td class="px-5 py-4 text-sm">
+                                        <div class="flex items-center gap-1.5">
+                                            <a href="{{ route('obat.edit', $obat->id) }}"
+                                                class="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-brand-50 dark:text-gray-400 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 transition"
+                                                title="Edit Obat">
                                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                            </a>
+                                            <form action="{{ route('obat.destroy', $obat->id) }}" method="POST" class="inline"
+                                                onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="p-1.5 rounded-lg text-gray-500 hover:text-error-500 hover:bg-error-50 dark:text-gray-400 dark:hover:bg-error-900/20 dark:hover:text-error-400 transition"
+                                                    title="Hapus Obat">
+                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                @endif
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="{{ auth()->user()->isAdminOrOwner() ? 9 : 8 }}" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     @if(request()->hasAny(['search', 'status']))
                                         Tidak ada data obat yang sesuai dengan filter pencarian.
                                     @else

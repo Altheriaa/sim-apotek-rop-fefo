@@ -36,4 +36,22 @@ class Penjualan extends Model
     {
         return $this->hasMany(DetailPenjualan::class);
     }
+
+    // ── Accessors Laba / HPP ──
+
+    /**
+     * Total Modal (HPP) seluruh item dalam transaksi
+     */
+    public function getTotalHppAttribute(): float
+    {
+        return (float) $this->details->sum(fn ($detail) => $detail->total_hpp);
+    }
+
+    /**
+     * Total Laba / Keuntungan Bersih transaksi
+     */
+    public function getTotalLabaAttribute(): float
+    {
+        return (float) $this->total_harga - $this->total_hpp;
+    }
 }

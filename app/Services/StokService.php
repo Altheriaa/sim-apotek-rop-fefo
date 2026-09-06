@@ -240,7 +240,7 @@ class StokService
                 Notifikasi::create([
                     'obat_id'          => $obat->id,
                     'jenis_notifikasi' => 'restock_rak',
-                    'pesan'            => "📦 Stok rak obat *{$obat->nama_obat}* menipis ({$stokRak} {$obat->satuan_jual}). Gudang masih ada {$stokGudang} {$obat->satuan_beli}. Silakan lakukan Transfer ke Rak.",
+                    'pesan'            => "Stok rak obat *{$obat->nama_obat}* menipis ({$stokRak} {$obat->satuan_jual}). Gudang masih ada {$stokGudang} {$obat->satuan_beli}. Silakan lakukan Transfer ke Rak.",
                     'target_nomor'     => config('services.fonnte.admin_target', '08974688919'),
                     'status'           => 'pending',
                 ]);

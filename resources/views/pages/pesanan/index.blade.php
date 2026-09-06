@@ -14,12 +14,12 @@
             </div>
         </div>
 
-        <!-- Alert Success -->
+        <!-- Alert Notification -->
         @if(session('success'))
-            <div
-                class="rounded-lg bg-success-50 p-4 text-success-800 border border-success-200 dark:bg-success-900/20 dark:text-success-400 dark:border-success-800/30">
-                {{ session('success') }}
-            </div>
+            <x-common.flash-alert type="success" :message="session('success')" />
+        @endif
+        @if(session('error'))
+            <x-common.flash-alert type="error" :message="session('error')" />
         @endif
 
         <!-- Table Card with Integrated Toolbar -->

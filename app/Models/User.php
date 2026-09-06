@@ -43,6 +43,16 @@ class User extends Authenticatable
         return $this->role === 'karyawan';
     }
 
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    public function isAdminOrOwner(): bool
+    {
+        return in_array($this->role, ['admin', 'owner']);
+    }
+
     // ── Relations ──
 
     public function transferRak(): HasMany
