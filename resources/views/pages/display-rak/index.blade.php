@@ -8,7 +8,7 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Display Rak Obat</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Monitor stok obat yang tersedia di display rak penjualan.</p>
             </div>
-            @if (Auth::user()->isAdmin() || Auth::user()->isAdmin())    
+            @if (Auth::user()->isAdmin() || Auth::user()->isKaryawan())    
                 <a href="{{ route('transfer-rak.create') }}"
                     class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
                     <i class="ti ti-circle-arrow-right text-base"></i>
@@ -176,7 +176,7 @@
                                         </span>
                                     @endif
                                 </td>
-                                @if (Auth::user()->isAdmin() || Auth::user()->isAdmin())  
+                                @if (Auth::user()->isAdmin() || Auth::user()->isKaryawan())  
                                     <td class="px-5 py-4 text-center">
                                         @if($isKosong || $isKritis)
                                             <a href="{{ route('transfer-rak.create', ['obat_id' => $obat->id]) }}"

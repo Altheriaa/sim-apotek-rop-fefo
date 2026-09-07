@@ -51,18 +51,51 @@ class LaporanController extends Controller
     {
         $query = ObatBatch::with(['obat', 'supplier']);
 
-        if ($request->filled('start_date')) $query->where('tanggal_masuk', '>=', $request->start_date);
-        if ($request->filled('end_date'))   $query->where('tanggal_masuk', '<=', $request->end_date);
+        $startDate = $request->start_date ?? $request->tanggal_dari;
+        $endDate   = $request->end_date ?? $request->tanggal_sampai;
+
+        if ($startDate) {
+            $query->where('tanggal_masuk', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->where('tanggal_masuk', '<=', $endDate);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_batch', 'like', "%{$search}%")
+                  ->orWhereHas('obat', fn ($oq) => $oq->where('nama_obat', 'like', "%{$search}%"))
+                  ->orWhereHas('supplier', fn ($sq) => $sq->where('nama_supplier', 'like', "%{$search}%"));
+            });
+        }
 
         $data = $query->orderBy('tanggal_masuk', 'desc')->get();
 
-        $pdf = Pdf::loadView('pages.laporan.pdf.obat-masuk', [
-            'data'          => $data,
-            'tanggalDari'   => $request->start_date,
-            'tanggalSampai' => $request->end_date,
-        ]);
+        $totalBatch     = $data->count();
+        $totalNilaiBeli = (float) $data->sum(function ($b) {
+            if ($b->harga_beli && $b->harga_beli > 0) {
+                return (float) $b->harga_beli;
+            }
+            return (float) ($b->stok_gudang * ($b->harga_beli_satuan ?? 0));
+        });
+        $totalSupplier  = $data->pluck('supplier_id')->filter()->unique()->count();
 
-        return $pdf->download('laporan-obat-masuk.pdf');
+        $logoPath = public_path('images/Logo Apotek Tabah Farma.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('pages.laporan.pdf.obat-masuk', [
+            'data'           => $data,
+            'tanggalDari'    => $startDate,
+            'tanggalSampai'  => $endDate,
+            'search'         => $request->search,
+            'totalBatch'     => $totalBatch,
+            'totalNilaiBeli' => $totalNilaiBeli,
+            'totalSupplier'  => $totalSupplier,
+            'logoBase64'     => $logoBase64,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-obat-masuk-' . date('Ymd_His') . '.pdf');
     }
 
     // ══════════════════════════════════════════════════
@@ -200,5 +233,55 @@ class LaporanController extends Controller
             'totalHpp'        => $totalHpp,
             'totalLaba'       => $totalLaba,
         ]);
+    }
+
+    public function penjualanPdf(Request $request)
+    {
+        $query = Penjualan::with(['user', 'details.obat', 'details.obatBatch']);
+
+        $startDate = $request->start_date ?? $request->tanggal_dari;
+        $endDate   = $request->end_date ?? $request->tanggal_sampai;
+
+        if ($startDate) {
+            $query->whereDate('tanggal_transaksi', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('tanggal_transaksi', '<=', $endDate);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('no_transaksi', 'like', "%{$search}%")
+                  ->orWhere('nama_pembeli', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn ($uq) => $uq->where('nama_user', 'like', "%{$search}%"));
+            });
+        }
+
+        $data = $query->latest('tanggal_transaksi')->get();
+
+        $totalTransaksi  = $data->count();
+        $totalPendapatan = (float) $data->sum('total_harga');
+        $totalHpp        = (float) $data->sum(fn ($trx) => $trx->total_hpp);
+        $totalLaba       = (float) ($totalPendapatan - $totalHpp);
+        $marginPersen    = $totalPendapatan > 0 ? round(($totalLaba / $totalPendapatan) * 100, 1) : 0;
+
+        $logoPath = public_path('images/Logo Apotek Tabah Farma.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('pages.laporan.pdf.penjualan', [
+            'data'            => $data,
+            'tanggalDari'     => $startDate,
+            'tanggalSampai'   => $endDate,
+            'search'          => $request->search,
+            'totalTransaksi'  => $totalTransaksi,
+            'totalPendapatan' => $totalPendapatan,
+            'totalHpp'        => $totalHpp,
+            'totalLaba'       => $totalLaba,
+            'marginPersen'    => $marginPersen,
+            'logoBase64'      => $logoBase64,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-penjualan-' . date('Ymd_His') . '.pdf');
     }
 }

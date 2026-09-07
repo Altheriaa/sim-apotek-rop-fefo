@@ -81,6 +81,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/transfer-rak', [TransferRakController::class, 'index'])->name('transfer-rak.index');
         Route::get('/transfer-rak/create', [TransferRakController::class, 'create'])->name('transfer-rak.create');
         Route::post('/transfer-rak', [TransferRakController::class, 'store'])->name('transfer-rak.store');
+
+        // Manajemen Master Data Obat
+        Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
+        Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
+        Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->whereNumber('obat')->name('obat.edit');
+        Route::put('/obat/{obat}', [ObatController::class, 'update'])->whereNumber('obat')->name('obat.update');
+        Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->whereNumber('obat')->name('obat.destroy');
     });
 
     // ─────────────────────────────────────────────────────────────────
@@ -99,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/laporan/obat-keluar/pdf', [LaporanController::class, 'obatKeluarPdf'])->name('laporan.obat-keluar.pdf');
         Route::get('/laporan/stok-obat', [LaporanController::class, 'stokObat'])->name('laporan.stok-obat');
         Route::get('/laporan/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
+        Route::get('/laporan/penjualan/pdf', [LaporanController::class, 'penjualanPdf'])->name('laporan.penjualan.pdf');
     });
 
     // ─────────────────────────────────────────────────────────────────
@@ -108,13 +116,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Manajemen user
         Route::resource('pengguna', PenggunaController::class);
-
-        // Manajemen Master Data Obat
-        Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
-        Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
-        Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->whereNumber('obat')->name('obat.edit');
-        Route::put('/obat/{obat}', [ObatController::class, 'update'])->whereNumber('obat')->name('obat.update');
-        Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->whereNumber('obat')->name('obat.destroy');
     });
 });
 

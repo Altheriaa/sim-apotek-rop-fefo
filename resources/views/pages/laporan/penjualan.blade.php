@@ -2,10 +2,23 @@
 
 @section('content')
     <div class="space-y-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Penjualan & Laba</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Rekap transaksi kasir, modal pokok (HPP), dan keuntungan
-                bersih.</p>
+        <!-- Header -->
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Penjualan & Laba</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Rekap transaksi kasir, modal pokok (HPP), dan keuntungan bersih.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{{ route('laporan.penjualan.pdf', ['start_date' => request('tanggal_dari', $startDate), 'end_date' => request('tanggal_sampai', $endDate), 'search' => request('search')]) }}"
+                    target="_blank"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-error-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-error-600 transition">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Cetak PDF
+                </a>
+            </div>
         </div>
 
         {{-- Ringkasan Keuangan (Omzet, HPP, Laba) --}}

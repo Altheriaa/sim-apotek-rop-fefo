@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Laporan Obat Masuk - Apotek Tabah Farma</title>
+    <title>Laporan Penjualan & Laba - Apotek Tabah Farma</title>
     <style>
         @page {
             margin: 12mm 15mm 15mm 15mm;
@@ -49,7 +49,7 @@
 
         .kop-text {
             text-align: center;
-            padding-right: 75px; /* balance logo on left */
+            padding-right: 75px;
         }
 
         .kop-title {
@@ -110,9 +110,9 @@
             background-color: #f8fafc;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
-            padding: 8px 12px;
+            padding: 8px 10px;
             text-align: center;
-            width: 33.33%;
+            width: 25%;
         }
 
         .summary-label {
@@ -129,7 +129,15 @@
             color: #0f172a;
         }
 
-        .summary-value.highlight {
+        .summary-value.highlight-omzet {
+            color: #2563eb;
+        }
+
+        .summary-value.highlight-hpp {
+            color: #475569;
+        }
+
+        .summary-value.highlight-laba {
             color: #166534;
         }
 
@@ -143,7 +151,7 @@
         .data-table th,
         .data-table td {
             border: 1px solid #cbd5e1;
-            padding: 6px 7px;
+            padding: 5px 6px;
             font-size: 8.5pt;
         }
 
@@ -167,6 +175,19 @@
             font-weight: bold;
             color: #0f172a;
             border-top: 2px solid #94a3b8;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 8pt;
+            line-height: 1.3;
+        }
+
+        .item-list li {
+            margin-bottom: 2px;
+            color: #334155;
         }
 
         .text-center { text-align: center; }
@@ -238,7 +259,7 @@
 
     {{-- Judul Laporan --}}
     <div class="report-header">
-        <div class="report-title">Laporan Obat Masuk (Logistik Gudang)</div>
+        <div class="report-title">Laporan Penjualan & Laba Keuntungan</div>
         <div class="report-period">
             @if($tanggalDari && $tanggalSampai)
                 Periode: <strong>{{ \Carbon\Carbon::parse($tanggalDari)->format('d/m/Y') }}</strong> s/d <strong>{{ \Carbon\Carbon::parse($tanggalSampai)->format('d/m/Y') }}</strong>
@@ -251,71 +272,73 @@
         @endif
     </div>
 
-    {{-- Ringkasan Statistik --}}
+    {{-- Ringkasan Keuangan (Statistik) --}}
     <table class="summary-table">
         <tr>
             <td class="summary-card">
-                <div class="summary-label">Total Batch Masuk</div>
-                <div class="summary-value">{{ number_format($totalBatch, 0, ',', '.') }} Batch</div>
+                <div class="summary-label">Total Transaksi</div>
+                <div class="summary-value">{{ number_format($totalTransaksi, 0, ',', '.') }} Transaksi</div>
             </td>
             <td class="summary-card">
-                <div class="summary-label">Total Supplier Terkait</div>
-                <div class="summary-value">{{ number_format($totalSupplier, 0, ',', '.') }} Supplier</div>
+                <div class="summary-label">Total Omzet Penjualan</div>
+                <div class="summary-value highlight-omzet">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
             </td>
             <td class="summary-card">
-                <div class="summary-label">Total Nilai Pembelian (Beli)</div>
-                <div class="summary-value highlight">Rp {{ number_format($totalNilaiBeli, 0, ',', '.') }}</div>
+                <div class="summary-label">Total Modal Pokok (HPP)</div>
+                <div class="summary-value highlight-hpp">Rp {{ number_format($totalHpp, 0, ',', '.') }}</div>
+            </td>
+            <td class="summary-card">
+                <div class="summary-label">Total Laba Bersih (+{{ $marginPersen }}%)</div>
+                <div class="summary-value highlight-laba">Rp {{ number_format($totalLaba, 0, ',', '.') }}</div>
             </td>
         </tr>
     </table>
 
-    {{-- Tabel Rincian Data --}}
+    {{-- Tabel Data Transaksi --}}
     <table class="data-table">
         <thead>
             <tr>
                 <th style="width: 25px;" class="text-center">No</th>
-                <th style="width: 70px;">Tgl. Masuk</th>
-                <th style="width: 95px;">No. Batch</th>
-                <th>Nama Obat</th>
-                <th style="width: 75px;">Kategori</th>
-                <th style="width: 120px;">Supplier</th>
-                <th style="width: 65px;" class="text-center">Tgl. ED</th>
-                <th style="width: 70px;" class="text-right">Jumlah</th>
-                <th style="width: 80px;" class="text-right">Harga Satuan</th>
-                <th style="width: 95px;" class="text-right">Subtotal Beli</th>
+                <th style="width: 105px;">No. Transaksi</th>
+                <th style="width: 80px;">Waktu</th>
+                <th style="width: 90px;">Pembeli</th>
+                <th>Rincian Item Obat Terjual</th>
+                <th style="width: 70px;">Kasir</th>
+                <th style="width: 85px;" class="text-right">Omzet (Rp)</th>
+                <th style="width: 85px;" class="text-right">Modal / HPP (Rp)</th>
+                <th style="width: 85px;" class="text-right">Laba (Rp)</th>
             </tr>
         </thead>
         <tbody>
-            @php 
-                $grandTotalQty = 0;
-                $grandTotalBeli = 0;
-            @endphp
-            @forelse($data as $index => $row)
+            @forelse($data as $index => $trx)
                 @php
-                    $qty = (int) $row->stok_gudang;
-                    $hargaSatuan = (float) ($row->harga_beli_satuan ?? 0);
-                    $subtotal = (float) ($row->harga_beli && $row->harga_beli > 0 ? $row->harga_beli : ($qty * $hargaSatuan));
-                    $grandTotalQty += $qty;
-                    $grandTotalBeli += $subtotal;
+                    $trxHpp = (float) $trx->total_hpp;
+                    $trxLaba = (float) ($trx->total_harga - $trxHpp);
                 @endphp
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td class="nowrap">{{ \Carbon\Carbon::parse($row->tanggal_masuk)->format('d/m/Y') }}</td>
-                    <td class="font-mono">{{ $row->nomor_batch ?? '-' }}</td>
+                    <td class="font-mono">{{ $trx->no_transaksi }}</td>
+                    <td class="nowrap">{{ $trx->tanggal_transaksi ? $trx->tanggal_transaksi->format('d/m/Y H:i') : '-' }}</td>
+                    <td>{{ $trx->nama_pembeli ?: 'Umum' }}</td>
                     <td>
-                        <strong>{{ $row->obat->nama_obat ?? '-' }}</strong>
+                        <ul class="item-list">
+                            @foreach($trx->details as $item)
+                                <li>
+                                    &bull; <strong>{{ $item->obat->nama_obat ?? 'Obat' }}</strong> 
+                                    ({{ $item->jumlah }} {{ $item->obat->satuan_jual ?? 'unit' }} &times; {{ number_format($item->harga_satuan, 0, ',', '.') }})
+                                </li>
+                            @endforeach
+                        </ul>
                     </td>
-                    <td>{{ $row->obat->kategori ?? '-' }}</td>
-                    <td>{{ $row->supplier->nama_supplier ?? '-' }}</td>
-                    <td class="text-center nowrap">{{ $row->tanggal_kadaluwarsa ? \Carbon\Carbon::parse($row->tanggal_kadaluwarsa)->format('d/m/Y') : '-' }}</td>
-                    <td class="text-right font-bold">{{ number_format($qty, 0, ',', '.') }} {{ $row->obat->satuan_beli ?? '' }}</td>
-                    <td class="text-right">Rp {{ number_format($hargaSatuan, 0, ',', '.') }}</td>
-                    <td class="text-right font-bold">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                    <td>{{ $trx->user->nama_user ?? '-' }}</td>
+                    <td class="text-right font-bold">Rp {{ number_format($trx->total_harga, 0, ',', '.') }}</td>
+                    <td class="text-right text-slate-600">Rp {{ number_format($trxHpp, 0, ',', '.') }}</td>
+                    <td class="text-right font-bold" style="color: #166534;">Rp {{ number_format($trxLaba, 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10" class="text-center" style="padding: 20px; color: #64748b;">
-                        Tidak ada data obat masuk pada periode / filter yang dipilih.
+                    <td colspan="9" class="text-center" style="padding: 20px; color: #64748b;">
+                        Tidak ada transaksi penjualan pada rentang tanggal / filter ini.
                     </td>
                 </tr>
             @endforelse
@@ -323,10 +346,10 @@
         @if($data->count() > 0)
             <tfoot>
                 <tr>
-                    <td colspan="7" class="text-right uppercase"><strong>Grand Total:</strong></td>
-                    <td class="text-right"><strong>{{ number_format($grandTotalQty, 0, ',', '.') }}</strong></td>
-                    <td></td>
-                    <td class="text-right"><strong>Rp {{ number_format($grandTotalBeli, 0, ',', '.') }}</strong></td>
+                    <td colspan="6" class="text-right uppercase"><strong>Grand Total:</strong></td>
+                    <td class="text-right font-bold">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</td>
+                    <td class="text-right font-bold">Rp {{ number_format($totalHpp, 0, ',', '.') }}</td>
+                    <td class="text-right font-bold" style="color: #166534;">Rp {{ number_format($totalLaba, 0, ',', '.') }}</td>
                 </tr>
             </tfoot>
         @endif
@@ -339,6 +362,7 @@
                 <div class="meta-info">
                     <strong>Catatan:</strong><br>
                     &bull; Laporan ini dicetak secara resmi dari Sistem Informasi Manajemen Apotek Tabah Farma.<br>
+                    &bull; Laba dihitung secara otomatis berdasarkan selisih harga jual dengan HPP batch FEFO.<br>
                     &bull; Waktu Cetak: {{ now()->format('d/m/Y H:i:s') }} WIB<br>
                     &bull; Petugas Pencetak: {{ auth()->user()->nama_user ?? 'Administrator' }}
                 </div>
@@ -346,7 +370,7 @@
             <td style="width: 40%;">
                 <div class="signature-box">
                     <div>Blangpidie, {{ now()->format('d/m/Y') }}</div>
-                    <div>Penanggung Jawab Gudang / Apoteker,</div>
+                    <div>Pemilik / Pimpinan Apotek,</div>
                     <div class="signature-space"></div>
                     <div class="signature-name">( __________________________ )</div>
                     <div class="signature-role">Apoteker Pengelola Apotek (APA)</div>
