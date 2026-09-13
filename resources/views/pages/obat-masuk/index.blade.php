@@ -8,7 +8,7 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Transaksi Obat Masuk</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Pencatatan penerimaan obat dari supplier, harga modal (HPP), dan pengaturan batch / ED.</p>
             </div>
-            <div class="flex gap-2">
+            {{-- <div class="flex gap-2">
                 <a href="{{ route('obat-masuk.create') }}"
                     class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 transition">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -16,7 +16,7 @@
                     </svg>
                     Catat Obat Masuk
                 </a>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Alert Notification -->

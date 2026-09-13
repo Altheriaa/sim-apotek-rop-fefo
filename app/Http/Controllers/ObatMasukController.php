@@ -59,12 +59,11 @@ class ObatMasukController extends Controller
     public function create()
     {
         $obats     = Obat::orderBy('nama_obat')->get();
-        $suppliers = Supplier::orderBy('nama_supplier')->get();
+        // $suppliers = Supplier::orderBy('nama_supplier')->get();
 
         return view('pages.obat-masuk.create', [
             'title'     => 'Tambah Obat Masuk',
             'obats'     => $obats,
-            'suppliers' => $suppliers,
         ]);
     }
 
@@ -82,7 +81,6 @@ class ObatMasukController extends Controller
     {
         $validated = $request->validate([
             'obat_id'             => 'required|exists:obat,id',
-            'supplier_id'         => 'required|exists:supplier,id',
             'nomor_batch'         => 'nullable|string|max:100',
             'tanggal_kadaluwarsa' => 'required|date|after:today',
             'jumlah'              => 'required|integer|min:1',
@@ -99,7 +97,7 @@ class ObatMasukController extends Controller
 
             ObatBatch::create([
                 'obat_id'             => $validated['obat_id'],
-                'supplier_id'         => $validated['supplier_id'],
+                'supplier_id'         => $obat->supplier_id,
                 'nomor_batch'         => $validated['nomor_batch'],
                 'tanggal_masuk'       => now()->toDateString(),
                 'tanggal_kadaluwarsa' => $validated['tanggal_kadaluwarsa'],

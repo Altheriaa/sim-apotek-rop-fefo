@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Obat Masuk — input penerimaan obat ke gudang
         Route::get('/obat-masuk/generate-batch', [ObatMasukController::class, 'generateBatchNumber'])->name('obat-masuk.generate-batch');
-        Route::resource('obat-masuk', ObatMasukController::class)->only(['index', 'create', 'store', 'show']);
+        Route::resource('obat-masuk', ObatMasukController::class)->only(['index', 'show']);
     });
 
     // ─────────────────────────────────────────────────────────────────
@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
         // Pemesanan (ROP)
         Route::resource('pesanan', PesananController::class)->except(['edit', 'update']);
         Route::patch('/pesanan/{pesanan}/status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
+        Route::post('/pesanan/{pesanan}/terima', [PesananController::class, 'terima'])->name('pesanan.terima');
 
         // Laporan
         Route::get('/laporan/obat-masuk', [LaporanController::class, 'obatMasuk'])->name('laporan.obat-masuk');

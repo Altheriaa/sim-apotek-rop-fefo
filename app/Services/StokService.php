@@ -8,6 +8,8 @@ use App\Models\TransferRak;
 use App\Models\Penjualan;
 use App\Models\DetailPenjualan;
 use App\Models\Notifikasi;
+use App\Models\Pesanan;
+use App\Models\DetailPesanan;
 use App\Jobs\KirimNotifikasiWhatsapp;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -209,13 +211,25 @@ class StokService
 
             if (! $sudahAda) {
                 $gudangDlmJual = $stokGudang * $obat->isi_per_kemasan;
+
+                // Ambil info supplier default dari relasi obat.supplier
+                $supplierInfo = '';
+                $obat->loadMissing('supplier');
+                if ($obat->supplier) {
+                    $supplierInfo = "\nSupplier: *{$obat->supplier->nama_supplier}*";
+                    if ($obat->supplier->kontak) {
+                        $supplierInfo .= " ({$obat->supplier->kontak})";
+                    }
+                }
+
                 $pesan = "*PERINGATAN ROP — Stok Menipis*\n"
                     . "Obat: *{$obat->nama_obat}*\n"
                     . "Total Apotek: *{$totalSatuanJual} {$obat->satuan_jual}*\n"
                     . "  → Gudang: {$stokGudang} {$obat->satuan_beli} (= {$gudangDlmJual} {$obat->satuan_jual})\n"
                     . "  → Rak: {$stokRak} {$obat->satuan_jual}\n"
                     . "Batas ROP: *{$obat->rop_minimum} {$obat->satuan_beli}*" . ($obat->isi_per_kemasan > 1 ? " (= {$batasRopSatuanJual} {$obat->satuan_jual})" : "") . "\n"
-                    . "Segera lakukan pemesanan ulang ke supplier.";
+                    . $supplierInfo
+                    . "\nSegera lakukan pemesanan ulang ke supplier.";
 
                 $notif = Notifikasi::create([
                     'obat_id'          => $obat->id,
@@ -227,6 +241,9 @@ class StokService
 
                 KirimNotifikasiWhatsapp::dispatch($notif);
             }
+
+            // Auto-generate draft pesanan pembelian ke supplier terkait
+            $this->generateDraftPesananRop($obat);
         }
 
         // B. Peringatan Rak Kosong (stok_rak ≤ min_stok_rak, dalam satuan_jual)
@@ -246,6 +263,62 @@ class StokService
                 ]);
             }
         }
+    }
+
+    /**
+     * Auto-generate draft pesanan pembelian saat stok mencapai batas ROP.
+     * Jika sudah ada draft pesanan aktif untuk supplier terkait, item obat digabungkan ke draft tersebut.
+     */
+    public function generateDraftPesananRop(Obat $obat): ?Pesanan
+    {
+        if (! $obat->supplier_id) {
+            return null;
+        }
+
+        // Cek apakah obat ini sedang dalam pesanan aktif (draft, diproses, atau dikirim)
+        $sedangDipesan = DetailPesanan::where('obat_id', $obat->id)
+            ->whereHas('pesanan', function ($q) {
+                $q->whereIn('status', ['draft', 'diproses', 'dikirim']);
+            })
+            ->exists();
+
+        if ($sedangDipesan) {
+            return null;
+        }
+
+        // Cari draft pesanan yang masih terbuka untuk supplier ini
+        $pesananDraft = Pesanan::where('supplier_id', $obat->supplier_id)
+            ->where('status', 'draft')
+            ->latest('id')
+            ->first();
+
+        if (! $pesananDraft) {
+            $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad(Pesanan::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+            $pesananDraft = Pesanan::create([
+                'kode_pesanan'  => $kodePesanan,
+                'supplier_id'   => $obat->supplier_id,
+                'user_id'       => auth()->id(),
+                'tanggal_pesan' => today(),
+                'status'        => 'draft',
+                'catatan'       => 'Digenerate otomatis oleh sistem ROP (Stok Menipis)',
+            ]);
+        }
+
+        // Estimasi harga beli satuan dari batch terakhir (jika ada)
+        $lastBatch = $obat->batches()->latest('id')->first();
+        $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
+
+        // Jumlah pesan default: 2x ROP minimum (atau minimal 1 satuan beli)
+        $jumlahPesan = max((int) $obat->rop_minimum * 2, 1);
+
+        DetailPesanan::create([
+            'pesanan_id'     => $pesananDraft->id,
+            'obat_id'        => $obat->id,
+            'jumlah_pesan'   => $jumlahPesan,
+            'estimasi_harga' => $estimasiHarga,
+        ]);
+
+        return $pesananDraft;
     }
 
     // ══════════════════════════════════════════════════════════════════

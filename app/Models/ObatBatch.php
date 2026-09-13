@@ -16,9 +16,10 @@ class ObatBatch extends Model
         'nomor_batch',
         'tanggal_masuk',
         'tanggal_kadaluwarsa',
-        'stok_gudang',   
-        'stok_rak',      
-        'harga_beli_satuan', 
+        // 'stok_awal',
+        'stok_gudang',
+        'stok_rak',
+        'harga_beli_satuan',
         'harga_beli',   // harga total
     ];
 

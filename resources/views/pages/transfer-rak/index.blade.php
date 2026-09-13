@@ -4,8 +4,9 @@
     <div class="space-y-6">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Transfer Gudang → Rak</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Riwayat pemindahan stok dari gudang ke display rak menggunakan algoritma FEFO.</p>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Transfer Rak</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Riwayat pemindahan stok dari gudang ke display rak
+                    menggunakan algoritma FEFO.</p>
             </div>
             <a href="{{ route('transfer-rak.create') }}"
                 class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
@@ -21,15 +22,18 @@
             <x-common.flash-alert type="error" :message="session('error')" />
         @endif
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
+        <div
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
                 <form action="{{ route('transfer-rak.index') }}" method="GET"
                     class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                         <div class="relative flex-1">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                            <span
+                                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}"
@@ -48,9 +52,12 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">Filter</button>
+                        <button type="submit"
+                            class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">Filter</button>
                         @if(request()->hasAny(['search', 'tanggal_dari', 'tanggal_sampai']))
-                            <a href="{{ route('transfer-rak.index') }}" class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150" title="Reset Filter">Reset</a>
+                            <a href="{{ route('transfer-rak.index') }}"
+                                class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150"
+                                title="Reset Filter">Reset</a>
                         @endif
                     </div>
                 </form>
@@ -65,14 +72,16 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Nama Obat</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">No. Batch</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">ED Batch</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Jumlah</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Jumlah
+                            </th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Petugas</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($transfers as $tr)
-                            <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
+                            <tr
+                                class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
                                 <td class="px-5 py-4 text-sm text-gray-500">
                                     {{ $loop->iteration + ($transfers->currentPage() - 1) * $transfers->perPage() }}
                                 </td>
@@ -90,7 +99,8 @@
                                 </td>
                                 <td class="px-5 py-4 text-center">
                                     <div class="font-bold text-brand-600 dark:text-brand-400">
-                                        {{ $tr->jumlah_keluar }} <span class="text-xs font-normal text-gray-500">{{ $tr->obat->satuan_beli ?? '' }}</span>
+                                        {{ $tr->jumlah_keluar }} <span
+                                            class="text-xs font-normal text-gray-500">{{ $tr->obat->satuan_beli ?? '' }}</span>
                                     </div>
                                     <div class="text-xs text-green-600 dark:text-green-400 font-medium">
                                         → {{ $tr->jumlah_masuk_rak }} {{ $tr->obat->satuan_jual ?? '' }}

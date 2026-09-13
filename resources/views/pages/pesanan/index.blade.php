@@ -10,7 +10,13 @@
                     (Reorder Point).</p>
             </div>
             <div class="flex gap-2">
-                <!-- Bisa tambahkan filter atau tombol manual pesan -->
+                <a href="{{ route('pesanan.create') }}"
+                    class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Buat Pesanan Manual
+                </a>
             </div>
         </div>
 
@@ -23,7 +29,8 @@
         @endif
 
         <!-- Table Card with Integrated Toolbar -->
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
+        <div
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
             <!-- Toolbar / Filter Header -->
             <div class="border-b border-gray-100 p-4 sm:p-5 dark:border-gray-800">
                 <form action="{{ route('pesanan.index') }}" method="GET"
@@ -31,14 +38,15 @@
                     <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center flex-wrap">
                         <!-- Search Input -->
                         <div class="relative flex-1 min-w-[200px]">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
+                            <span
+                                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}"
-                                placeholder="Cari no. pesanan, supplier..."
+                                placeholder="Cari Ko. pesanan, supplier..."
                                 class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150">
                         </div>
 
@@ -47,15 +55,22 @@
                             <select name="status" onchange="this.form.submit()"
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150 cursor-pointer">
                                 <option value="" class="dark:bg-gray-900">Semua Status</option>
-                                <option value="menunggu" {{ request('status') === 'menunggu' ? 'selected' : '' }} class="dark:bg-gray-900">Menunggu</option>
-                                <option value="diproses" {{ request('status') === 'diproses' ? 'selected' : '' }} class="dark:bg-gray-900">Diproses</option>
-                                <option value="dikirim" {{ request('status') === 'dikirim' ? 'selected' : '' }} class="dark:bg-gray-900">Dikirim</option>
-                                <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }} class="dark:bg-gray-900">Selesai</option>
-                                <option value="batal" {{ request('status') === 'batal' ? 'selected' : '' }} class="dark:bg-gray-900">Batal</option>
+                                <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Draft (ROP)</option>
+                                <option value="diproses" {{ request('status') === 'diproses' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Diproses</option>
+                                <option value="dikirim" {{ request('status') === 'dikirim' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Dikirim</option>
+                                <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Selesai</option>
+                                <option value="batal" {{ request('status') === 'batal' ? 'selected' : '' }}
+                                    class="dark:bg-gray-900">Batal</option>
                             </select>
-                            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                            <span
+                                class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </div>
@@ -96,7 +111,7 @@
                 <table class="w-full min-w-[850px] text-left">
                     <thead>
                         <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">ID</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Kode Pesanan</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal Pesan</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Supplier</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Item Obat</th>
@@ -109,27 +124,41 @@
                         @forelse($pesanans as $pesanan)
                             <tr
                                 class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
-                                <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90">
-                                    #{{ $pesanan->id }}
+                                <td class="px-5 py-4 text-sm font-bold text-gray-800 dark:text-white/90 align-top">
+                                    #{{ $pesanan->kode_pesanan }}
                                 </td>
-                                <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
+                                <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90 align-top whitespace-nowrap">
                                     {{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->format('d M Y') }}
                                 </td>
-                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 align-top">
                                     {{ $pesanan->supplier->nama_supplier ?? '-' }}
                                 </td>
-                                <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    @php
-                                        $itemNames = $pesanan->detailPesanan->map(function ($d) {
-                                            return ($d->obat->nama_obat ?? 'Obat') . ' (' . $d->jumlah_pesan . ')';
-                                        })->join(', ');
-                                    @endphp
-                                    {{ $itemNames ?: '-' }}
+                                <td class="px-5 py-4 align-top">
+                                    <div class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1 min-w-[280px]">
+                                        @forelse($pesanan->detailPesanan as $d)
+                                            <div
+                                                class="flex items-center justify-between gap-2.5 text-xs py-1 px-2.5 rounded-lg bg-gray-50/90 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/60">
+                                                <div class="flex items-center gap-2 min-w-0">
+                                                    <span class="h-1.5 w-1.5 rounded-full bg-black shrink-0"></span>
+                                                    <span class="font-medium text-gray-800 dark:text-white/90 truncate"
+                                                        title="{{ $d->obat->nama_obat ?? 'Obat' }}">
+                                                        {{ $d->obat->nama_obat ?? 'Obat' }}
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    class="shrink-0 font-semibold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded text-[11px] whitespace-nowrap">
+                                                    {{ $d->jumlah_pesan }} {{ $d->obat->satuan_beli ?? 'Box' }}
+                                                </span>
+                                            </div>
+                                        @empty
+                                            <span class="text-xs text-gray-400">-</span>
+                                        @endforelse
+                                    </div>
                                 </td>
-                                <td class="px-5 py-4 text-sm font-bold text-brand-600 dark:text-brand-400">
+                                <td class="px-5 py-4 text-sm font-bold text-brand-600 dark:text-brand-400 align-top">
                                     {{ $pesanan->detailPesanan->sum('jumlah_pesan') }}
                                 </td>
-                                <td class="px-5 py-4 text-sm">
+                                <td class="px-5 py-4 text-sm align-top">
                                     @php
                                         $statusClass = [
                                             'draft' => 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
@@ -145,7 +174,7 @@
                                         {{ ucfirst($pesanan->status) }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 text-sm">
+                                <td class="px-5 py-4 text-sm align-top">
                                     <div class="flex items-center gap-1.5">
                                         <a href="{{ route('pesanan.show', $pesanan->id) }}"
                                             class="p-1.5 rounded-lg text-gray-500 hover:text-brand-500 hover:bg-brand-50 dark:text-gray-400 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 transition"
