@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Obat;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class ObatController extends Controller
@@ -51,10 +52,12 @@ class ObatController extends Controller
     public function create()
     {
         $kodeOtomatis = Obat::generateKodeObat();
+        $suppliers = Supplier::all();
 
         return view('pages.obat.create', [
-            'title'        => 'Tambah Obat',
+            'title' => 'Tambah Obat',
             'kodeOtomatis' => $kodeOtomatis,
+            'suppliers' => $suppliers,
         ]);
     }
 
@@ -62,6 +65,7 @@ class ObatController extends Controller
     {
         $validated = $request->validate([
             'kode_obat'       => 'nullable|string|max:50|unique:obat,kode_obat',
+            'supplier_id'     => 'required|exists:supplier,id',
             'nama_obat'       => 'required|string|max:255',
             'kategori'        => 'nullable|string|max:100',
             'satuan_beli'     => 'required|string|max:50',
@@ -99,9 +103,12 @@ class ObatController extends Controller
 
     public function edit(Obat $obat)
     {
+        $suppliers = Supplier::all();
+
         return view('pages.obat.edit', [
             'title' => 'Edit Obat',
             'obat'  => $obat,
+            'suppliers' => $suppliers,
         ]);
     }
 
@@ -109,6 +116,7 @@ class ObatController extends Controller
     {
         $validated = $request->validate([
             'kode_obat'       => 'nullable|string|max:50|unique:obat,kode_obat,' . $obat->id,
+            'supplier_id'     => 'required|exists:supplier,id',
             'nama_obat'       => 'required|string|max:255',
             'kategori'        => 'nullable|string|max:100',
             'satuan_beli'     => 'required|string|max:50',

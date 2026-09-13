@@ -26,4 +26,9 @@ class Supplier extends Model
     {
         return $this->hasMany(Pesanan::class);
     }
+
+    public function obat(): HasMany
+    {
+        return $this->hasMany(Obat::class);
+    }
 }

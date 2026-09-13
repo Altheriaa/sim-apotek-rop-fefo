@@ -94,6 +94,7 @@
                         <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">#</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Kode Obat</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Supplier</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Nama Obat</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Satuan</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Stok Total</th>
@@ -126,6 +127,15 @@
                                         </a>
                                     @else
                                         {{ $obat->kode_obat }}
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                                    @if(auth()->user()->isAdminOrOwner())
+                                        <a href="{{ route('obat.edit', $obat->id) }}" class="hover:text-brand-500 transition">
+                                            {{ $obat->supplier->nama_supplier ?? '-' }}
+                                        </a>
+                                    @else
+                                        {{ $obat->supplier->nama_supplier ?? '-' }}
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">

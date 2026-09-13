@@ -59,8 +59,12 @@ class DatabaseSeeder extends Seeder
             'kontak'        => '0651-6302638',
         ]);
 
+        // ── 3. Data Obat ──
+        $supplierIds = Supplier::pluck('id')->toArray();
+
         Obat::create([
             'kode_obat'       => 'OBT-001',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'PARACETAMOL 500MG TAB 100S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -73,6 +77,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-002',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'PARAMEX TAB STR 4S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -85,6 +90,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-003',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'FARSIFEN 400MG 100S',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -97,6 +103,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-004',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'FARSIFEN PLUS',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -109,6 +116,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-005',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'MOLEXFLU TAB 150S',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -121,6 +129,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-006',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'CETIRIZINE 10MG TAB',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -133,6 +142,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-007',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'SANMOL 500MG TABS',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -145,6 +155,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-008',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'BODREXIN 80MG 18 TABLET',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -157,6 +168,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-009',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'BODREX TAB 20S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -169,6 +181,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-010',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'BODREX EXTRA TAB 4S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -181,6 +194,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-011',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'BODREX FLU & BATUK BERDAHAK PE 4S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -193,6 +207,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-012',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'HUFAGRIP FORTE TAB 100S',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -205,6 +220,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-013',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'ANTASIDA SUSP 60ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -217,6 +233,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-014',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'ANTASIDA DOEN 400MG TAB',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -229,6 +246,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-015',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OMEPRAZOLE 20MG',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -241,6 +259,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-016',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'LANSOPRAZOLE 30MG',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -253,6 +272,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-017',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'POLYSILANE CHEW TAB 40S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -265,6 +285,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-018',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'POLYSILANE SYR 100ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -277,6 +298,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-019',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'POLYSILANE SYR 180ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -289,6 +311,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-020',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'RANITIDINE 150MG TAB 100S',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -301,6 +324,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-021',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'AMOXICILLIN 500MG TAB 100S',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -313,6 +337,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-022',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'METHYLPREDNISOLONE 4MG TAB 100S',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -325,6 +350,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-023',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'ALLOPURINOL 100MG TAB 100S',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -337,6 +363,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-024',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'AMLODIPINE 5MG TAB',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -349,6 +376,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-025',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'AMLODIPINE 10MG TAB',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -361,6 +389,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-026',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'PARACETAMOL SYR 60ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -373,6 +402,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-027',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'LERZIN 10MG CAP 50S',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Box',
@@ -385,6 +415,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-028',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'LERZIN SYR 60ML',
             'kategori'        => 'Obat Keras',
             'satuan_beli'     => 'Botol',
@@ -397,6 +428,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-029',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'SANMOL 120MG/5ML SYR 60ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -409,6 +441,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-030',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'SANMOL 60MG/0,6ML DROP 15ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -421,6 +454,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-031',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'BODREX MIGRA STR 4S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -433,6 +467,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-032',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'BODREX FLU & BATUK KERING STR 4S',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -445,6 +480,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-033',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'HUFAGRIP BP HIJAU SYR 60ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
@@ -457,6 +493,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-034',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'HUFAGRIP PILEK BIRU SYR 60ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
@@ -469,6 +506,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-035',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'HUFAGRIP FLU & BATUK KUNING SYR 60ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
@@ -481,6 +519,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-036',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'HUFAGRIP TMP SYR 60ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -493,6 +532,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-037',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'MIXAGRIP FLU & BATUK TAB 100S',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -505,6 +545,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-038',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'MIXAGRIP FLU STR 4S ',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -517,6 +558,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-039',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'KOMIX JERUK NIPIS SACH 30S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -529,6 +571,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-040',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'KOMIX JAHE SACH 30S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -541,6 +584,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-041',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'KOMIX OBH SACH 30S',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Box',
@@ -553,6 +597,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-042',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'KOMIX PEPP SACH 30S',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Box',
@@ -565,6 +610,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-043',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI JAHE SYR 100ML (GEPENG)',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -577,6 +623,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-044',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI MENTHOL SYR 100ML (GEPENG)',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -589,6 +636,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-045',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI PLUS BATUK FLU MENTHOL SYR 100ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
@@ -601,6 +649,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-046',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI PLUS BATUK FLU JAHE SYR 100ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
@@ -613,6 +662,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-047',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI PLUS BATUK FLU MADU SYR 100ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
@@ -625,6 +675,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-048',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI PLUS BATUK FLU MENTHOL SYR 60ML',
             'kategori'        => 'Obat Bebas',
             'satuan_beli'     => 'Botol',
@@ -637,6 +688,7 @@ class DatabaseSeeder extends Seeder
 
         Obat::create([
             'kode_obat'       => 'OBT-049',
+            'supplier_id'     => fake()->randomElement($supplierIds),
             'nama_obat'       => 'OBH COMBI PLUS BATUK FLU MADU SYR 60ML',
             'kategori'        => 'Obat Prekursor',
             'satuan_beli'     => 'Botol',
