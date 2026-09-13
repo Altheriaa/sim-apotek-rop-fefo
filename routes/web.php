@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
         // Manajemen Supplier
         Route::post('/supplier/create', [SupplierController::class, 'store']);
         Route::get('/supplier/create', [SupplierController::class, 'create'])->name('supplier.create');
+        Route::get('/supplier/store', [SupplierController::class, 'store'])->name('supplier.store');
         Route::get('/supplier/{supplier}', [SupplierController::class, 'show'])->whereNumber('supplier')->name('supplier.show');
         Route::get('/supplier/{supplier}/edit', [SupplierController::class, 'edit'])->whereNumber('supplier')->name('supplier.edit');
         Route::put('/supplier/{supplier}', [SupplierController::class, 'update'])->whereNumber('supplier')->name('supplier.update');
