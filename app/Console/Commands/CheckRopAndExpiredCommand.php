@@ -30,7 +30,7 @@ class CheckRopAndExpiredCommand extends Command
         $this->info("ROP: {$ropCount} obat di bawah/sama dengan ROP minimum.");
 
         // 2. Cek kadaluwarsa (30 hari ke depan)
-        $edCount = $stokService->cekKadaluwarsa(560);
+        $edCount = $stokService->cekKadaluwarsa(30);
         $this->info("Kadaluwarsa: {$edCount} notifikasi baru dibuat.");
 
         $this->info('Pengecekan selesai.');
