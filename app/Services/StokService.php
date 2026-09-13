@@ -280,7 +280,7 @@ class StokService
             $notif = Notifikasi::create([
                 'obat_id'          => $batch->obat_id,
                 'jenis_notifikasi' => 'mendekati_kadaluwarsa',
-                'pesan'            => "⏰ *MENDEKATI KADALUWARSA*\n"
+                'pesan'            => "*MENDEKATI KADALUWARSA*\n"
                     . "Obat: *{$batch->obat->nama_obat}*\n"
                     . "No. Batch: {$batch->nomor_batch}\n"
                     . "ED: {$batch->tanggal_kadaluwarsa->format('d/m/Y')} ({$sisaHari} hari lagi)\n"
