@@ -6,8 +6,7 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Laporan Transfer ke Rak</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Pilih rentang tanggal untuk melihat atau mengunduh
-                    laporan.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Riwayat perpindahan stok dari Gudang ke Display Rak (FEFO).</p>
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('laporan.transfer-rak.pdf', ['start_date' => request('tanggal_dari', $startDate), 'end_date' => request('tanggal_sampai', $endDate), 'search' => request('search')]) }}"
@@ -52,7 +51,7 @@
                                     </svg>
                                 </span>
                                 <input type="text" id="search" name="search" value="{{ request('search') }}"
-                                    placeholder="Cari nama atau nomor batch..."
+                                    placeholder="Cari nama obat atau nomor batch..."
                                     class="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 dark:focus:bg-gray-900 transition duration-150">
                             </div>
                         </div>
@@ -88,8 +87,7 @@
                     </thead>
                     <tbody>
                         @forelse($data as $row)
-                            <tr
-                                class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
+                            <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     {{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}
                                 </td>

@@ -96,6 +96,11 @@ class MenuHelper
                         'icon' => 'inbox-right',
                         'path' => '/transfer-rak',
                     ],
+                    [
+                        'name' => 'Pembuangan Obat',
+                        'icon' => 'trash',
+                        'path' => '/obat-keluar',
+                    ],
                 ],
             ];
         }else{
@@ -134,6 +139,16 @@ class MenuHelper
                         'name' => 'Laporan Obat Masuk',
                         'icon' => 'report-in',
                         'path' => '/laporan/obat-masuk',
+                    ],
+                    [
+                        'name' => 'Laporan Transfer ke Rak',
+                        'icon' => 'inbox-right',
+                        'path' => '/laporan/transfer-rak',
+                    ],
+                    [
+                        'name' => 'Laporan Disposal',
+                        'icon' => 'trash',
+                        'path' => '/laporan/disposal',
                     ],
                     [
                         'name' => 'Laporan Stok Obat',
@@ -190,6 +205,7 @@ class MenuHelper
             'receipt'     => '<i class="ti ti-receipt text-lg"></i>',
             'shop'        => '<i class="ti ti-shopping-bag"></i>',
             'building-warehouse' => '<i class="ti ti-building-warehouse"></i>',
+            'trash'              => '<i class="ti ti-trash text-lg"></i>',
         ];
 
         return $icons[$iconName] ?? '<i class="ti ti-circle text-lg"></i>';

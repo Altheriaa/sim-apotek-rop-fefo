@@ -32,8 +32,7 @@ class DisplayRakController extends Controller
         }
 
         $obats = $query->orderBy('nama_obat')->paginate(20)->withQueryString();
-
-        // Statistik ringkas
+        
         $totalObat       = Obat::count();
         $obatKritis      = Obat::whereRaw('(SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) <= obat.min_stok_rak')->count();
         $obatHabisRak    = Obat::whereRaw('(SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) = 0')->count();

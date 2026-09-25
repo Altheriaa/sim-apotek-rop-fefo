@@ -130,7 +130,7 @@
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
         <!-- Notifikasi Terbaru -->
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-dark">
+        <div id="notifikasi-widget" class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-dark scroll-mt-20">
             <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800 flex justify-between items-center">
                 <h3 class="font-semibold text-gray-800 dark:text-white/90">Notifikasi Terbaru</h3>
                 <span class="text-xs font-semibold px-2 py-0.5 dark:text-white">

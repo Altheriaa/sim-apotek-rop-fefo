@@ -13,6 +13,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\ObatKeluarController;
 
 // ── Autentikasi ──
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -89,6 +90,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->whereNumber('obat')->name('obat.edit');
         Route::put('/obat/{obat}', [ObatController::class, 'update'])->whereNumber('obat')->name('obat.update');
         Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->whereNumber('obat')->name('obat.destroy');
+        // Disposal / Pembuangan Batch Expired atau Rusak
+        Route::get('/obat-keluar', [ObatKeluarController::class, 'index'])->name('obat-keluar.index');
+        Route::get('/obat-keluar/create', [ObatKeluarController::class, 'create'])->name('obat-keluar.create');
+        Route::post('/obat-keluar', [ObatKeluarController::class, 'store'])->name('obat-keluar.store');
     });
 
     // ─────────────────────────────────────────────────────────────────
@@ -104,8 +109,10 @@ Route::middleware(['auth'])->group(function () {
         // Laporan
         Route::get('/laporan/obat-masuk', [LaporanController::class, 'obatMasuk'])->name('laporan.obat-masuk');
         Route::get('/laporan/obat-masuk/pdf', [LaporanController::class, 'obatMasukPdf'])->name('laporan.obat-masuk.pdf');
-        Route::get('/laporan/obat-keluar', [LaporanController::class, 'obatKeluar'])->name('laporan.obat-keluar');
-        Route::get('/laporan/obat-keluar/pdf', [LaporanController::class, 'obatKeluarPdf'])->name('laporan.obat-keluar.pdf');
+        Route::get('/laporan/transfer-rak', [LaporanController::class, 'transferRak'])->name('laporan.transfer-rak');
+        Route::get('/laporan/transfer-rak/pdf', [LaporanController::class, 'transferRakPdf'])->name('laporan.transfer-rak.pdf');
+        Route::get('/laporan/disposal', [LaporanController::class, 'disposal'])->name('laporan.disposal');
+        Route::get('/laporan/disposal/pdf', [LaporanController::class, 'disposalPdf'])->name('laporan.disposal.pdf');
         Route::get('/laporan/stok-obat', [LaporanController::class, 'stokObat'])->name('laporan.stok-obat');
         Route::get('/laporan/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
         Route::get('/laporan/penjualan/pdf', [LaporanController::class, 'penjualanPdf'])->name('laporan.penjualan.pdf');

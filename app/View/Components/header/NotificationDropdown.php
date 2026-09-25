@@ -2,6 +2,7 @@
 
 namespace App\View\Components\header;
 
+use App\Models\Notifikasi;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -21,6 +22,16 @@ class NotificationDropdown extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.header.notification-dropdown');
+        $notifications = Notifikasi::with('obat')
+            ->latest('id')
+            ->take(10)
+            ->get();
+
+        $unreadCount = Notifikasi::whereDate('created_at', today())->count();
+
+        return view('components.header.notification-dropdown', [
+            'notifications' => $notifications,
+            'unreadCount'   => $unreadCount,
+        ]);
     }
 }

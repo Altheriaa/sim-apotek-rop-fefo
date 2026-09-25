@@ -31,9 +31,7 @@ class KasirController extends Controller
         ]);
     }
 
-    /**
-     * Proses checkout — terima cart dari form, jalankan StokService
-     */
+    // Proses Checkout
     public function store(Request $request)
     {
         $request->validate([
@@ -80,9 +78,7 @@ class KasirController extends Controller
         }
     }
 
-    /**
-     * Halaman struk setelah transaksi sukses
-     */
+    // Direct ke Page Struk
     public function struk(Penjualan $penjualan)
     {
         $penjualan->load(['details.obat', 'details.obatBatch', 'user']);
@@ -93,9 +89,7 @@ class KasirController extends Controller
         ]);
     }
 
-    /**
-     * Riwayat semua transaksi penjualan
-     */
+    // Riwayat Semua Transaksi
     public function riwayat(Request $request)
     {
         $query = Penjualan::with(['user', 'details']);
@@ -127,9 +121,7 @@ class KasirController extends Controller
         ]);
     }
 
-    /**
-     * Detail transaksi penjualan
-     */
+    // Detail Transaksi
     public function show(Penjualan $penjualan)
     {
         $penjualan->load(['details.obat', 'details.obatBatch', 'user']);

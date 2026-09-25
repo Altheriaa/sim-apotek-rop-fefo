@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obat;
+use App\Models\ObatBatch;
 use App\Models\ObatKeluar;
 use App\Services\StokService;
 use Illuminate\Http\Request;
@@ -13,6 +13,9 @@ class ObatKeluarController extends Controller
         protected StokService $stokService
     ) {}
 
+    /**
+     * Daftar riwayat disposal (pembuangan batch expired/rusak)
+     */
     public function index(Request $request)
     {
         $query = ObatKeluar::with(['obat', 'obatBatch', 'user']);
@@ -20,14 +23,13 @@ class ObatKeluarController extends Controller
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
-                $q->whereHas('obat', function ($oq) use ($search) {
-                    $oq->where('nama_obat', 'like', "%{$search}%");
-                })->orWhereHas('obatBatch', function ($bq) use ($search) {
-                    $bq->where('nomor_batch', 'like', "%{$search}%");
-                })->orWhereHas('user', function ($uq) use ($search) {
-                    $uq->where('nama_user', 'like', "%{$search}%");
-                });
+                $q->whereHas('obat', fn ($oq) => $oq->where('nama_obat', 'like', "%{$search}%"))
+                  ->orWhereHas('obatBatch', fn ($bq) => $bq->where('nomor_batch', 'like', "%{$search}%"));
             });
+        }
+
+        if ($request->filled('alasan')) {
+            $query->where('alasan', $request->alasan);
         }
 
         if ($request->filled('tanggal_dari')) {
@@ -38,46 +40,66 @@ class ObatKeluarController extends Controller
             $query->where('tanggal_keluar', '<=', $request->tanggal_sampai);
         }
 
-        $obatKeluars = $query->latest('tanggal_keluar')->latest('id')->paginate(10)->withQueryString();
+        $disposals = $query->latest('tanggal_keluar')->latest('id')->paginate(15)->withQueryString();
 
         return view('pages.obat-keluar.index', [
-            'title'       => 'Obat Keluar',
-            'obatKeluars' => $obatKeluars,
+            'title'    => 'Disposal / Pembuangan Obat',
+            'disposals' => $disposals,
+            'alasanOptions' => ObatKeluar::$alasanOptions,
         ]);
     }
 
-    public function create()
+    /**
+     * Form disposal — tampilkan batch yang expired atau stoknya > 0
+     */
+    public function create(Request $request)
     {
-        $obats = Obat::orderBy('nama_obat')->get();
+        // Prioritaskan batch expired, lalu yang mendekati expired
+        $batches = ObatBatch::with('obat')
+            ->where(function ($q) {
+                $q->where('stok_gudang', '>', 0)->orWhere('stok_rak', '>', 0);
+            })
+            ->orderByRaw('tanggal_kadaluwarsa <= CURDATE() DESC') // expired dulu
+            ->orderBy('tanggal_kadaluwarsa', 'asc')
+            ->get();
 
         return view('pages.obat-keluar.create', [
-            'title' => 'Tambah Obat Keluar',
-            'obats' => $obats,
+            'title'   => 'Catat Pembuangan Obat',
+            'batches' => $batches,
+            'alasanOptions' => ObatKeluar::$alasanOptions,
         ]);
     }
 
+    /**
+     * Proses disposal — kurangi stok batch dan catat riwayat
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'obat_id' => 'required|exists:obat,id',
-            'jumlah'  => 'required|integer|min:1',
+            'obat_batch_id' => 'required|exists:obat_batch,id',
+            'jumlah_gudang' => 'required|integer|min:0',
+            'jumlah_rak'    => 'required|integer|min:0',
+            'alasan'        => 'required|in:expired,rusak,lainnya',
+            'catatan'       => 'nullable|string|max:500',
         ]);
 
         try {
-            $batchTerpakai = $this->stokService->keluarkanObat(
-                $validated['obat_id'],
-                $validated['jumlah'],
-                auth()->id()
+            $disposal = $this->stokService->disposalBatch(
+                batchId:      $validated['obat_batch_id'],
+                jumlahGudang: $validated['jumlah_gudang'],
+                jumlahRak:    $validated['jumlah_rak'],
+                alasan:       $validated['alasan'],
+                userId:       auth()->id(),
+                catatan:      $validated['catatan'] ?? null,
             );
 
-            $detail = collect($batchTerpakai)->map(function ($b) {
-                return "Batch {$b['no_batch']}: {$b['jumlah']} (ED: {$b['ed']})";
-            })->join(', ');
+            $batch  = $disposal->obatBatch()->with('obat')->first();
+            $label  = ObatKeluar::$alasanOptions[$validated['alasan']] ?? $validated['alasan'];
 
             return redirect()->route('obat-keluar.index')
-                ->with('success', "Obat keluar berhasil dicatat. Batch: {$detail}");
+                ->with('success', "Disposal berhasil dicatat. Batch {$batch->nomor_batch} ({$batch->obat->nama_obat}) — {$label}.");
         } catch (\Exception $e) {
-            return back()->withErrors(['jumlah' => $e->getMessage()])->withInput();
+            return back()->with('error', $e->getMessage())->withInput();
         }
     }
 }

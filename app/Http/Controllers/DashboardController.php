@@ -14,7 +14,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // ── Statistik utama (multi-lokasi) ──
         $totalObat      = Obat::count();
         $totalStokGudang = (int) ObatBatch::sum('stok_gudang');
         $totalStokRak   = (int) ObatBatch::sum('stok_rak');

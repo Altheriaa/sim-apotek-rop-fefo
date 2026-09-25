@@ -8,6 +8,7 @@ use App\Models\TransferRak;
 use App\Models\Penjualan;
 use App\Models\DetailPenjualan;
 use App\Models\Notifikasi;
+use App\Models\ObatKeluar;
 use App\Models\Pesanan;
 use App\Models\DetailPesanan;
 use App\Jobs\KirimNotifikasiWhatsapp;
@@ -240,10 +241,9 @@ class StokService
                 ]);
 
                 KirimNotifikasiWhatsapp::dispatch($notif);
+                // Auto-generate draft pesanan pembelian ke supplier terkait
+                $this->generateDraftPesananRop($obat);
             }
-
-            // Auto-generate draft pesanan pembelian ke supplier terkait
-            $this->generateDraftPesananRop($obat);
         }
 
         // B. Peringatan Rak Kosong (stok_rak ≤ min_stok_rak, dalam satuan_jual)
@@ -367,5 +367,70 @@ class StokService
         }
 
         return $count;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 5. Disposal / Pembuangan Batch Expired atau Rusak
+    // ══════════════════════════════════════════════════════════════════
+
+    /**
+     * Catat pembuangan (disposal) batch obat yang expired atau rusak.
+     * Mengurangi stok_gudang dan/atau stok_rak pada batch terkait.
+     *
+     * @param  int    $batchId       ID ObatBatch yang akan dibuang
+     * @param  int    $jumlahGudang  Jumlah dibuang dari stok_gudang (satuan_beli)
+     * @param  int    $jumlahRak     Jumlah dibuang dari stok_rak (satuan_jual)
+     * @param  string $alasan        'expired' | 'rusak' | 'lainnya'
+     * @param  int    $userId        ID user yang melakukan disposal
+     * @param  string|null $catatan  Catatan tambahan
+     * @throws Exception Jika jumlah melebihi stok yang ada
+     */
+    public function disposalBatch(
+        int $batchId,
+        int $jumlahGudang,
+        int $jumlahRak,
+        string $alasan,
+        int $userId,
+        ?string $catatan = null
+    ): ObatKeluar {
+        return DB::transaction(function () use ($batchId, $jumlahGudang, $jumlahRak, $alasan, $userId, $catatan) {
+            $batch = ObatBatch::lockForUpdate()->findOrFail($batchId);
+
+            if ($jumlahGudang > $batch->stok_gudang) {
+                throw new Exception(
+                    "Jumlah buang gudang ({$jumlahGudang}) melebihi stok gudang tersedia ({$batch->stok_gudang})."
+                );
+            }
+
+            if ($jumlahRak > $batch->stok_rak) {
+                throw new Exception(
+                    "Jumlah buang rak ({$jumlahRak}) melebihi stok rak tersedia ({$batch->stok_rak})."
+                );
+            }
+
+            if ($jumlahGudang === 0 && $jumlahRak === 0) {
+                throw new Exception('Jumlah yang dibuang tidak boleh 0.');
+            }
+
+            // Kurangi stok pada batch
+            if ($jumlahGudang > 0) {
+                $batch->decrement('stok_gudang', $jumlahGudang);
+            }
+            if ($jumlahRak > 0) {
+                $batch->decrement('stok_rak', $jumlahRak);
+            }
+
+            // Catat riwayat disposal
+            return ObatKeluar::create([
+                'obat_id'       => $batch->obat_id,
+                'obat_batch_id' => $batchId,
+                'user_id'       => $userId,
+                'tanggal_keluar' => today()->toDateString(),
+                'jumlah_gudang' => $jumlahGudang,
+                'jumlah_rak'    => $jumlahRak,
+                'alasan'        => $alasan,
+                'catatan'       => $catatan,
+            ]);
+        });
     }
 }

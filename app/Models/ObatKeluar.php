@@ -14,12 +14,27 @@ class ObatKeluar extends Model
         'obat_batch_id',
         'user_id',
         'tanggal_keluar',
-        'jumlah',
+        'jumlah_gudang',  // Jumlah dibuang dari stok_gudang (satuan_beli)
+        'jumlah_rak',     // Jumlah dibuang dari stok_rak (satuan_jual)
+        'alasan',         // expired | rusak | lainnya
+        'catatan',
     ];
 
     protected $casts = [
         'tanggal_keluar' => 'date',
     ];
+
+    // ── Label alasan disposal ──
+    public static array $alasanOptions = [
+        'expired' => 'Kadaluwarsa (Expired)',
+        'rusak'   => 'Rusak / Tidak Layak Pakai',
+        'lainnya' => 'Lainnya',
+    ];
+
+    public function getAlasanLabelAttribute(): string
+    {
+        return self::$alasanOptions[$this->alasan] ?? $this->alasan;
+    }
 
     // ── Relations ──
 
