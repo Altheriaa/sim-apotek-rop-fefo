@@ -162,7 +162,7 @@
                                     </div>
                                 @else
                                     <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-error-50 text-error-600 dark:text-white-400">
-                                        <i class="ti ti-clock-alert text-lg"></i>
+                                        <i class="ti ti-calendar-due text-lg"></i>
                                     </div>
                                 @endif
 

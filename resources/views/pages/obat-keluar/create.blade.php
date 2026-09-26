@@ -39,8 +39,8 @@
                             @foreach($batches as $batch)
                                 @php
                                     $isExpired = $batch->tanggal_kadaluwarsa->lt(now());
-                                    $label = $batch->obat->nama_obat . ' — ' . $batch->nomor_batch
-                                           . ' (ED: ' . $batch->tanggal_kadaluwarsa->format('d/m/Y') . ')'
+                                    $label = $batch->obat->nama_obat . ' (' . $batch->nomor_batch . ')'
+                                           . ' - ED: ' . $batch->tanggal_kadaluwarsa->format('d/m/Y')
                                            . ($isExpired ? ' ⚠ EXPIRED' : '');
                                 @endphp
                                 <option value="{{ $batch->id }}"
@@ -174,7 +174,7 @@
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="mt-0.5 rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 dark:bg-gray-800 dark:text-gray-400">Lainnya</span>
-                        <span>Alasan lain — isi catatan untuk penjelasan.</span>
+                        <span>Alasan lain: isi catatan untuk penjelasan.</span>
                     </li>
                 </ul>
             </div>

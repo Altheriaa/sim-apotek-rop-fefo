@@ -17,13 +17,7 @@ use Exception;
 
 class StokService
 {
-    // ══════════════════════════════════════════════════════════════════
-    // Helper: Hitung Total Stok Apotek dalam Satuan Jual
-    // ══════════════════════════════════════════════════════════════════
-
-    /**
-     * Total Stok (satuan_jual) = (stok_gudang × isi_per_kemasan) + stok_rak
-     */
+    // hitung stok total
     public function hitungTotalStokSatuanJual(Obat $obat): int
     {
         $stokGudang = $obat->batches()->sum('stok_gudang');
@@ -326,16 +320,16 @@ class StokService
     // ══════════════════════════════════════════════════════════════════
 
     /**
-     * Cek batch obat yang mendekati kadaluwarsa (≤ $days hari).
+     * Cek batch obat yang mendekati kadaluwarsa (≤ $months bulan).
      * Dipanggil oleh scheduled command harian.
      */
-    public function cekKadaluwarsa(int $days = 30): int
+    public function cekKadaluwarsa(int $months = 6): int
     {
         $batches = ObatBatch::with('obat')
             ->where(function ($q) {
                 $q->where('stok_gudang', '>', 0)->orWhere('stok_rak', '>', 0);
             })
-            ->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays($days)->toDateString()])
+            ->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addMonths($months)->toDateString()])
             ->get();
 
         $count = 0;
@@ -348,7 +342,7 @@ class StokService
 
             if ($sudahAda) continue;
 
-            $sisaHari  = now()->diffInDays($batch->tanggal_kadaluwarsa);
+            $sisaHari  = (int) today()->diffInDays($batch->tanggal_kadaluwarsa);
 
             $notif = Notifikasi::create([
                 'obat_id'          => $batch->obat_id,
@@ -371,11 +365,8 @@ class StokService
 
     // ══════════════════════════════════════════════════════════════════
     // 5. Disposal / Pembuangan Batch Expired atau Rusak
-    // ══════════════════════════════════════════════════════════════════
 
     /**
-     * Catat pembuangan (disposal) batch obat yang expired atau rusak.
-     * Mengurangi stok_gudang dan/atau stok_rak pada batch terkait.
      *
      * @param  int    $batchId       ID ObatBatch yang akan dibuang
      * @param  int    $jumlahGudang  Jumlah dibuang dari stok_gudang (satuan_beli)

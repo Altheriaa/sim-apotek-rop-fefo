@@ -16,7 +16,7 @@ class CheckRopAndExpiredCommand extends Command
     {
         $this->info('Memulai pengecekan ROP dan kadaluwarsa...');
 
-        // 1. Cek ROP untuk semua obat
+        // Cek ROP untuk semua obat
         $obatList = Obat::where('rop_minimum', '>', 0)->get();
         $ropCount = 0;
 
@@ -29,9 +29,20 @@ class CheckRopAndExpiredCommand extends Command
 
         $this->info("ROP: {$ropCount} obat di bawah/sama dengan ROP minimum.");
 
-        // 2. Cek kadaluwarsa (30 hari ke depan)
-        $edCount = $stokService->cekKadaluwarsa(30);
-        $this->info("Kadaluwarsa: {$edCount} notifikasi baru dibuat.");
+        // Cek kadaluwarsa (6 bulan ke depan)
+        $edCount = $stokService->cekKadaluwarsa(6);
+        $this->info("Mendekati ED: {$edCount} notifikasi baru dibuat.");
+
+        // restock rak
+        $obatList = Obat::where('min_stok_rak', '>', 0)->get();
+        $restockRakCount = 0;
+        foreach ($obatList as $obat) {
+            if ($obat->stok_rak <= $obat->min_stok_rak) {
+                $stokService->cekRopDanRak($obat);
+                $restockRakCount++;
+            }
+        }
+        $this->info("Perlu Restock Rak: {$restockRakCount} notifikasi baru dibuat.");
 
         $this->info('Pengecekan selesai.');
 

@@ -143,7 +143,7 @@
 
         <div class="footer">
             <span>Dicetak pada: {{ now()->format('d/m/Y H:i:s') }}</span>
-            <span>Sistem Inventaris Apotek — ROP &amp; FEFO</span>
+            <span>Sistem Inventaris Apotek | ROP &amp; FEFO</span>
         </div>
     </div>
 </body>

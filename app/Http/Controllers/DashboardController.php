@@ -34,11 +34,11 @@ class DashboardController extends Controller
             ->whereRaw('(SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) > 0')
             ->count();
 
-        // Batch mendekati kadaluwarsa (≤ 30 hari, masih ada stok)
+        // Batch mendekati kadaluwarsa (≤ 6 bulan, masih ada stok)
         $batchEdCount = ObatBatch::where(function ($q) {
                 $q->where('stok_gudang', '>', 0)->orWhere('stok_rak', '>', 0);
             })
-            ->where('tanggal_kadaluwarsa', '<=', now()->addDays(30))
+            ->where('tanggal_kadaluwarsa', '<=', now()->addMonths(6))
             ->count();
 
         // Penjualan 7 hari terakhir (untuk chart)

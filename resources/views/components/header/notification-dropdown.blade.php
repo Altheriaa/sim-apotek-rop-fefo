@@ -95,7 +95,7 @@
                     >
                         <!-- Icon Box -->
                         <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $isRop ? 'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50' : ($isRak ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/50' : 'bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50') }}">
-                            <i class="ti {{ $isRop ? 'ti-alert-triangle' : ($isRak ? 'ti-arrow-right-circle' : 'ti-clock-alert') }} text-lg"></i>
+                            <i class="ti {{ $isRop ? 'ti-alert-triangle' : ($isRak ? 'ti-arrow-right-circle' : 'ti-calendar-due') }} text-lg"></i>
                         </div>
 
                         <!-- Content -->
