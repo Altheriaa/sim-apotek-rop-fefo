@@ -7,10 +7,19 @@
         <div>
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Detail Pesanan</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ $pesanan->kode_pesanan }} &mdash; {{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->format('d F Y') }}
+                {{ $pesanan->kode_pesanan }} &bull; {{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->format('d F Y') }}
             </p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('pesanan.pdf', $pesanan->id) }}"
+                target="_blank"
+                class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 transition">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span>Cetak Surat Pesanan (PDF)</span>
+            </a>
             <a href="{{ route('pesanan.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-800/80">
                 Kembali
             </a>
@@ -44,6 +53,10 @@
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Kode Pesanan</p>
                         <p class="font-semibold text-gray-800 dark:text-white/90 font-mono">{{ $pesanan->kode_pesanan }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Nomor Surat Pesanan</p>
+                        <p class="font-semibold text-brand-600 dark:text-brand-400 font-mono">{{ $pesanan->nomor_surat }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Pesan</p>
@@ -125,6 +138,41 @@
 
         <!-- Sidebar: Update Status / Terima Pesanan -->
         <div class="lg:col-span-1 space-y-4">
+
+            <!-- Dokumen Surat Pesanan (SP) -->
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-dark">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-800 dark:text-white/90">Surat Pesanan (SP)</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Dokumen resmi ke supplier</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                    Dokumen cetak resmi Apotek Tabah Farma lengkap dengan kop, rincian obat, dan kolom tanda tangan Apoteker.
+                </p>
+                <div class="flex flex-col gap-2">
+                    <a href="{{ route('pesanan.pdf', $pesanan->id) }}"
+                        target="_blank"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 transition">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        <span>Cetak Surat Pesanan</span>
+                    </a>
+                    <a href="{{ route('pesanan.pdf', [$pesanan->id, 'download' => 1]) }}"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                        <svg class="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Unduh File PDF</span>
+                    </a>
+                </div>
+            </div>
 
             @if($pesanan->status === 'selesai' || $pesanan->status === 'batal')
                 <!-- Terminal state -->

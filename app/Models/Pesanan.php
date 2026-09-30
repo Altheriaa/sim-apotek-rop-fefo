@@ -51,4 +51,23 @@ class Pesanan extends Model
     {
         return $this->status === 'selesai';
     }
+
+    /**
+     * Format nomor resmi Surat Pesanan: [No]/TF/[Bulan Romawi]/[Tahun]
+     * Contoh: 02/TF/VI/2026
+     */
+    public function getNomorSuratAttribute(): string
+    {
+        $bulanRomawi = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ];
+        $tanggal = $this->tanggal_pesan ? \Carbon\Carbon::parse($this->tanggal_pesan) : now();
+        $month = (int) $tanggal->format('n');
+        $romawi = $bulanRomawi[$month] ?? 'I';
+        $no = str_pad((string) $this->id, 2, '0', STR_PAD_LEFT);
+        $year = $tanggal->format('Y');
+
+        return "{$no}/TF/{$romawi}/{$year}";
+    }
 }

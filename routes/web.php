@@ -103,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Pemesanan (ROP)
         Route::resource('pesanan', PesananController::class)->except(['edit', 'update']);
+        Route::get('/pesanan/{pesanan}/pdf', [PesananController::class, 'cetakPdf'])->name('pesanan.pdf');
         Route::patch('/pesanan/{pesanan}/status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
         Route::post('/pesanan/{pesanan}/terima', [PesananController::class, 'terima'])->name('pesanan.terima');
 

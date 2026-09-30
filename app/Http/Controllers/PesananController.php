@@ -9,6 +9,7 @@ use App\Models\Obat;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PesananController extends Controller
 {
@@ -128,11 +129,15 @@ class PesananController extends Controller
             }
 
             $createdCount++;
+            $lastPesanan = $pesanan;
         }
 
-        $message = $createdCount > 1
-            ? "Berhasil membuat {$createdCount} pesanan (dikelompokkan otomatis berdasarkan masing-masing supplier)."
-            : "Pesanan berhasil dibuat.";
+        if ($createdCount === 1 && $lastPesanan) {
+            return redirect()->route('pesanan.show', $lastPesanan->id)
+                ->with('success', 'Pesanan draft berhasil dibuat. Anda dapat langsung mencetak atau mengunduh Surat Pesanan untuk supplier.');
+        }
+
+        $message = "Berhasil membuat {$createdCount} pesanan (dikelompokkan otomatis per supplier).";
 
         return redirect()->route('pesanan.index')->with('success', $message);
     }
@@ -225,5 +230,30 @@ class PesananController extends Controller
 
         return redirect()->route('pesanan.index')
             ->with('success', 'Pesanan berhasil dihapus.');
+    }
+
+    /**
+     * Cetak dokumen resmi Surat Pesanan (PDF) untuk diberikan kepada supplier
+     */
+    public function cetakPdf(Request $request, Pesanan $pesanan)
+    {
+        $pesanan->load(['supplier', 'user', 'detailPesanan.obat']);
+
+        $logoPath = public_path('images/Logo Apotek Tabah Farma.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('pages.pesanan.pdf', [
+            'pesanan'    => $pesanan,
+            'logoBase64' => $logoBase64,
+        ])->setPaper('a4', 'portrait');
+
+        $sanitizedCode = strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '-', $pesanan->kode_pesanan));
+        $filename = 'surat-pesanan-' . $sanitizedCode . '.pdf';
+
+        if ($request->has('download')) {
+            return $pdf->download($filename);
+        }
+
+        return $pdf->stream($filename);
     }
 }
