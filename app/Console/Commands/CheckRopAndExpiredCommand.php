@@ -16,18 +16,19 @@ class CheckRopAndExpiredCommand extends Command
     {
         $this->info('Memulai pengecekan ROP dan kadaluwarsa...');
 
-        // Cek ROP untuk semua obat
-        $obatList = Obat::where('rop_minimum', '>', 0)->get();
+        // Cek ROP untuk semua obat menggunakan ROP Dinamis
+        $obatList = Obat::all();
         $ropCount = 0;
 
         foreach ($obatList as $obat) {
-            if ($obat->stok_total <= ($obat->rop_minimum * $obat->isi_per_kemasan)) {
+            $ropDinamis = $obat->rop_dinamis;
+            if ($ropDinamis > 0 && $obat->stok_total <= ($ropDinamis * $obat->isi_per_kemasan)) {
                 $stokService->cekRopDanRak($obat);
                 $ropCount++;
             }
         }
 
-        $this->info("ROP: {$ropCount} obat di bawah/sama dengan ROP minimum.");
+        $this->info("ROP: {$ropCount} obat di bawah/sama dengan batas ROP dinamis.");
 
         // Cek kadaluwarsa (6 bulan ke depan)
         $edCount = $stokService->cekKadaluwarsa(6);
