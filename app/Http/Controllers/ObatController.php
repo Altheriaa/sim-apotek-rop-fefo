@@ -26,19 +26,31 @@ class ObatController extends Controller
             });
         }
 
-        if ($request->filled('status')) {
-            if ($request->status === 'rop') {
-                // Total stok apotek (satuan_jual) ≤ Batas ROP (rop_minimum dalam satuan_beli × isi_per_kemasan)
-                $query->whereRaw('(
-                    (SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) * obat.isi_per_kemasan
-                    + (SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id)
-                ) <= (obat.rop_minimum * obat.isi_per_kemasan)');
-            } elseif ($request->status === 'aman') {
-                $query->whereRaw('(
-                    (SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) * obat.isi_per_kemasan
-                    + (SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id)
-                ) > (obat.rop_minimum * obat.isi_per_kemasan)');
-            }
+        // Filter status ROP menggunakan rop_dinamis (dihitung di PHP via accessor)
+        // rop_dinamis = D×L fallback ke rop_minimum jika belum ada riwayat penjualan.
+        $filterStatus = $request->status;
+
+        if ($filterStatus === 'rop' || $filterStatus === 'aman') {
+            $allObats = $query->latest('id')->get();
+            $allObats = $allObats->filter(function ($obat) use ($filterStatus) {
+                $ropDinamis = $obat->rop_dinamis;
+                $totalSatuanJual = ($obat->total_stok_gudang * $obat->isi_per_kemasan) + $obat->total_stok_rak;
+                $batas = $ropDinamis * $obat->isi_per_kemasan;
+                return $filterStatus === 'rop'
+                    ? ($ropDinamis > 0 && $totalSatuanJual <= $batas)
+                    : ($ropDinamis <= 0 || $totalSatuanJual > $batas);
+            })->values();
+
+            return view('pages.obat.index', [
+                'title' => 'Data Obat',
+                'obats' => new \Illuminate\Pagination\LengthAwarePaginator(
+                    $allObats->forPage(\Illuminate\Support\Facades\Request::get('page', 1), 10),
+                    $allObats->count(),
+                    10,
+                    null,
+                    ['path' => \Illuminate\Support\Facades\Request::url(), 'query' => request()->query()]
+                ),
+            ]);
         }
 
         $obats = $query->latest('id')->paginate(10)->withQueryString();
@@ -73,6 +85,7 @@ class ObatController extends Controller
             'isi_per_kemasan' => 'required|integer|min:1',
             'harga_jual'      => 'required|numeric|min:0',
             'rop_minimum'     => 'required|integer|min:0',
+            'lead_time_hari'  => 'required|integer|min:1|max:365',
             'min_stok_rak'    => 'required|integer|min:0',
         ]);
 
@@ -124,6 +137,7 @@ class ObatController extends Controller
             'isi_per_kemasan' => 'required|integer|min:1',
             'harga_jual'      => 'required|numeric|min:0',
             'rop_minimum'     => 'required|integer|min:0',
+            'lead_time_hari'  => 'required|integer|min:1|max:365',
             'min_stok_rak'    => 'required|integer|min:0',
         ]);
 

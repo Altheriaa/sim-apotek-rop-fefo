@@ -135,15 +135,31 @@
                             class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
                     </div>
 
-                    <!-- ROP Minimum -->
+                    <!-- ROP Minimum (Fallback) -->
                     <div>
                         <label for="rop_minimum"
-                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Batas Minimal
-                            (ROP)</label>
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">ROP Minimum
+                            <span class="text-xs text-gray-400">(Fallback)</span></label>
                         <input type="number" id="rop_minimum" name="rop_minimum"
                             value="{{ old('rop_minimum', $obat->rop_minimum) }}" required min="0"
                             class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150">
-                        <p class="mt-1 text-xs text-gray-400">Dihitung dalam satuan beli (cth: 5 Box/Botol)</p>
+                        <p class="mt-1 text-xs text-gray-400">Dalam satuan beli (Box/Botol). Dipakai jika belum ada riwayat penjualan.</p>
+                    </div>
+
+                    <!-- Lead Time Supplier -->
+                    <div>
+                        <label for="lead_time_hari"
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Lead Time Supplier
+                            <span class="text-xs font-normal text-brand-500">(Untuk ROP Dinamis)</span></label>
+                        <div class="relative">
+                            <input type="number" id="lead_time_hari" name="lead_time_hari"
+                                value="{{ old('lead_time_hari', $obat->lead_time_hari) }}" required
+                                min="1" max="365"
+                                class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-4 py-2.5 pr-14 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-500 transition duration-150"
+                                placeholder="3">
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-gray-400">hari</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-400">ROP Dinamis = Rata-rata pemakaian/hari &times; Lead time ini</p>
                     </div>
 
                     <!-- Min Stok Rak -->

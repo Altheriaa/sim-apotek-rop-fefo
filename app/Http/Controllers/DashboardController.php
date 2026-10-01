@@ -19,11 +19,13 @@ class DashboardController extends Controller
         $totalStokRak   = (int) ObatBatch::sum('stok_rak');
         $totalStok      = $totalStokGudang + $totalStokRak;
 
-        // Obat kritis: Total Apotek (satuan_jual) ≤ ROP Minimum (satuan_beli × isi_per_kemasan)
+        // Obat kritis: Total Apotek (satuan_jual) ≤ ROP Dinamis (satuan_beli × isi_per_kemasan)
+        // rop_dinamis = D×L dari penjualan 30 hari terakhir; fallback ke rop_minimum jika belum ada riwayat.
         $obatKritisCount = 0;
-        $obatList        = Obat::where('rop_minimum', '>', 0)->get();
+        $obatList        = Obat::all();
         foreach ($obatList as $obat) {
-            if ($obat->stok_total <= ($obat->rop_minimum * $obat->isi_per_kemasan)) {
+            $ropDinamis = $obat->rop_dinamis;
+            if ($ropDinamis > 0 && $obat->stok_total <= ($ropDinamis * $obat->isi_per_kemasan)) {
                 $obatKritisCount++;
             }
         }

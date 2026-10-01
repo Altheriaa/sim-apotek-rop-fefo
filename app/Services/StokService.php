@@ -184,10 +184,11 @@ class StokService
 
     /**
      * Evaluasi dua kondisi peringatan stok:
-     * A. Total Stok Apotek (satuan_jual) ≤ (ROP × isi_per_kemasan) → Kirim notifikasi WA, suggest pesanan
+     * A. Total Stok Apotek (satuan_jual) ≤ ROP Dinamis (D×L, satuan_jual) → Kirim notifikasi WA, suggest pesanan
      * B. Stok Rak ≤ min_stok_rak → Log notifikasi restock_rak
      *
-     * rop_minimum didefinisikan dalam satuan_beli (misal: 5 Box)
+     * rop_dinamis = ceil((rata_rata_pemakaian_harian × lead_time_hari) / isi_per_kemasan)
+     * Jika belum ada riwayat penjualan, fallback ke rop_minimum statis.
      * Total Stok (satuan_jual) = (stok_gudang × isi_per_kemasan) + stok_rak
      */
     public function cekRopDanRak(Obat $obat): void
@@ -195,10 +196,11 @@ class StokService
         $stokGudang         = $obat->batches()->sum('stok_gudang'); // dalam satuan_beli (Box)
         $stokRak            = $obat->batches()->sum('stok_rak');     // dalam satuan_jual (Strip)
         $totalSatuanJual    = ($stokGudang * $obat->isi_per_kemasan) + $stokRak;
-        $batasRopSatuanJual = $obat->rop_minimum * $obat->isi_per_kemasan; // ROP Box dinormalisasi ke satuan jual
+        $ropDinamis         = $obat->rop_dinamis; // dalam satuan_beli (sudah dihitung oleh accessor)
+        $batasRopSatuanJual = $ropDinamis * $obat->isi_per_kemasan;
 
-        // A. Pemicu ROP (Total Apotek ≤ ROP Minimum dalam satuan_beli)
-        if ($obat->rop_minimum > 0 && $totalSatuanJual <= $batasRopSatuanJual) {
+        // A. Pemicu ROP (Total Apotek ≤ ROP Dinamis dalam satuan_beli)
+        if ($ropDinamis > 0 && $totalSatuanJual <= $batasRopSatuanJual) {
             $sudahAda = Notifikasi::where('obat_id', $obat->id)
                 ->where('jenis_notifikasi', 'stok_menipis')
                 ->whereDate('created_at', today())
@@ -222,7 +224,8 @@ class StokService
                     . "Total Apotek: *{$totalSatuanJual} {$obat->satuan_jual}*\n"
                     . "  → Gudang: {$stokGudang} {$obat->satuan_beli} (= {$gudangDlmJual} {$obat->satuan_jual})\n"
                     . "  → Rak: {$stokRak} {$obat->satuan_jual}\n"
-                    . "Batas ROP: *{$obat->rop_minimum} {$obat->satuan_beli}*" . ($obat->isi_per_kemasan > 1 ? " (= {$batasRopSatuanJual} {$obat->satuan_jual})" : "") . "\n"
+                    . "Batas ROP Dinamis: *{$ropDinamis} {$obat->satuan_beli}*" . ($obat->isi_per_kemasan > 1 ? " (= {$batasRopSatuanJual} {$obat->satuan_jual})" : "") . "\n"
+                    . "Lead Time: {$obat->lead_time_hari} hari | Rata-rata pakai: {$obat->rata_rata_pemakaian_harian} {$obat->satuan_jual}/hari\n"
                     . $supplierInfo
                     . "\nSegera lakukan pemesanan ulang ke supplier.";
 
@@ -302,8 +305,8 @@ class StokService
         $lastBatch = $obat->batches()->latest('id')->first();
         $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
 
-        // Jumlah pesan default: 2x ROP minimum (atau minimal 1 satuan beli)
-        $jumlahPesan = max((int) $obat->rop_minimum * 2, 1);
+        // Jumlah pesan default: 2× ROP dinamis (minimal 1 satuan beli)
+        $jumlahPesan = max((int) $obat->rop_dinamis * 2, 1);
 
         DetailPesanan::create([
             'pesanan_id'     => $pesananDraft->id,

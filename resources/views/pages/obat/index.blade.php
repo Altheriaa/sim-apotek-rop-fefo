@@ -112,8 +112,10 @@
                                 $stokGudang = (int) ($obat->total_stok_gudang ?? 0);
                                 $stokRak = (int) ($obat->total_stok_rak ?? 0);
                                 $stokTotal = ($stokGudang * ($obat->isi_per_kemasan ?? 1)) + $stokRak;
-                                $batasRopSatuanJual = $obat->rop_minimum * ($obat->isi_per_kemasan ?? 1);
-                                $isRop = $obat->rop_minimum > 0 && $stokTotal <= $batasRopSatuanJual;
+                                $ropDinamis = $obat->rop_dinamis;
+                                $batasRopSatuanJual = $ropDinamis * ($obat->isi_per_kemasan ?? 1);
+                                $isRop = $ropDinamis > 0 && $stokTotal <= $batasRopSatuanJual;
+                                $usedFallback = $obat->rata_rata_pemakaian_harian <= 0;
                             @endphp
                             <tr
                                 class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
@@ -161,11 +163,16 @@
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <div class="font-semibold text-gray-800 dark:text-white/90">{{ $obat->rop_minimum }}
+                                    <div class="font-semibold text-gray-800 dark:text-white/90">{{ $ropDinamis }}
                                         {{ $obat->satuan_beli }}</div>
                                     @if($obat->isi_per_kemasan > 1)
                                         <div class="text-[11px] text-gray-400">(= {{ $batasRopSatuanJual }}
                                             {{ $obat->satuan_jual }})</div>
+                                    @endif
+                                    @if($usedFallback)
+                                        <div class="text-[11px] text-amber-500">fallback statis</div>
+                                    @else
+                                        <div class="text-[11px] text-brand-400">D×L: {{ $obat->rata_rata_pemakaian_harian }}×{{ $obat->lead_time_hari }}</div>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm">

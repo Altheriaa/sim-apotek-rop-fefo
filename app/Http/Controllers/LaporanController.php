@@ -260,13 +260,31 @@ class LaporanController extends Controller
             });
         }
 
-        if ($request->filled('status_rop')) {
-            if ($request->status_rop === 'kritis') {
-                $query->whereRaw('(
-                    (SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) * obat.isi_per_kemasan
-                    + (SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id)
-                ) <= (obat.rop_minimum * obat.isi_per_kemasan)');
-            }
+        if ($request->filled('status_rop') && $request->status_rop === 'kritis') {
+            // rop_dinamis dihitung di PHP (accessor), tidak bisa di SQL langsung
+            $allData = $query->orderBy('nama_obat')->get();
+            $allData = $allData->filter(function ($obat) {
+                $ropDinamis = $obat->rop_dinamis;
+                $stokGudang = (int) ($obat->stok_gudang_total ?? 0);
+                $stokRak    = (int) ($obat->stok_rak_total ?? 0);
+                $stokTotal  = ($stokGudang * $obat->isi_per_kemasan) + $stokRak;
+                return $ropDinamis > 0 && $stokTotal <= ($ropDinamis * $obat->isi_per_kemasan);
+            })->values();
+
+            $page    = $request->get('page', 1);
+            $perPage = 20;
+            $data    = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allData->forPage($page, $perPage),
+                $allData->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+
+            return view('pages.laporan.stok-obat', [
+                'title' => 'Laporan Stok Obat',
+                'data'  => $data,
+            ]);
         }
 
         $data = $query->orderBy('nama_obat')->paginate(20)->withQueryString();
