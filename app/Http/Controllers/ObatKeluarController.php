@@ -13,9 +13,6 @@ class ObatKeluarController extends Controller
         protected StokService $stokService
     ) {}
 
-    /**
-     * Daftar riwayat disposal (pembuangan batch expired/rusak)
-     */
     public function index(Request $request)
     {
         $query = ObatKeluar::with(['obat', 'obatBatch', 'user']);
@@ -49,17 +46,13 @@ class ObatKeluarController extends Controller
         ]);
     }
 
-    /**
-     * Form disposal — tampilkan batch yang expired atau stoknya > 0
-     */
     public function create(Request $request)
     {
-        // Prioritaskan batch expired, lalu yang mendekati expired
         $batches = ObatBatch::with('obat')
             ->where(function ($q) {
                 $q->where('stok_gudang', '>', 0)->orWhere('stok_rak', '>', 0);
             })
-            ->orderByRaw('tanggal_kadaluwarsa <= CURDATE() DESC') // expired dulu
+            ->orderByRaw('tanggal_kadaluwarsa <= CURDATE() DESC')
             ->orderBy('tanggal_kadaluwarsa', 'asc')
             ->get();
 
@@ -70,9 +63,6 @@ class ObatKeluarController extends Controller
         ]);
     }
 
-    /**
-     * Proses disposal — kurangi stok batch dan catat riwayat
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([

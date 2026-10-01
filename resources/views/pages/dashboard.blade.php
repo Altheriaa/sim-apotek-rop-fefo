@@ -39,8 +39,9 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-dark">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Stok Fisik</p>
-                    <h4 class="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{{ number_format($totalStok) }}</h4>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Stok Gudang</p>
+                    <h4 class="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{{ number_format($totalStokGudang) }}</h4>
+                    <p class="text-xs text-gray-400 mt-0.5">Rak: {{ number_format($totalStokRak) }} satuan</p>
                 </div>
                 <div class="flex h-11 w-11 items-center justify-center rounded-full bg-success-100 text-success-600 dark:bg-success-900/20 dark:text-success-400">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,14 +216,18 @@
                 <a href="{{ route('transfer-rak.index') }}" class="text-sm font-medium text-black dark:text-white/90">Lihat Semua</a>
             </div>
             <div class="p-5">
-                 @if($transferTerakhir->isEmpty())
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada aktivitas transfer ke rak.</p>
+                @if($transferTerakhir->isEmpty())
+                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                        <i class="ti ti-circle-arrow-right text-3xl mb-2 text-gray-300 dark:text-gray-600"></i>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada transfer hari ini.</p>
+                        <a href="{{ route('transfer-rak.create') }}" class="mt-2 text-xs font-medium text-brand-500 hover:underline">Transfer stok dari gudang ke rak</a>
+                    </div>
                 @else
                     <ul class="space-y-4">
                         @foreach($transferTerakhir->take(5) as $tr)
                             <li class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0 last:pb-0 dark:border-gray-800">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-ful">
+                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                                         <i class="ti ti-circle-arrow-right text-xl text-black dark:text-white/90"></i>
                                     </div>
                                     <div>
@@ -231,7 +236,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-sm font-bold text-brand-600 dark:text-brand-400">+{{ $tr->jumlah }}</p>
+                                    <p class="text-sm font-bold text-brand-600 dark:text-brand-400">+{{ $tr->jumlah_masuk_rak }} {{ $tr->obat->satuan_jual }}</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($tr->tanggal_transfer)->format('d M Y') }}</p>
                                 </div>
                             </li>

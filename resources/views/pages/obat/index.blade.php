@@ -8,7 +8,7 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Data Obat</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Kelola master data obat dan informasi ROP.</p>
             </div>
-            @if(auth()->user()->isAdmin() || auth()->user()->isKaryawan())
+            @if(auth()->user()->isAdminOrOwner())
                 <div class="flex gap-2">
                     <a href="{{ route('obat.create') }}"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600">
@@ -98,10 +98,10 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Nama Obat</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Satuan</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Stok Total</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">ROP Minimum</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">ROP Dinamis</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Status Stok</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Harga</th>
-                            @if(auth()->user()->isAdmin() || auth()->user()->isKaryawan())
+                            @if(auth()->user()->isAdminOrOwner())
                                 <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Aksi</th>
                             @endif
                         </tr>
@@ -178,13 +178,13 @@
                                 <td class="px-5 py-4 text-sm">
                                     <span
                                         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $isRop ? 'bg-error-100 text-error-700 dark:bg-error-900/30 dark:text-error-400' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400' }}">
-                                        {{ $isRop ? ' Perlu Reorder' : ' Aman' }}
+                                        {{ $isRop ? 'Perlu Reorder' : 'Aman' }}
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     Rp {{ number_format($obat->harga_jual, 0, ',', '.') }} / {{ $obat->satuan_jual }}
                                 </td>
-                                @if(auth()->user()->isAdmin() || auth()->user()->isKaryawan())
+                                @if(auth()->user()->isAdminOrOwner())
                                     <td class="px-5 py-4 text-sm">
                                         <div class="flex items-center gap-1.5">
                                             <a href="{{ route('obat.edit', $obat->id) }}"

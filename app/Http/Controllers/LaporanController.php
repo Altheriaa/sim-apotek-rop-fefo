@@ -261,14 +261,31 @@ class LaporanController extends Controller
         }
 
         if ($request->filled('status_rop') && $request->status_rop === 'kritis') {
-            // rop_dinamis dihitung di PHP (accessor), tidak bisa di SQL langsung
+            // rop_dinamis dihitung di PHP, tidak bisa di SQL langsung.
+            // Preload total penjualan 30 hari dalam satu query untuk menghindari N+1.
+            $penjualanPerObat = \App\Models\DetailPenjualan::query()
+                ->whereHas('penjualan', fn ($q) =>
+                    $q->where('tanggal_transaksi', '>=', now()->subDays(30))
+                )
+                ->selectRaw('obat_id, SUM(jumlah) as total_terjual')
+                ->groupBy('obat_id')
+                ->pluck('total_terjual', 'obat_id');
+
             $allData = $query->orderBy('nama_obat')->get();
-            $allData = $allData->filter(function ($obat) {
-                $ropDinamis = $obat->rop_dinamis;
+            $allData = $allData->filter(function ($obat) use ($penjualanPerObat) {
+                $d = round(($penjualanPerObat[$obat->id] ?? 0) / 30, 2);
+                $l = (int) ($obat->lead_time_hari ?? 3);
+                $isiPerKemasan = max((int) $obat->isi_per_kemasan, 1);
+
+                $ropDinamis = $d > 0
+                    ? (int) ceil(($d * $l) / $isiPerKemasan)
+                    : (int) $obat->rop_minimum;
+
                 $stokGudang = (int) ($obat->stok_gudang_total ?? 0);
                 $stokRak    = (int) ($obat->stok_rak_total ?? 0);
-                $stokTotal  = ($stokGudang * $obat->isi_per_kemasan) + $stokRak;
-                return $ropDinamis > 0 && $stokTotal <= ($ropDinamis * $obat->isi_per_kemasan);
+                $stokTotal  = ($stokGudang * $isiPerKemasan) + $stokRak;
+
+                return $ropDinamis > 0 && $stokTotal <= ($ropDinamis * $isiPerKemasan);
             })->values();
 
             $page    = $request->get('page', 1);

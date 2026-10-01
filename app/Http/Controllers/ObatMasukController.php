@@ -58,12 +58,10 @@ class ObatMasukController extends Controller
 
     public function create()
     {
-        $obats     = Obat::orderBy('nama_obat')->get();
-        // $suppliers = Supplier::orderBy('nama_supplier')->get();
-
+        $obats = Obat::orderBy('nama_obat')->get();
         return view('pages.obat-masuk.create', [
-            'title'     => 'Tambah Obat Masuk',
-            'obats'     => $obats,
+            'title' => 'Tambah Obat Masuk',
+            'obats' => $obats,
         ]);
     }
 

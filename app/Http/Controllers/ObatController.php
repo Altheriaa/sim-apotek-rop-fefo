@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetailPenjualan;
 use App\Models\Obat;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ObatController extends Controller
 {
@@ -26,16 +28,32 @@ class ObatController extends Controller
             });
         }
 
-        // Filter status ROP menggunakan rop_dinamis (dihitung di PHP via accessor)
-        // rop_dinamis = D×L fallback ke rop_minimum jika belum ada riwayat penjualan.
         $filterStatus = $request->status;
 
         if ($filterStatus === 'rop' || $filterStatus === 'aman') {
             $allObats = $query->latest('id')->get();
-            $allObats = $allObats->filter(function ($obat) use ($filterStatus) {
-                $ropDinamis = $obat->rop_dinamis;
-                $totalSatuanJual = ($obat->total_stok_gudang * $obat->isi_per_kemasan) + $obat->total_stok_rak;
-                $batas = $ropDinamis * $obat->isi_per_kemasan;
+
+            // Satu query untuk semua obat — ambil total penjualan 30 hari terakhir
+            $penjualanPerObat = DetailPenjualan::query()
+                ->whereHas('penjualan', fn ($q) =>
+                    $q->where('tanggal_transaksi', '>=', now()->subDays(30))
+                )
+                ->selectRaw('obat_id, SUM(jumlah) as total_terjual')
+                ->groupBy('obat_id')
+                ->pluck('total_terjual', 'obat_id');
+
+            $allObats = $allObats->filter(function ($obat) use ($filterStatus, $penjualanPerObat) {
+                $d = round(($penjualanPerObat[$obat->id] ?? 0) / 30, 2);
+                $l = (int) ($obat->lead_time_hari ?? 3);
+                $isiPerKemasan = max((int) $obat->isi_per_kemasan, 1);
+
+                $ropDinamis = $d > 0
+                    ? (int) ceil(($d * $l) / $isiPerKemasan)
+                    : (int) $obat->rop_minimum;
+
+                $totalSatuanJual = ((int) $obat->total_stok_gudang * $isiPerKemasan) + (int) $obat->total_stok_rak;
+                $batas = $ropDinamis * $isiPerKemasan;
+
                 return $filterStatus === 'rop'
                     ? ($ropDinamis > 0 && $totalSatuanJual <= $batas)
                     : ($ropDinamis <= 0 || $totalSatuanJual > $batas);
@@ -43,12 +61,12 @@ class ObatController extends Controller
 
             return view('pages.obat.index', [
                 'title' => 'Data Obat',
-                'obats' => new \Illuminate\Pagination\LengthAwarePaginator(
-                    $allObats->forPage(\Illuminate\Support\Facades\Request::get('page', 1), 10),
+                'obats' => new LengthAwarePaginator(
+                    $allObats->forPage(Request::get('page', 1), 10),
                     $allObats->count(),
                     10,
                     null,
-                    ['path' => \Illuminate\Support\Facades\Request::url(), 'query' => request()->query()]
+                    ['path' => Request::url(), 'query' => request()->query()]
                 ),
             ]);
         }

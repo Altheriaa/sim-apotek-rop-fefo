@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Obat;
 use App\Models\ObatBatch;
+use App\Models\DetailPenjualan;
 use App\Models\Penjualan;
 use App\Models\TransferRak;
 use App\Models\Notifikasi;
@@ -14,23 +15,40 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalObat      = Obat::count();
+        $totalObat       = Obat::count();
         $totalStokGudang = (int) ObatBatch::sum('stok_gudang');
-        $totalStokRak   = (int) ObatBatch::sum('stok_rak');
-        $totalStok      = $totalStokGudang + $totalStokRak;
+        $totalStokRak    = (int) ObatBatch::sum('stok_rak');
 
-        // Obat kritis: Total Apotek (satuan_jual) ≤ ROP Dinamis (satuan_beli × isi_per_kemasan)
-        // rop_dinamis = D×L dari penjualan 30 hari terakhir; fallback ke rop_minimum jika belum ada riwayat.
+        $penjualanPerObat = DetailPenjualan::query()
+            ->whereHas('penjualan', fn($q) =>
+                $q->where('tanggal_transaksi', '>=', now()->subDays(30))
+            )
+            ->selectRaw('obat_id, SUM(jumlah) as total_terjual')
+            ->groupBy('obat_id')
+            ->pluck('total_terjual', 'obat_id');
+
+        $obatList = Obat::withSum('batches as stok_gudang_sum', 'stok_gudang')
+            ->withSum('batches as stok_rak_sum', 'stok_rak')
+            ->get();
+
         $obatKritisCount = 0;
-        $obatList        = Obat::all();
         foreach ($obatList as $obat) {
-            $ropDinamis = $obat->rop_dinamis;
-            if ($ropDinamis > 0 && $obat->stok_total <= ($ropDinamis * $obat->isi_per_kemasan)) {
+            $d = round(($penjualanPerObat[$obat->id] ?? 0) / 30, 2);
+            $l = (int) ($obat->lead_time_hari ?? 3);
+            $isiPerKemasan = max((int) $obat->isi_per_kemasan, 1);
+
+            $ropDinamis = $d > 0
+                ? (int) ceil(($d * $l) / $isiPerKemasan)
+                : (int) $obat->rop_minimum;
+
+            $stokTotal = ((int) $obat->stok_gudang_sum * $isiPerKemasan) + (int) $obat->stok_rak_sum;
+
+            if ($ropDinamis > 0 && $stokTotal <= ($ropDinamis * $isiPerKemasan)) {
                 $obatKritisCount++;
             }
         }
 
-        // Obat yang perlu restock rak (stok_rak ≤ min_stok_rak namun gudang masih ada)
+        // Obat yang perlu restock rak (stok_rak <= min_stok_rak namun gudang masih ada)
         $rakKritisCount = Obat::where('min_stok_rak', '>', 0)
             ->whereRaw('(SELECT COALESCE(SUM(stok_rak),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) <= obat.min_stok_rak')
             ->whereRaw('(SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) > 0')
@@ -50,7 +68,7 @@ class DashboardController extends Controller
             ->orderBy('tanggal')
             ->get();
 
-        // Transfer rak hari ini
+        // Transfer rak hari ini (dalam satuan_jual)
         $transferHariIni = TransferRak::whereDate('tanggal_transfer', today())->sum('jumlah_masuk_rak');
 
         // Omzet & Laba Hari Ini
@@ -81,7 +99,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Aktivitas terakhir — gabungan transfer rak & penjualan
         $transferTerakhir = TransferRak::with(['obat', 'user'])
             ->latest()
             ->take(5)
@@ -93,24 +110,23 @@ class DashboardController extends Controller
             ->get();
 
         return view('pages.dashboard', [
-            'title'              => 'Dashboard',
-            'totalObat'          => $totalObat,
-            'totalStok'          => $totalStok,
-            'totalStokGudang'    => $totalStokGudang,
-            'totalStokRak'       => $totalStokRak,
-            'obatKritisCount'    => $obatKritisCount,
-            'rakKritisCount'     => $rakKritisCount,
-            'batchEdCount'       => $batchEdCount,
-            'penjualanChart'     => $penjualanChart,
-            'transferHariIni'    => $transferHariIni,
-            'omzetHariIni'       => $omzetHariIni,
-            'labaHariIni'        => $labaHariIni,
-            'omzetBulanIni'      => $omzetBulanIni,
-            'labaBulanIni'       => $labaBulanIni,
-            'notifikasiTerbaru'  => $notifikasiTerbaru,
-            'pesananAktif'       => $pesananAktif,
-            'transferTerakhir'   => $transferTerakhir,
-            'penjualanTerakhir'  => $penjualanTerakhir,
+            'title'             => 'Dashboard',
+            'totalObat'         => $totalObat,
+            'totalStokGudang'   => $totalStokGudang,
+            'totalStokRak'      => $totalStokRak,
+            'obatKritisCount'   => $obatKritisCount,
+            'rakKritisCount'    => $rakKritisCount,
+            'batchEdCount'      => $batchEdCount,
+            'penjualanChart'    => $penjualanChart,
+            'transferHariIni'   => $transferHariIni,
+            'omzetHariIni'      => $omzetHariIni,
+            'labaHariIni'       => $labaHariIni,
+            'omzetBulanIni'     => $omzetBulanIni,
+            'labaBulanIni'      => $labaBulanIni,
+            'notifikasiTerbaru' => $notifikasiTerbaru,
+            'pesananAktif'      => $pesananAktif,
+            'transferTerakhir'  => $transferTerakhir,
+            'penjualanTerakhir' => $penjualanTerakhir,
         ]);
     }
 }

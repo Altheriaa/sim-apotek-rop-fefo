@@ -104,29 +104,35 @@ class PesananController extends Controller
 
         $createdCount = 0;
         foreach ($groupedBySupplier as $supplierId => $items) {
-            $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad(Pesanan::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+            $pesanan = DB::transaction(function () use ($supplierId, $items, $validated, $obats) {
+                // Hitung urutan pesanan hari ini di dalam transaksi untuk mengurangi risiko duplikasi
+                $todayCount = Pesanan::whereDate('created_at', today())->lockForUpdate()->count();
+                $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad($todayCount + 1, 4, '0', STR_PAD_LEFT);
 
-            $pesanan = Pesanan::create([
-                'kode_pesanan'  => $kodePesanan,
-                'supplier_id'   => $supplierId,
-                'user_id'       => auth()->id(),
-                'tanggal_pesan' => $validated['tanggal_pesan'],
-                'status'        => 'draft',
-                'catatan'       => $validated['catatan'] ?? 'Pesanan manual',
-            ]);
-
-            foreach ($items as $item) {
-                $obat          = $obats[$item['obat_id']];
-                $lastBatch     = $obat->batches()->latest('id')->first();
-                $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
-
-                DetailPesanan::create([
-                    'pesanan_id'     => $pesanan->id,
-                    'obat_id'        => $item['obat_id'],
-                    'jumlah_pesan'   => $item['jumlah_pesan'],
-                    'estimasi_harga' => $estimasiHarga,
+                $pesanan = Pesanan::create([
+                    'kode_pesanan'  => $kodePesanan,
+                    'supplier_id'   => $supplierId,
+                    'user_id'       => auth()->id(),
+                    'tanggal_pesan' => $validated['tanggal_pesan'],
+                    'status'        => 'draft',
+                    'catatan'       => $validated['catatan'] ?? 'Pesanan manual',
                 ]);
-            }
+
+                foreach ($items as $item) {
+                    $obat          = $obats[$item['obat_id']];
+                    $lastBatch     = $obat->batches()->latest('id')->first();
+                    $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
+
+                    DetailPesanan::create([
+                        'pesanan_id'     => $pesanan->id,
+                        'obat_id'        => $item['obat_id'],
+                        'jumlah_pesan'   => $item['jumlah_pesan'],
+                        'estimasi_harga' => $estimasiHarga,
+                    ]);
+                }
+
+                return $pesanan;
+            });
 
             $createdCount++;
             $lastPesanan = $pesanan;

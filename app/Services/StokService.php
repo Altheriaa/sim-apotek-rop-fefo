@@ -17,7 +17,6 @@ use Exception;
 
 class StokService
 {
-    // hitung stok total
     public function hitungTotalStokSatuanJual(Obat $obat): int
     {
         $stokGudang = $obat->batches()->sum('stok_gudang');
@@ -25,20 +24,8 @@ class StokService
         return ($stokGudang * $obat->isi_per_kemasan) + $stokRak;
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 1. Transfer Stok dari Gudang ke Display Rak (FEFO + Konversi)
-    // ══════════════════════════════════════════════════════════════════
-
     /**
-     * Pindahkan sejumlah Box/Dus dari gudang ke rak display.
-     * Konversi otomatis: $jumlahBox × isi_per_kemasan → stok_rak (satuan_jual).
-     * Menggunakan algoritma FEFO: batch dengan ED terdekat dipindah lebih dulu.
-     *
-     * Contoh: Transfer 2 Box Paracetamol (isi_per_kemasan=10)
-     *         → stok_gudang: -2 Box
-     *         → stok_rak:    +20 Strip
-     *
-     * @throws Exception Jika stok gudang tidak mencukupi
+     * @throws Exception
      */
     public function transferKeRak(int $obatId, int $jumlahBox, int $userId, ?string $keterangan = null): array
     {
@@ -68,8 +55,8 @@ class StokService
                 $ambilBox        = min($batch->stok_gudang, $sisaBox);
                 $hasilSatuanJual = $ambilBox * $obat->isi_per_kemasan;
 
-                $batch->decrement('stok_gudang', $ambilBox);       // Kurangi gudang (Box)
-                $batch->increment('stok_rak', $hasilSatuanJual);   // Tambah rak (Strip/Botol)
+                $batch->decrement('stok_gudang', $ambilBox);
+                $batch->increment('stok_rak', $hasilSatuanJual);
 
                 TransferRak::create([
                     'obat_id'          => $obatId,
@@ -97,18 +84,10 @@ class StokService
         });
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 2. Transaksi Kasir / POS (FEFO Rak) + Cek ROP Otomatis
-    // ══════════════════════════════════════════════════════════════════
-
     /**
-     * Proses checkout kasir. Mengurangi stok_rak via FEFO.
-     * Kasir menjual dalam satuan_jual (Strip/Sachet/Botol).
-     * Setiap item yang terjual dicek terhadap ROP & min stok rak.
-     *
-     * @param  array $dataTransaksi  ['total_harga', 'nominal_bayar', 'kembalian', 'nama_pembeli'?, 'catatan'?]
-     * @param  array $items          [['obat_id', 'jumlah'], ...] — jumlah dalam satuan_jual
-     * @throws Exception Jika stok rak tidak mencukupi
+     * @param  array $dataTransaksi 
+     * @param  array $items          
+     * @throws Exception 
      */
     public function prosesPenjualan(array $dataTransaksi, array $items, int $userId): Penjualan
     {
@@ -131,7 +110,7 @@ class StokService
 
             foreach ($items as $item) {
                 $obat    = Obat::findOrFail($item['obat_id']);
-                $qtyBeli = (int) $item['jumlah']; // Dalam satuan_jual (misal 3 Strip)
+                $qtyBeli = (int) $item['jumlah']; // satuan_jual
 
                 $stokRakTersedia = $obat->batches()->sum('stok_rak');
 
@@ -162,8 +141,8 @@ class StokService
                         'penjualan_id'  => $penjualan->id,
                         'obat_id'       => $obat->id,
                         'obat_batch_id' => $batch->id,
-                        'jumlah'        => $ambil,                       // Dalam satuan_jual
-                        'harga_satuan'  => $obat->harga_jual,            // Harga per satuan_jual
+                        'jumlah'        => $ambil,
+                        'harga_satuan'  => $obat->harga_jual,
                         'subtotal'      => $ambil * $obat->harga_jual,
                     ]);
 
@@ -171,35 +150,24 @@ class StokService
                 }
 
                 // Evaluasi ROP & status rak setelah setiap item terjual
-                $this->cekRopDanRak($obat->fresh());
+                $this->cekRopDanRak($obat->fresh(), $userId);
             }
 
             return $penjualan;
         });
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 3. Pengecekan Otomatis ROP (Total Apotek dalam Satuan Jual) & Rak
-    // ══════════════════════════════════════════════════════════════════
-
     /**
-     * Evaluasi dua kondisi peringatan stok:
-     * A. Total Stok Apotek (satuan_jual) ≤ ROP Dinamis (D×L, satuan_jual) → Kirim notifikasi WA, suggest pesanan
-     * B. Stok Rak ≤ min_stok_rak → Log notifikasi restock_rak
-     *
-     * rop_dinamis = ceil((rata_rata_pemakaian_harian × lead_time_hari) / isi_per_kemasan)
-     * Jika belum ada riwayat penjualan, fallback ke rop_minimum statis.
-     * Total Stok (satuan_jual) = (stok_gudang × isi_per_kemasan) + stok_rak
+     * @param  int $userId  
      */
-    public function cekRopDanRak(Obat $obat): void
+    public function cekRopDanRak(Obat $obat, int $userId = 0): void
     {
-        $stokGudang         = $obat->batches()->sum('stok_gudang'); // dalam satuan_beli (Box)
-        $stokRak            = $obat->batches()->sum('stok_rak');     // dalam satuan_jual (Strip)
+        $stokGudang         = $obat->batches()->sum('stok_gudang');
+        $stokRak            = $obat->batches()->sum('stok_rak');
         $totalSatuanJual    = ($stokGudang * $obat->isi_per_kemasan) + $stokRak;
-        $ropDinamis         = $obat->rop_dinamis; // dalam satuan_beli (sudah dihitung oleh accessor)
+        $ropDinamis         = $obat->rop_dinamis;
         $batasRopSatuanJual = $ropDinamis * $obat->isi_per_kemasan;
 
-        // A. Pemicu ROP (Total Apotek ≤ ROP Dinamis dalam satuan_beli)
         if ($ropDinamis > 0 && $totalSatuanJual <= $batasRopSatuanJual) {
             $sudahAda = Notifikasi::where('obat_id', $obat->id)
                 ->where('jenis_notifikasi', 'stok_menipis')
@@ -209,9 +177,8 @@ class StokService
             if (! $sudahAda) {
                 $gudangDlmJual = $stokGudang * $obat->isi_per_kemasan;
 
-                // Ambil info supplier default dari relasi obat.supplier
-                $supplierInfo = '';
                 $obat->loadMissing('supplier');
+                $supplierInfo = '';
                 if ($obat->supplier) {
                     $supplierInfo = "\nSupplier: *{$obat->supplier->nama_supplier}*";
                     if ($obat->supplier->kontak) {
@@ -238,12 +205,11 @@ class StokService
                 ]);
 
                 KirimNotifikasiWhatsapp::dispatch($notif);
-                // Auto-generate draft pesanan pembelian ke supplier terkait
-                $this->generateDraftPesananRop($obat);
+                $this->generateDraftPesananRop($obat, $userId);
             }
         }
 
-        // B. Peringatan Rak Kosong (stok_rak ≤ min_stok_rak, dalam satuan_jual)
+        // B. Peringatan rak kosong: stok_rak sudah di bawah min_stok_rak tapi gudang masih ada
         if ($obat->min_stok_rak > 0 && $stokRak <= $obat->min_stok_rak && $stokGudang > 0) {
             $sudahAda = Notifikasi::where('obat_id', $obat->id)
                 ->where('jenis_notifikasi', 'restock_rak')
@@ -263,16 +229,14 @@ class StokService
     }
 
     /**
-     * Auto-generate draft pesanan pembelian saat stok mencapai batas ROP.
-     * Jika sudah ada draft pesanan aktif untuk supplier terkait, item obat digabungkan ke draft tersebut.
+     * @param  int $userId  
      */
-    public function generateDraftPesananRop(Obat $obat): ?Pesanan
+    public function generateDraftPesananRop(Obat $obat, int $userId = 0): ?Pesanan
     {
         if (! $obat->supplier_id) {
             return null;
         }
 
-        // Cek apakah obat ini sedang dalam pesanan aktif (draft, diproses, atau dikirim)
         $sedangDipesan = DetailPesanan::where('obat_id', $obat->id)
             ->whereHas('pesanan', function ($q) {
                 $q->whereIn('status', ['draft', 'diproses', 'dikirim']);
@@ -283,30 +247,33 @@ class StokService
             return null;
         }
 
-        // Cari draft pesanan yang masih terbuka untuk supplier ini
-        $pesananDraft = Pesanan::where('supplier_id', $obat->supplier_id)
-            ->where('status', 'draft')
-            ->latest('id')
-            ->first();
+        $pesananDraft = DB::transaction(function () use ($obat, $userId) {
+            $draft = Pesanan::where('supplier_id', $obat->supplier_id)
+                ->where('status', 'draft')
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
 
-        if (! $pesananDraft) {
-            $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad(Pesanan::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
-            $pesananDraft = Pesanan::create([
-                'kode_pesanan'  => $kodePesanan,
-                'supplier_id'   => $obat->supplier_id,
-                'user_id'       => auth()->id(),
-                'tanggal_pesan' => today(),
-                'status'        => 'draft',
-                'catatan'       => 'Digenerate otomatis oleh sistem ROP (Stok Menipis)',
-            ]);
-        }
+            if (! $draft) {
+                $todayCount  = Pesanan::whereDate('created_at', today())->lockForUpdate()->count();
+                $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad($todayCount + 1, 4, '0', STR_PAD_LEFT);
 
-        // Estimasi harga beli satuan dari batch terakhir (jika ada)
-        $lastBatch = $obat->batches()->latest('id')->first();
+                $draft = Pesanan::create([
+                    'kode_pesanan'  => $kodePesanan,
+                    'supplier_id'   => $obat->supplier_id,
+                    'user_id'       => $userId ?: null,
+                    'tanggal_pesan' => today(),
+                    'status'        => 'draft',
+                    'catatan'       => 'Digenerate otomatis oleh sistem ROP (Stok Menipis)',
+                ]);
+            }
+
+            return $draft;
+        });
+
+        $lastBatch     = $obat->batches()->latest('id')->first();
         $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
-
-        // Jumlah pesan default: 2× ROP dinamis (minimal 1 satuan beli)
-        $jumlahPesan = max((int) $obat->rop_dinamis * 2, 1);
+        $jumlahPesan   = max((int) $obat->rop_dinamis * 2, 1);
 
         DetailPesanan::create([
             'pesanan_id'     => $pesananDraft->id,
@@ -318,14 +285,6 @@ class StokService
         return $pesananDraft;
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 4. Pengecekan Kadaluwarsa (Scheduler Harian)
-    // ══════════════════════════════════════════════════════════════════
-
-    /**
-     * Cek batch obat yang mendekati kadaluwarsa (≤ $months bulan).
-     * Dipanggil oleh scheduled command harian.
-     */
     public function cekKadaluwarsa(int $months = 6): int
     {
         $batches = ObatBatch::with('obat')
@@ -345,7 +304,7 @@ class StokService
 
             if ($sudahAda) continue;
 
-            $sisaHari  = (int) today()->diffInDays($batch->tanggal_kadaluwarsa);
+            $sisaHari = (int) today()->diffInDays($batch->tanggal_kadaluwarsa);
 
             $notif = Notifikasi::create([
                 'obat_id'          => $batch->obat_id,
@@ -366,18 +325,14 @@ class StokService
         return $count;
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // 5. Disposal / Pembuangan Batch Expired atau Rusak
-
     /**
-     *
-     * @param  int    $batchId       ID ObatBatch yang akan dibuang
-     * @param  int    $jumlahGudang  Jumlah dibuang dari stok_gudang (satuan_beli)
-     * @param  int    $jumlahRak     Jumlah dibuang dari stok_rak (satuan_jual)
-     * @param  string $alasan        'expired' | 'rusak' | 'lainnya'
-     * @param  int    $userId        ID user yang melakukan disposal
-     * @param  string|null $catatan  Catatan tambahan
-     * @throws Exception Jika jumlah melebihi stok yang ada
+     * @param  int    $batchId       
+     * @param  int    $jumlahGudang  
+     * @param  int    $jumlahRak    
+     * @param  string $alasan       
+     * @param  int    $userId       
+     * @param  string|null $catatan  
+     * @throws Exception 
      */
     public function disposalBatch(
         int $batchId,
@@ -406,7 +361,6 @@ class StokService
                 throw new Exception('Jumlah yang dibuang tidak boleh 0.');
             }
 
-            // Kurangi stok pada batch
             if ($jumlahGudang > 0) {
                 $batch->decrement('stok_gudang', $jumlahGudang);
             }
@@ -414,16 +368,15 @@ class StokService
                 $batch->decrement('stok_rak', $jumlahRak);
             }
 
-            // Catat riwayat disposal
             return ObatKeluar::create([
-                'obat_id'       => $batch->obat_id,
-                'obat_batch_id' => $batchId,
-                'user_id'       => $userId,
+                'obat_id'        => $batch->obat_id,
+                'obat_batch_id'  => $batchId,
+                'user_id'        => $userId,
                 'tanggal_keluar' => today()->toDateString(),
-                'jumlah_gudang' => $jumlahGudang,
-                'jumlah_rak'    => $jumlahRak,
-                'alasan'        => $alasan,
-                'catatan'       => $catatan,
+                'jumlah_gudang'  => $jumlahGudang,
+                'jumlah_rak'     => $jumlahRak,
+                'alasan'         => $alasan,
+                'catatan'        => $catatan,
             ]);
         });
     }
