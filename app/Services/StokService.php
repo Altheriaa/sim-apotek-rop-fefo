@@ -92,10 +92,7 @@ class StokService
     public function prosesPenjualan(array $dataTransaksi, array $items, int $userId): Penjualan
     {
         return DB::transaction(function () use ($dataTransaksi, $items, $userId) {
-            $noTransaksi = 'TRX-' . date('Ymd') . '-' . str_pad(
-                Penjualan::whereDate('tanggal_transaksi', today())->count() + 1,
-                4, '0', STR_PAD_LEFT
-            );
+            $noTransaksi = Penjualan::generateNoTransaksi();
 
             $penjualan = Penjualan::create([
                 'no_transaksi'      => $noTransaksi,
@@ -255,8 +252,7 @@ class StokService
                 ->first();
 
             if (! $draft) {
-                $todayCount  = Pesanan::whereDate('created_at', today())->lockForUpdate()->count();
-                $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad($todayCount + 1, 4, '0', STR_PAD_LEFT);
+                $kodePesanan = Pesanan::generateKodePesanan();
 
                 $draft = Pesanan::create([
                     'kode_pesanan'  => $kodePesanan,

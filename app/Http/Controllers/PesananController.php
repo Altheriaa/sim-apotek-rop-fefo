@@ -102,12 +102,10 @@ class PesananController extends Controller
             return $obats[$item['obat_id']]->supplier_id;
         });
 
-        $createdCount = 0;
-        foreach ($groupedBySupplier as $supplierId => $items) {
-            $pesanan = DB::transaction(function () use ($supplierId, $items, $validated, $obats) {
-                // Hitung urutan pesanan hari ini di dalam transaksi untuk mengurangi risiko duplikasi
-                $todayCount = Pesanan::whereDate('created_at', today())->lockForUpdate()->count();
-                $kodePesanan = 'PO-' . date('Ymd') . '-' . str_pad($todayCount + 1, 4, '0', STR_PAD_LEFT);
+        $createdPesananList = DB::transaction(function () use ($groupedBySupplier, $validated, $obats) {
+            $list = [];
+            foreach ($groupedBySupplier as $supplierId => $items) {
+                $kodePesanan = Pesanan::generateKodePesanan($validated['tanggal_pesan'] ?? null);
 
                 $pesanan = Pesanan::create([
                     'kode_pesanan'  => $kodePesanan,
@@ -131,12 +129,14 @@ class PesananController extends Controller
                     ]);
                 }
 
-                return $pesanan;
-            });
+                $list[] = $pesanan;
+            }
 
-            $createdCount++;
-            $lastPesanan = $pesanan;
-        }
+            return $list;
+        });
+
+        $createdCount = count($createdPesananList);
+        $lastPesanan = end($createdPesananList);
 
         if ($createdCount === 1 && $lastPesanan) {
             return redirect()->route('pesanan.show', $lastPesanan->id)

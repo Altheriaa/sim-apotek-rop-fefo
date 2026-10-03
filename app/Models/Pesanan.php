@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Pesanan extends Model
 {
@@ -50,6 +51,39 @@ class Pesanan extends Model
     public function isSelesai(): bool
     {
         return $this->status === 'selesai';
+    }
+
+    /**
+     * Generate Kode Pesanan unik (Format: PO-YYYYMMDD-0001)
+     */
+    public static function generateKodePesanan(?string $date = null): string
+    {
+        $dateStr = $date ? date('Ymd', strtotime($date)) : now()->format('Ymd');
+        $prefix = "PO-{$dateStr}-";
+
+        $driver = DB::connection()->getDriverName();
+        $query = self::where('kode_pesanan', 'like', "{$prefix}%");
+
+        if ($driver === 'mysql') {
+            $query->orderByRaw("CAST(SUBSTRING_INDEX(kode_pesanan, '-', -1) AS UNSIGNED) DESC");
+        } else {
+            $query->orderBy('kode_pesanan', 'desc');
+        }
+
+        $lastPesanan = $query->lockForUpdate()->first();
+
+        if ($lastPesanan && preg_match('/(\d+)$/', $lastPesanan->kode_pesanan, $matches)) {
+            $nextNumber = ((int) $matches[1]) + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        do {
+            $kodePesanan = $prefix . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+            $nextNumber++;
+        } while (self::where('kode_pesanan', $kodePesanan)->exists());
+
+        return $kodePesanan;
     }
 
     /**
