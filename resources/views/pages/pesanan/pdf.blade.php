@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <title>Surat Pesanan - {{ $pesanan->nomor_surat }}</title>
@@ -47,7 +48,8 @@
 
         .kop-text {
             text-align: center;
-            padding-right: 70px; /* Menyeimbangkan logo di kiri */
+            padding-right: 70px;
+            /* Menyeimbangkan logo di kiri */
         }
 
         .kop-title {
@@ -231,6 +233,7 @@
         }
     </style>
 </head>
+
 <body>
 
     {{-- Kop Surat Resmi Apotek Tabah Farma --}}
@@ -272,7 +275,7 @@
                 <table class="supplier-table">
                     <tr>
                         <td style="width: 70px;"><strong>Kepada :</strong></td>
-                        <td><strong>{{ $pesanan->supplier->nama_supplier ?? '-' }}</strong></td>
+                        <td><strong>{{ $pesanan->supplier->nama_supplier }}</strong></td>
                     </tr>
                     <tr>
                         <td style="padding-top: 3px;"><strong>Yth &nbsp; &nbsp; :</strong></td>
@@ -341,7 +344,9 @@
             </td>
             <td style="width: 55%; vertical-align: top; text-align: right;">
                 <div class="signature-wrapper">
-                    <div>Blangpidie, {{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->locale('id')->isoFormat('D MMMM Y') }}</div>
+                    <div>Blangpidie,
+                        {{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->locale('id')->isoFormat('D MMMM Y') }}
+                    </div>
                     <div style="margin-top: 2px;">Penanggung Jawab,</div>
                     <div class="signature-space"></div>
                     <div class="signature-name">Apt. Siti Qamaryatul Husna, S.Farm</div>
@@ -352,4 +357,5 @@
     </table>
 
 </body>
+
 </html>
