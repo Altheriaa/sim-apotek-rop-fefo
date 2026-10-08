@@ -77,44 +77,39 @@ class MenuHelper
         ];
 
         // 5. Gudang (FEFO)
-        if($isAdminOrKaryawan) {
-            $groups[] = [
-                'title' => 'Gudang (FEFO)',
-                'items' => [
-                    [
-                        'name' => 'Stok Gudang',
-                        'icon' => 'building-warehouse',
-                        'path' => '/stok-gudang',
-                    ],
-                    [
-                        'name' => 'Obat Masuk',
-                        'icon' => 'inbox-in',
-                        'path' => '/obat-masuk',
-                    ],
-                    [
-                        'name' => 'Transfer ke Rak',
-                        'icon' => 'inbox-right',
-                        'path' => '/transfer-rak',
-                    ],
-                    [
-                        'name' => 'Pembuangan Obat',
-                        'icon' => 'trash',
-                        'path' => '/obat-keluar',
-                    ],
-                ],
+        $gudangItems = [
+            [
+                'name' => 'Stok Gudang',
+                'icon' => 'building-warehouse',
+                'path' => '/stok-gudang',
+            ],
+        ];
+
+        if ($isAdminOrKaryawan) {
+            $gudangItems[] = [
+                'name' => 'Obat Masuk',
+                'icon' => 'inbox-in',
+                'path' => '/obat-masuk',
             ];
-        }else{
-            $groups[] = [
-                'title' => 'Gudang (FEFO)',
-                'items' => [
-                    [
-                        'name' => 'Stok Gudang',
-                        'icon' => 'building-warehouse',
-                        'path' => '/stok-gudang',
-                    ],
-                ],
+            $gudangItems[] = [
+                'name' => 'Transfer ke Rak',
+                'icon' => 'inbox-right',
+                'path' => '/transfer-rak',
             ];
         }
+
+        if ($isAdminOrOwner) {
+            $gudangItems[] = [
+                'name' => 'Pembuangan Obat',
+                'icon' => 'trash',
+                'path' => '/obat-keluar',
+            ];
+        }
+
+        $groups[] = [
+            'title' => 'Gudang (FEFO)',
+            'items' => $gudangItems,
+        ];
 
         // 6. Pemesanan (ROP)
         if ($isAdminOrOwner) {
