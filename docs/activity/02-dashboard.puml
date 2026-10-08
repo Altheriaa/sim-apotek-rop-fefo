@@ -1,0 +1,17 @@
+@startuml 02-dashboard
+title Activity Diagram Dashboard
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Pengguna|
+start
+:Membuka menu Dashboard;
+|Sistem|
+:Mengambil data ringkasan stok,\npenjualan, dan notifikasi;
+:Menampilkan ringkasan dan grafik\npada dashboard;
+stop
+@enduml

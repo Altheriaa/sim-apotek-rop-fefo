@@ -1,0 +1,31 @@
+@startuml 12b-pesanan-proses
+title Activity Diagram Memproses Pesanan (Cetak, Status, Hapus)
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+|Pengguna|
+start
+:Membuka detail pesanan;
+:Menekan cetak surat pesanan;
+|Sistem|
+:Membuat dokumen PDF surat pesanan;
+|Pengguna|
+:Mengirim surat pesanan ke supplier;
+:Memilih status baru (diproses, dikirim);
+|Sistem|
+:Memperbarui status pesanan;
+|Pengguna|
+if (Menghapus pesanan?) then (ya)
+  :Menekan tombol hapus;
+  |Sistem|
+  if (Status pesanan draft?) then (ya)
+    :Menghapus pesanan;
+  else (tidak)
+    :Menampilkan pesan hanya draft\nyang bisa dihapus;
+  endif
+endif
+stop
+@enduml

@@ -1,0 +1,34 @@
+@startuml 10-transfer-rak
+title Activity Diagram Transfer Gudang ke Rak
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Pengguna|
+start
+:Membuka menu Transfer ke Rak;
+|Sistem|
+:Menampilkan riwayat transfer;
+|Pengguna|
+:Membuka form transfer baru;
+:Memilih obat dan jumlah box;
+:Menekan tombol simpan;
+|Sistem|
+:Menjumlahkan stok gudang obat;
+if (Stok gudang cukup?) then (ya)
+  :Mengurutkan batch berdasarkan\nED terdekat (FEFO);
+  repeat
+    :Mengurangi stok gudang batch;
+    :Menambah stok rak (box x isi per kemasan);
+    :Mencatat riwayat transfer;
+  repeat while (Jumlah belum terpenuhi?) is (ya) not (tidak)
+  :Menampilkan batch yang dipindahkan;
+else (tidak)
+  :Membatalkan transaksi;
+  :Menampilkan pesan stok gudang tidak cukup;
+endif
+stop
+@enduml

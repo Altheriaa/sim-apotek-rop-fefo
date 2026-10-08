@@ -1,0 +1,25 @@
+@startuml 08-stok-gudang
+title Activity Diagram Stok Gudang (FEFO)
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Pengguna|
+start
+:Membuka menu Stok Gudang;
+|Sistem|
+:Mengambil batch dengan stok gudang > 0;
+:Menampilkan batch urut tanggal\nkadaluwarsa terdekat (FEFO);
+:Menampilkan ringkasan total batch,\nkadaluwarsa, dan hampir kadaluwarsa;
+|Pengguna|
+if (Mencari atau memfilter status ED?) then (ya)
+  :Mengisi kata kunci atau memilih status;
+  |Sistem|
+  :Menyaring data batch;
+  :Menampilkan hasil;
+endif
+stop
+@enduml

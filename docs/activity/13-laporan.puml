@@ -1,0 +1,25 @@
+@startuml 13-laporan
+title Activity Diagram Laporan
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Pengguna|
+start
+:Memilih jenis laporan (obat masuk,\ntransfer rak, disposal,\nstok obat, atau penjualan);
+:Mengisi filter periode;
+|Sistem|
+:Mengambil data sesuai filter;
+:Menampilkan data laporan;
+|Pengguna|
+if (Mencetak laporan?) then (ya)
+  :Menekan tombol cetak PDF;
+  |Sistem|
+  :Membuat dokumen PDF laporan;
+  :Menampilkan atau mengunduh PDF;
+endif
+stop
+@enduml

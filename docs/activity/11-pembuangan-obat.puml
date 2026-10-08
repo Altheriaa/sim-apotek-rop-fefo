@@ -1,0 +1,33 @@
+@startuml 11-pembuangan-obat
+title Activity Diagram Pembuangan Obat (Disposal)
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Pengguna|
+start
+:Membuka menu Pembuangan Obat;
+|Sistem|
+:Menampilkan riwayat pembuangan;
+|Pengguna|
+:Membuka form pembuangan;
+:Memilih batch;
+:Mengisi jumlah gudang, jumlah rak,\nalasan, dan catatan;
+:Menekan tombol simpan;
+|Sistem|
+if (Jumlah gudang dan rak <= stok batch?) then (ya)
+  if (Total jumlah > 0?) then (ya)
+    :Mengurangi stok gudang dan stok rak batch;
+    :Mencatat data obat keluar;
+    :Menampilkan pesan berhasil;
+  else (tidak)
+    :Menampilkan pesan jumlah tidak boleh 0;
+  endif
+else (tidak)
+  :Menampilkan pesan jumlah melebihi stok;
+endif
+stop
+@enduml

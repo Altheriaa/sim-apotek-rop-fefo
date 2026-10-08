@@ -1,0 +1,29 @@
+@startuml 15-notifikasi-terjadwal
+title Activity Diagram Pengecekan Terjadwal ROP dan Kadaluwarsa
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Sistem|
+start
+:Penjadwal berjalan setiap hari pukul 07:00;
+:Memeriksa stok total setiap obat\nterhadap ROP dinamis;
+if (Ada obat di bawah ROP?) then (ya)
+  if (Notifikasi hari ini belum ada?) then (ya)
+    :Membuat notifikasi dan mengirim WhatsApp;
+    :Membuat draft pesanan ke supplier\n(jika belum sedang dipesan);
+  endif
+endif
+:Memeriksa batch yang kadaluwarsa\ndalam 6 bulan;
+if (Ada batch mendekati ED?) then (ya)
+  :Membuat notifikasi dan mengirim WhatsApp;
+endif
+:Memeriksa stok rak terhadap minimum rak;
+if (Stok rak menipis dan gudang masih ada?) then (ya)
+  :Membuat notifikasi restock rak;
+endif
+stop
+@enduml

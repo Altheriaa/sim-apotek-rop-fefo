@@ -1,0 +1,28 @@
+@startuml 01-login-logout
+title Activity Diagram Login dan Logout
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+skinparam SwimlaneBorderColor #333333
+skinparam NoteBackgroundColor #F5F5F5
+|Pengguna|
+start
+:Membuka halaman login;
+:Mengisi email/username dan password;
+|Sistem|
+:Memvalidasi kelengkapan input;
+if (Kredensial benar?) then (ya)
+  :Membuat sesi dan meregenerasi ID sesi;
+  :Menampilkan dashboard;
+  |Pengguna|
+  :Memilih logout;
+  |Sistem|
+  :Menghapus sesi dan token;
+  :Menampilkan halaman login;
+else (tidak)
+  :Menampilkan pesan\n"Username atau password salah";
+endif
+stop
+@enduml
