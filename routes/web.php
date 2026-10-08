@@ -90,10 +90,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/obat/{obat}/edit', [ObatController::class, 'edit'])->whereNumber('obat')->name('obat.edit');
         Route::put('/obat/{obat}', [ObatController::class, 'update'])->whereNumber('obat')->name('obat.update');
         Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->whereNumber('obat')->name('obat.destroy');
-        // Disposal / Pembuangan Batch Expired atau Rusak
-        Route::get('/obat-keluar', [ObatKeluarController::class, 'index'])->name('obat-keluar.index');
-        Route::get('/obat-keluar/create', [ObatKeluarController::class, 'create'])->name('obat-keluar.create');
-        Route::post('/obat-keluar', [ObatKeluarController::class, 'store'])->name('obat-keluar.store');
     });
 
     // ─────────────────────────────────────────────────────────────────
@@ -117,6 +113,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/laporan/stok-obat', [LaporanController::class, 'stokObat'])->name('laporan.stok-obat');
         Route::get('/laporan/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
         Route::get('/laporan/penjualan/pdf', [LaporanController::class, 'penjualanPdf'])->name('laporan.penjualan.pdf');
+
+        // Disposal / Pembuangan Batch Expired atau Rusak
+        Route::get('/obat-keluar', [ObatKeluarController::class, 'index'])->name('obat-keluar.index');
+        Route::get('/obat-keluar/create', [ObatKeluarController::class, 'create'])->name('obat-keluar.create');
+        Route::post('/obat-keluar', [ObatKeluarController::class, 'store'])->name('obat-keluar.store');
     });
 
     // ─────────────────────────────────────────────────────────────────
