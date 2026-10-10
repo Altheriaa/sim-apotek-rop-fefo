@@ -23,9 +23,14 @@ class FonnteService
             return ['status' => false, 'reason' => 'Token belum dikonfigurasi'];
         }
 
+        if (trim($target) === '') {
+            Log::warning('Fonnte: Nomor tujuan kosong (cek FONNTE_ADMIN_TARGET).');
+            return ['status' => false, 'reason' => 'Nomor tujuan kosong'];
+        }
+
         try {
             $response = Http::withHeaders([
-                'Authorization' => $token,
+                'Authorization' => trim($token),
             ])
                 ->asForm()
                 ->post('https://api.fonnte.com/send', [
@@ -36,11 +41,27 @@ class FonnteService
 
             $result = $response->json();
 
-            Log::info('Fonnte: Pesan terkirim', [
-                'target' => $target,
-                'status' => $result['status'] ?? 'unknown',
-                'id'     => $result['id'] ?? null,
-            ]);
+            if (! is_array($result)) {
+                Log::error('Fonnte: Respons tidak valid', [
+                    'target' => $target,
+                    'http'   => $response->status(),
+                    'body'   => mb_substr($response->body(), 0, 300),
+                ]);
+
+                return ['status' => false, 'reason' => 'Respons tidak valid (HTTP ' . $response->status() . ')'];
+            }
+
+            if (($result['status'] ?? false) === true) {
+                Log::info('Fonnte: Pesan terkirim', [
+                    'target' => $target,
+                    'id'     => $result['id'] ?? null,
+                ]);
+            } else {
+                Log::warning('Fonnte: Pesan ditolak', [
+                    'target' => $target,
+                    'reason' => $result['reason'] ?? 'tidak diketahui',
+                ]);
+            }
 
             return $result;
         } catch (\Exception $e) {

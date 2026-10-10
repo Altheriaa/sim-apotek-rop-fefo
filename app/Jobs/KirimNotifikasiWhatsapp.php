@@ -16,6 +16,9 @@ class KirimNotifikasiWhatsapp implements ShouldQueue
 
     public int $tries = 3;
 
+    /** Jeda antar percobaan ulang (detik). */
+    public array $backoff = [30, 120];
+
     public function __construct(
         public Notifikasi $notifikasi
     ) {}
@@ -27,17 +30,17 @@ class KirimNotifikasiWhatsapp implements ShouldQueue
             $this->notifikasi->pesan
         );
 
-        if (isset($result['status']) && $result['status'] === true) {
-            $this->notifikasi->update([
-                'status'     => 'terkirim',
-                'fonnte_id'  => $result['id'] ?? null,
-                'dikirim_at' => now(),
-            ]);
-        } else {
-            $this->notifikasi->update([
-                'status' => 'gagal',
-            ]);
+        if (($result['status'] ?? false) !== true) {
+            // Lempar exception supaya antrean mencoba ulang; setelah percobaan
+            // terakhir failed() menandai notifikasi sebagai gagal.
+            throw new \RuntimeException('Fonnte menolak pesan: ' . ($result['reason'] ?? 'tidak diketahui'));
         }
+
+        $this->notifikasi->update([
+            'status'     => 'terkirim',
+            'fonnte_id'  => is_array($result['id'] ?? null) ? ($result['id'][0] ?? null) : ($result['id'] ?? null),
+            'dikirim_at' => now(),
+        ]);
     }
 
     public function failed(\Throwable $exception): void

@@ -16,34 +16,24 @@ class CheckRopAndExpiredCommand extends Command
     {
         $this->info('Memulai pengecekan ROP dan kadaluwarsa...');
 
-        // Cek ROP untuk semua obat menggunakan ROP Dinamis
-        $obatList = Obat::all();
-        $ropCount = 0;
+        // ROP dinamis + restock rak dicek sekaligus, satu kali per obat.
+        // cekRopDanRak() sudah memvalidasi kedua kondisi dan mencegah duplikat harian.
+        $notifBaru = 0;
+        $perluTindakan = 0;
 
-        foreach ($obatList as $obat) {
-            $ropDinamis = $obat->rop_dinamis;
-            if ($ropDinamis > 0 && $obat->stok_total <= ($ropDinamis * $obat->isi_per_kemasan)) {
-                $stokService->cekRopDanRak($obat);
-                $ropCount++;
+        foreach (Obat::with('supplier')->get() as $obat) {
+            $dibuat = $stokService->cekRopDanRak($obat);
+            $notifBaru += $dibuat;
+            if ($dibuat > 0) {
+                $perluTindakan++;
             }
         }
 
-        $this->info("ROP: {$ropCount} obat di bawah/sama dengan batas ROP dinamis.");
+        $this->info("ROP/Restock Rak: {$notifBaru} notifikasi baru dibuat untuk {$perluTindakan} obat.");
 
         // Cek kadaluwarsa (6 bulan ke depan)
         $edCount = $stokService->cekKadaluwarsa(6);
         $this->info("Mendekati ED: {$edCount} notifikasi baru dibuat.");
-
-        // restock rak
-        $obatList = Obat::where('min_stok_rak', '>', 0)->get();
-        $restockRakCount = 0;
-        foreach ($obatList as $obat) {
-            if ($obat->stok_rak <= $obat->min_stok_rak) {
-                $stokService->cekRopDanRak($obat);
-                $restockRakCount++;
-            }
-        }
-        $this->info("Perlu Restock Rak: {$restockRakCount} notifikasi baru dibuat.");
 
         $this->info('Pengecekan selesai.');
 

@@ -17,6 +17,11 @@ use Exception;
 
 class StokService
 {
+    /** Jeda antar pesan WA dalam satu proses (detik), agar tidak diblokir Fonnte. */
+    private const JEDA_KIRIM_DETIK = 3;
+
+    private int $urutanKirim = 0;
+
     public function hitungTotalStokSatuanJual(Obat $obat): int
     {
         $stokGudang = $obat->batches()->sum('stok_gudang');
@@ -157,8 +162,9 @@ class StokService
     /**
      * @param  int $userId  
      */
-    public function cekRopDanRak(Obat $obat, int $userId = 0): void
+    public function cekRopDanRak(Obat $obat, int $userId = 0): int
     {
+        $dibuat = 0;
         $stokGudang         = $obat->batches()->sum('stok_gudang');
         $stokRak            = $obat->batches()->sum('stok_rak');
         $totalSatuanJual    = ($stokGudang * $obat->isi_per_kemasan) + $stokRak;
@@ -197,11 +203,12 @@ class StokService
                     'obat_id'          => $obat->id,
                     'jenis_notifikasi' => 'stok_menipis',
                     'pesan'            => $pesan,
-                    'target_nomor'     => config('services.fonnte.admin_target', '08974688919'),
+                    'target_nomor'     => $this->targetAdmin(),
                     'status'           => 'pending',
                 ]);
 
-                KirimNotifikasiWhatsapp::dispatch($notif);
+                $this->kirimWa($notif);
+                $dibuat++;
                 $this->generateDraftPesananRop($obat, $userId);
             }
         }
@@ -214,15 +221,33 @@ class StokService
                 ->exists();
 
             if (! $sudahAda) {
-                Notifikasi::create([
+                $notif = Notifikasi::create([
                     'obat_id'          => $obat->id,
                     'jenis_notifikasi' => 'restock_rak',
                     'pesan'            => "Stok rak obat *{$obat->nama_obat}* menipis ({$stokRak} {$obat->satuan_jual}). Gudang masih ada {$stokGudang} {$obat->satuan_beli}. Silakan lakukan Transfer ke Rak.",
-                    'target_nomor'     => config('services.fonnte.admin_target', '08974688919'),
+                    'target_nomor'     => $this->targetAdmin(),
                     'status'           => 'pending',
                 ]);
+
+                $this->kirimWa($notif);
+                $dibuat++;
             }
         }
+
+        return $dibuat;
+    }
+
+    private function targetAdmin(): string
+    {
+        return (string) config('services.fonnte.admin_target');
+    }
+
+    private function kirimWa(Notifikasi $notif): void
+    {
+        KirimNotifikasiWhatsapp::dispatch($notif)
+            ->delay(now()->addSeconds($this->urutanKirim * self::JEDA_KIRIM_DETIK));
+
+        $this->urutanKirim++;
     }
 
     /**
@@ -295,6 +320,7 @@ class StokService
         foreach ($batches as $batch) {
             $sudahAda = Notifikasi::where('obat_id', $batch->obat_id)
                 ->where('jenis_notifikasi', 'mendekati_kadaluwarsa')
+                ->where('pesan', 'like', "%No. Batch: {$batch->nomor_batch}\n%")
                 ->whereDate('created_at', today())
                 ->exists();
 
@@ -310,11 +336,11 @@ class StokService
                     . "No. Batch: {$batch->nomor_batch}\n"
                     . "ED: {$batch->tanggal_kadaluwarsa->format('d/m/Y')} ({$sisaHari} hari lagi)\n"
                     . "Sisa Stok Batch: Gudang {$batch->stok_gudang} {$batch->obat->satuan_beli} | Rak {$batch->stok_rak} {$batch->obat->satuan_jual}",
-                'target_nomor'     => config('services.fonnte.admin_target', '08974688919'),
+                'target_nomor'     => $this->targetAdmin(),
                 'status'           => 'pending',
             ]);
 
-            KirimNotifikasiWhatsapp::dispatch($notif);
+            $this->kirimWa($notif);
             $count++;
         }
 
