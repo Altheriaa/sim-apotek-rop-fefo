@@ -97,7 +97,7 @@
                         class="flex items-start gap-3 p-2 rounded-xl transition hover:bg-gray-50 dark:hover:bg-white/5 group">
                         <!-- Icon Box -->
                         <div
-                            class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $isRop ? 'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50' : ($isRak ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/50' : 'bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50') }}">
+                            class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl {{ $isRop ? 'bg-warning-50 text-warning-700 border border-warning-200 dark:bg-warning-500/15 dark:text-warning-400 dark:border-warning-500/30' : ($isRak ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/30' : 'bg-error-50 text-error-700 border border-error-200 dark:bg-error-500/15 dark:text-error-400 dark:border-error-500/30') }}">
                             <i
                                 class="ti {{ $isRop ? 'ti-alert-triangle' : ($isRak ? 'ti-arrow-right-circle' : 'ti-calendar-due') }} text-lg"></i>
                         </div>
@@ -106,10 +106,10 @@
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-1 mb-0.5">
                                 <span
-                                    class="text-xs font-semibold {{ $isRop ? 'text-amber-700 dark:text-amber-400' : ($isRak ? 'text-blue-700 dark:text-blue-400' : 'text-rose-700 dark:text-rose-400') }}">
+                                    class="text-xs font-semibold {{ $isRop ? 'text-warning-700 dark:text-warning-400' : ($isRak ? 'text-blue-700 dark:text-blue-400' : 'text-error-700 dark:text-error-400') }}">
                                     {{ $notif->judul }}
                                 </span>
-                                <span class="text-[10px] text-gray-400 shrink-0">
+                                <span class="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
                                     {{ $notif->created_at->diffForHumans(null, true) }}
                                 </span>
                             </div>
@@ -129,22 +129,22 @@
                             <div class="mt-1.5 flex items-center gap-1.5">
                                 @if($isRak)
                                     <span
-                                        class="inline-flex items-center text-[10px] font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded">
+                                        class="inline-flex items-center text-[11px] font-medium text-blue-700 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded">
                                         <i class="ti ti-building-warehouse mr-1 text-[11px]"></i> Rak Display
                                     </span>
                                 @elseif($notif->isTerkirim())
                                     <span
-                                        class="inline-flex items-center text-[10px] font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded">
+                                        class="inline-flex items-center text-[11px] font-medium text-success-700 bg-success-50 dark:bg-success-500/15 dark:text-success-400 px-1.5 py-0.5 rounded">
                                         <i class="ti ti-brand-whatsapp mr-1 text-[11px]"></i> WA Terkirim
                                     </span>
                                 @elseif($notif->isPending())
                                     <span
-                                        class="inline-flex items-center text-[10px] font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded">
+                                        class="inline-flex items-center text-[11px] font-medium text-warning-700 bg-warning-50 dark:bg-warning-500/15 dark:text-warning-400 px-1.5 py-0.5 rounded">
                                         <i class="ti ti-clock mr-1 text-[11px]"></i> WA Pending
                                     </span>
                                 @else
                                     <span
-                                        class="inline-flex items-center text-[10px] font-medium text-red-600 bg-red-50 dark:bg-red-900/30 dark:text-red-400 px-1.5 py-0.5 rounded">
+                                        class="inline-flex items-center text-[11px] font-medium text-error-700 bg-error-50 dark:bg-error-500/15 dark:text-error-400 px-1.5 py-0.5 rounded">
                                         <i class="ti ti-alert-circle mr-1 text-[11px]"></i> WA Gagal
                                     </span>
                                 @endif
@@ -158,8 +158,8 @@
                         class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 mb-2">
                         <i class="ti ti-bell-off text-2xl"></i>
                     </div>
-                    <p class="text-xs font-medium text-gray-600 dark:text-gray-300">Tidak ada notifikasi baru</p>
-                    <p class="text-[11px] text-gray-400 mt-0.5">Stok dan kadaluwarsa aman terkendali</p>
+                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300">Belum ada notifikasi</p>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Notifikasi muncul saat stok di bawah ROP, rak menipis, atau batch mendekati ED.</p>
                 </li>
             @endforelse
         </ul>
@@ -169,7 +169,6 @@
             <a href="{{ route('dashboard') }}#notifikasi-widget" @click="closeDropdown()"
                 class="flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:border-gray-800 dark:bg-gray-800/70 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white transition">
                 <span>Lihat Semua di Dashboard</span>
-                <i class="ti ti-arrow-right text-xs"></i>
             </a>
         </div>
     </div>

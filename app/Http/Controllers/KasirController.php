@@ -25,7 +25,7 @@ class KasirController extends Controller
         $categories = $obats->pluck('kategori')->filter()->unique()->values();
 
         return view('pages.kasir.index', [
-            'title'      => 'Kasir — Point of Sale',
+            'title'      => 'Kasir',
             'obats'      => $obats,
             'categories' => $categories,
         ]);

@@ -184,7 +184,7 @@
                                                 <i class="ti ti-circle-arrow-right text-sm"></i> Transfer
                                             </a>
                                         @else
-                                            <span class="text-xs text-gray-400">—</span>
+                                            <span class="text-xs text-gray-400 font-medium">-</span>
                                         @endif
                                     </td>
                                 @endif

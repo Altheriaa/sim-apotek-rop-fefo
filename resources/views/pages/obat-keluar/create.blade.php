@@ -65,11 +65,11 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div class="rounded-md bg-white p-3 dark:bg-gray-900/50">
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Stok Gudang</p>
-                                <p id="info-gudang" class="text-lg font-bold text-gray-800 dark:text-white">—</p>
+                                <p id="info-gudang" class="text-lg font-bold text-gray-800 dark:text-white">-</p>
                             </div>
                             <div class="rounded-md bg-white p-3 dark:bg-gray-900/50">
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Stok Rak</p>
-                                <p id="info-rak" class="text-lg font-bold text-gray-800 dark:text-white">—</p>
+                                <p id="info-rak" class="text-lg font-bold text-gray-800 dark:text-white">-</p>
                             </div>
                         </div>
                     </div>

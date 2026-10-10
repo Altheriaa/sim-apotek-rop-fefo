@@ -110,17 +110,17 @@
                             <td class="px-5 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
                                 @if($d->jumlah_gudang > 0)
                                     <span class="font-semibold">{{ $d->jumlah_gudang }}</span>
-                                    <span class="text-xs text-gray-400">{{ $d->obat->satuan_beli ?? '' }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ $d->obat->satuan_beli ?? '' }}</span>
                                 @else
-                                    <span class="text-gray-300 dark:text-gray-600">—</span>
+                                    <span class="text-gray-400 dark:text-gray-500 font-medium">-</span>
                                 @endif
                             </td>
                             <td class="px-5 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
                                 @if($d->jumlah_rak > 0)
                                     <span class="font-semibold">{{ $d->jumlah_rak }}</span>
-                                    <span class="text-xs text-gray-400">{{ $d->obat->satuan_jual ?? '' }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ $d->obat->satuan_jual ?? '' }}</span>
                                 @else
-                                    <span class="text-gray-300 dark:text-gray-600">—</span>
+                                    <span class="text-gray-400 dark:text-gray-500 font-medium">-</span>
                                 @endif
                             </td>
                             <td class="px-5 py-3 text-sm">
@@ -139,7 +139,7 @@
                                 {{ $d->user->nama_user ?? $d->user->name ?? '-' }}
                             </td>
                             <td class="px-5 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                                {{ $d->catatan ?? '—' }}
+                                {{ $d->catatan ?? '-' }}
                             </td>
                         </tr>
                     @empty

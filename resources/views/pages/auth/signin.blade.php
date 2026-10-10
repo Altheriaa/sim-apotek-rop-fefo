@@ -2,8 +2,6 @@
 
 @section('content')
     <div class="relative z-1 flex min-h-screen w-full items-center justify-center bg-gray-50 p-6 dark:bg-gray-950">
-        <!-- Background Grid Shapes -->
-        <x-common.common-grid-shape />
 
         <!-- Login Card Container -->
         <div

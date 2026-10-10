@@ -50,7 +50,7 @@
                                             data-isi="{{ $obat->isi_per_kemasan }}"
                                             data-batches="{{ $obat->batches->map(fn($b) => ['batch' => $b->nomor_batch, 'stok' => $b->stok_gudang, 'ed' => $b->tanggal_kadaluwarsa->format('d/m/Y')])->toJson() }}"
                                             {{ old('obat_id', request('obat_id')) == $obat->id ? 'selected' : '' }}>
-                                            {{ $obat->nama_obat }} — Gudang: {{ $stokGudang }} {{ $obat->satuan_beli }}
+                                            {{ $obat->nama_obat }} (Gudang: {{ $stokGudang }} {{ $obat->satuan_beli }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -198,7 +198,7 @@
                 fefoList.innerHTML = batches.map((b, i) =>
                     `<div class="flex items-center gap-2">
                                 <span class="font-bold text-blue-600 dark:text-blue-400">${i + 1}.</span>
-                                Batch <strong>${b.batch}</strong> — ED: ${b.ed} — Stok: ${b.stok} ${satuanBeli}
+                                Batch <strong>${b.batch}</strong>, ED: ${b.ed}, Stok: ${b.stok} ${satuanBeli}
                                 ${i === 0 ? '<span class="ml-auto rounded-full bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 text-[10px] text-blue-700 dark:text-blue-300">Diambil Pertama</span>' : ''}
                             </div>`
                 ).join('');

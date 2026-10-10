@@ -113,10 +113,10 @@
                             @endif
                         </td>
                         <td class="text-orange">
-                            {{ $row->jumlah_gudang > 0 ? $row->jumlah_gudang . ' ' . ($row->obat->satuan_beli ?? '') : '—' }}
+                            {{ $row->jumlah_gudang > 0 ? $row->jumlah_gudang . ' ' . ($row->obat->satuan_beli ?? '') : '-' }}
                         </td>
                         <td class="text-red">
-                            {{ $row->jumlah_rak > 0 ? $row->jumlah_rak . ' ' . ($row->obat->satuan_jual ?? '') : '—' }}
+                            {{ $row->jumlah_rak > 0 ? $row->jumlah_rak . ' ' . ($row->obat->satuan_jual ?? '') : '-' }}
                         </td>
                         <td>
                             @php

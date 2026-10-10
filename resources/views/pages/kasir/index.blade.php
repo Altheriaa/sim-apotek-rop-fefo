@@ -20,7 +20,7 @@
         {{-- Header --}}
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Kasir — Point of Sale</h1>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white/90">Kasir</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Proses transaksi penjualan obat ke pembeli. Stok akan
                     otomatis terpotong dari rak via FEFO.</p>
             </div>

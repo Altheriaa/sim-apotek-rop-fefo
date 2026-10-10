@@ -87,7 +87,7 @@ class ObatKeluarController extends Controller
             $label  = ObatKeluar::$alasanOptions[$validated['alasan']] ?? $validated['alasan'];
 
             return redirect()->route('obat-keluar.index')
-                ->with('success', "Disposal berhasil dicatat. Batch {$batch->nomor_batch} ({$batch->obat->nama_obat}) — {$label}.");
+                ->with('success', "Disposal berhasil dicatat: Batch {$batch->nomor_batch} ({$batch->obat->nama_obat}), alasan {$label}.");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage())->withInput();
         }

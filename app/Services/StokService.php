@@ -189,7 +189,7 @@ class StokService
                     }
                 }
 
-                $pesan = "*PERINGATAN ROP — Stok Menipis*\n"
+                $pesan = "*PERINGATAN ROP: Stok Menipis*\n"
                     . "Obat: *{$obat->nama_obat}*\n"
                     . "Total Apotek: *{$totalSatuanJual} {$obat->satuan_jual}*\n"
                     . "  → Gudang: {$stokGudang} {$obat->satuan_beli} (= {$gudangDlmJual} {$obat->satuan_jual})\n"

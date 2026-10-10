@@ -70,7 +70,7 @@
                         </path>
                     </svg>
                 </span>
-                Sign out
+                Keluar
             </button>
         </form>
     </div>

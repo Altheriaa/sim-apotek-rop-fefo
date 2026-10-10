@@ -182,12 +182,12 @@
                 <td class="px-3 py-3 align-middle">
                     <div class="supplier-container">
                         <span class="supplier-label inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                            — Belum dipilih —
+                            Belum dipilih
                         </span>
                     </div>
                 </td>
                 <td class="px-3 py-3 align-middle text-center">
-                    <span class="satuan-label inline-flex items-center justify-center h-10 text-sm font-medium text-gray-600 dark:text-gray-300">—</span>
+                    <span class="satuan-label inline-flex items-center justify-center h-10 text-sm font-medium text-gray-600 dark:text-gray-300">-</span>
                 </td>
                 <td class="px-3 py-3 align-middle">
                     <input type="number" name="items[${rowIndex}][jumlah_pesan]" value="${jumlah}" required min="1" placeholder="0"
@@ -211,7 +211,7 @@
 
             obatSelect.addEventListener('change', function () {
                 const opt = this.options[this.selectedIndex];
-                satuanLabel.textContent = opt.dataset.satuan || '—';
+                satuanLabel.textContent = opt.dataset.satuan || '-';
                 const suppName = opt.dataset.supplier;
                 if (suppName) {
                     supplierContainer.innerHTML = `
@@ -225,7 +225,7 @@
                 } else {
                     supplierContainer.innerHTML = `
                         <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                            — Belum ditentukan —
+                            Belum ditentukan
                         </span>
                     `;
                 }

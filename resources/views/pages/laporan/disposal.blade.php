@@ -153,14 +153,14 @@
                                     @if($row->jumlah_gudang > 0)
                                         {{ $row->jumlah_gudang }} {{ $row->obat->satuan_beli ?? '' }}
                                     @else
-                                        <span class="text-gray-300 dark:text-gray-600">—</span>
+                                        <span class="text-gray-400 dark:text-gray-500 font-medium">-</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-sm font-bold text-red-600 dark:text-red-400">
                                     @if($row->jumlah_rak > 0)
                                         {{ $row->jumlah_rak }} {{ $row->obat->satuan_jual ?? '' }}
                                     @else
-                                        <span class="text-gray-300 dark:text-gray-600">—</span>
+                                        <span class="text-gray-400 dark:text-gray-500 font-medium">-</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4">

@@ -15,9 +15,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalObat       = Obat::count();
-        $totalStokGudang = (int) ObatBatch::sum('stok_gudang');
-        $totalStokRak    = (int) ObatBatch::sum('stok_rak');
+        $totalObat = Obat::count();
+
+        // Jumlah jenis obat yang masih punya stok. Sum stok mentah tidak dipakai
+        // karena satuannya berbeda per obat (Box, Dus, Strip, Botol).
+        $obatAdaStokGudang = ObatBatch::where('stok_gudang', '>', 0)->distinct('obat_id')->count('obat_id');
+        $obatAdaStokRak    = ObatBatch::where('stok_rak', '>', 0)->distinct('obat_id')->count('obat_id');
 
         $penjualanPerObat = DetailPenjualan::query()
             ->whereHas('penjualan', fn($q) =>
@@ -54,11 +57,11 @@ class DashboardController extends Controller
             ->whereRaw('(SELECT COALESCE(SUM(stok_gudang),0) FROM obat_batch WHERE obat_batch.obat_id = obat.id) > 0')
             ->count();
 
-        // Batch mendekati kadaluwarsa (≤ 6 bulan, masih ada stok)
+        // Batch yang ED-nya jatuh dalam 6 bulan ke depan (belum lewat), masih ada stok
         $batchEdCount = ObatBatch::where(function ($q) {
                 $q->where('stok_gudang', '>', 0)->orWhere('stok_rak', '>', 0);
             })
-            ->where('tanggal_kadaluwarsa', '<=', now()->addMonths(6))
+            ->whereBetween('tanggal_kadaluwarsa', [today(), today()->addMonths(6)])
             ->count();
 
         // Penjualan 7 hari terakhir (untuk chart)
@@ -112,8 +115,8 @@ class DashboardController extends Controller
         return view('pages.dashboard', [
             'title'             => 'Dashboard',
             'totalObat'         => $totalObat,
-            'totalStokGudang'   => $totalStokGudang,
-            'totalStokRak'      => $totalStokRak,
+            'obatAdaStokGudang' => $obatAdaStokGudang,
+            'obatAdaStokRak'    => $obatAdaStokRak,
             'obatKritisCount'   => $obatKritisCount,
             'rakKritisCount'    => $rakKritisCount,
             'batchEdCount'      => $batchEdCount,

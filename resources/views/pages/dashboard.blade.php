@@ -39,9 +39,8 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-dark">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Stok Gudang</p>
-                    <h4 class="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{{ number_format($totalStokGudang) }}</h4>
-                    <p class="text-xs text-gray-400 mt-0.5">Rak: {{ number_format($totalStokRak) }} satuan</p>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Obat Ada di Gudang</p>
+                    <h4 class="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{{ number_format($obatAdaStokGudang) }} </h4>
                 </div>
                 <div class="flex h-11 w-11 items-center justify-center rounded-full bg-success-100 text-success-600 dark:bg-success-900/20 dark:text-success-400">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,7 +54,7 @@
         <div class="rounded-2xl border border-warning-200 bg-warning-50 p-5 dark:border-warning-800/30 dark:bg-warning-900/10">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-warning-600 dark:text-warning-400">Obat Kritis ( < ROP)</p>
+                    <p class="text-sm font-medium text-warning-700 dark:text-warning-400">Obat Kritis (stok ≤ ROP)</p>
                     <h4 class="mt-1 text-2xl font-bold text-warning-700 dark:text-warning-300">{{ number_format($obatKritisCount) }}</h4>
                 </div>
                 <div class="flex h-11 w-11 items-center justify-center rounded-full bg-warning-200 text-warning-700 dark:bg-warning-800/50 dark:text-warning-300">
@@ -70,7 +69,7 @@
         <div class="rounded-2xl border border-error-200 bg-error-50 p-5 dark:border-error-800/30 dark:bg-error-900/10">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-error-600 dark:text-error-400">Mendekati ED (< 30 Hari)</p>
+                    <p class="text-sm font-medium text-error-700 dark:text-error-400">Batch ED ≤ 6 Bulan</p>
                     <h4 class="mt-1 text-2xl font-bold text-error-700 dark:text-error-300">{{ number_format($batchEdCount) }}</h4>
                 </div>
                 <div class="flex h-11 w-11 items-center justify-center rounded-full bg-error-200 text-error-700 dark:bg-error-800/50 dark:text-error-300">
@@ -87,8 +86,8 @@
         <div class="rounded-2xl border border-brand-200 bg-brand-50/50 p-5 dark:border-brand-900/30 dark:bg-brand-900/10 flex items-center justify-between">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Hari Ini</span>
-                    <span class="text-xs text-gray-400">({{ now()->format('d M Y') }})</span>
+                    <span class="text-sm font-semibold text-brand-700 dark:text-brand-400">Hari ini</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ now()->isoFormat('D MMMM Y') }}</span>
                 </div>
                 <div class="mt-2 flex items-baseline gap-3">
                     <div>
@@ -96,8 +95,8 @@
                         <h4 class="text-xl font-bold text-gray-800 dark:text-white/90">Rp {{ number_format($omzetHariIni, 0, ',', '.') }}</h4>
                     </div>
                     <div class="border-l border-gray-200 dark:border-gray-700 pl-3">
-                        <p class="text-xs text-success-600 dark:text-success-400 font-medium">Laba / Untung</p>
-                        <h4 class="text-xl font-bold text-success-600 dark:text-success-400">+Rp {{ number_format($labaHariIni, 0, ',', '.') }}</h4>
+                        <p class="text-xs text-success-700 dark:text-success-400 font-medium">Laba</p>
+                        <h4 class="text-xl font-bold text-success-700 dark:text-success-400">+Rp {{ number_format($labaHariIni, 0, ',', '.') }}</h4>
                     </div>
                 </div>
             </div>
@@ -109,8 +108,8 @@
         <div class="rounded-2xl border border-success-200 bg-success-50/50 p-5 dark:border-success-900/30 dark:bg-success-900/10 flex items-center justify-between">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-success-700 dark:text-success-400">Bulan Ini</span>
-                    <span class="text-xs text-gray-400">({{ now()->isoFormat('MMMM Y') }})</span>
+                    <span class="text-sm font-semibold text-success-700 dark:text-success-400">Bulan ini</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ now()->isoFormat('MMMM Y') }}</span>
                 </div>
                 <div class="mt-2 flex items-baseline gap-3">
                     <div>
@@ -134,15 +133,16 @@
         <div id="notifikasi-widget" class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-dark scroll-mt-20">
             <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800 flex justify-between items-center">
                 <h3 class="font-semibold text-gray-800 dark:text-white/90">Notifikasi Terbaru</h3>
-                <span class="text-xs font-semibold px-2 py-0.5 dark:text-white">
-                    {{ $notifikasiTerbaru->count() }} Terkini
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    {{ $notifikasiTerbaru->count() }} terbaru
                 </span>
             </div>
             <div class="p-5">
                 @if($notifikasiTerbaru->isEmpty())
-                    <div class="flex flex-col items-center justify-center py-6 text-gray-400 text-center">
-                        <i class="ti ti-bell-off text-3xl mb-1 text-gray-300 dark:text-gray-600"></i>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada notifikasi baru.</p>
+                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                        <i class="ti ti-bell-off text-3xl mb-1 text-gray-300 dark:text-gray-600" aria-hidden="true"></i>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Belum ada notifikasi.</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Pengecekan ROP dan ED berjalan otomatis setiap hari pukul 07:00.</p>
                     </div>
                 @else
                     <ul class="space-y-3">
@@ -154,15 +154,15 @@
                             @endphp
                             <li class="flex items-start gap-3 rounded-xl border border-gray-100 p-3.5 dark:border-gray-800/80 dark:bg-gray-900/40 hover:border-gray-200 transition">
                                 @if($isRop)
-                                    <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-600/15  text-warning-600 dark:bg-warning-900/30 dark:text-warning-400">
+                                    <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-warning-200 bg-warning-50 text-warning-700 dark:border-warning-500/30 dark:bg-warning-500/15 dark:text-warning-400">
                                         <i class="ti ti-alert-triangle text-lg"></i>
                                     </div>
                                 @elseif($isRak)
-                                    <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-dark-600 dark:text-white-400">
+                                    <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-400">
                                         <i class="ti ti-arrow-right-circle text-lg"></i>
                                     </div>
                                 @else
-                                    <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-error-50 text-error-600 dark:text-white-400">
+                                    <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-error-200 bg-error-50 text-error-700 dark:border-error-500/30 dark:bg-error-500/15 dark:text-error-400">
                                         <i class="ti ti-calendar-due text-lg"></i>
                                     </div>
                                 @endif
@@ -172,7 +172,7 @@
                                         <span class="inline-flex items-center text-xs font-bold {{ $isRop ? 'text-warning-700 dark:text-warning-400' : ($isRak ? 'text-blue-700 dark:text-blue-400' : 'text-error-700 dark:text-error-400') }}">
                                             {{ $notif->judul }}
                                         </span>
-                                        <span class="text-[11px] text-gray-400 shrink-0">
+                                        <span class="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
                                             {{ $notif->created_at->diffForHumans() }}
                                         </span>
                                     </div>
@@ -191,7 +191,7 @@
                                             @elseif($isRak)
                                                 <a href="{{ route('transfer-rak.create', ['obat_id' => $notif->obat_id]) }}"
                                                     class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-400 hover:underline">
-                                                    <i class="ti ti-arrow-right"></i> Transfer ke Rak
+                                                    <i class="ti ti-transfer"></i> Transfer ke Rak
                                                 </a>
                                             @else
                                                 <a href="{{ route('stok-gudang.index', ['search' => $notif->obat->nama_obat]) }}"
@@ -219,7 +219,7 @@
                 @if($transferTerakhir->isEmpty())
                     <div class="flex flex-col items-center justify-center py-6 text-center">
                         <i class="ti ti-circle-arrow-right text-3xl mb-2 text-gray-300 dark:text-gray-600"></i>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada transfer hari ini.</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Belum ada transfer gudang ke rak.</p>
                         <a href="{{ route('transfer-rak.create') }}" class="mt-2 text-xs font-medium text-brand-500 hover:underline">Transfer stok dari gudang ke rak</a>
                     </div>
                 @else
