@@ -28,6 +28,14 @@ class DatabaseSeeder extends Seeder
             'role'      => 'karyawan',
         ]);
 
+        User::create([
+            'nama_user' => 'Owner',
+            'username'  => 'owner',
+            'email'     => 'owner@gmail.com',
+            'password'  => 'password',
+            'role'      => 'owner',
+        ]);
+
         // ── 2. Data Supplier ──
         Supplier::create([
             'nama_supplier' => 'PT. GREAT DELI FARMA',
