@@ -8,5 +8,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Scheduled: cek ROP dan kadaluwarsa setiap hari jam 07:00 pagi
 Schedule::command('stok:check-rop-expired')->dailyAt('07:00');
