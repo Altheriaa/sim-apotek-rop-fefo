@@ -11,6 +11,7 @@ use App\Models\Notifikasi;
 use App\Models\ObatKeluar;
 use App\Models\Pesanan;
 use App\Models\DetailPesanan;
+use App\Models\Supplier;
 use App\Jobs\KirimNotifikasiWhatsapp;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -183,7 +184,7 @@ class StokService
                 $obat->loadMissing('supplier');
                 $supplierInfo = '';
                 if ($obat->supplier) {
-                    $supplierInfo = "\nSupplier: *{$obat->supplier->nama_supplier}*";
+                    $supplierInfo = "\nSupplier Terakhir / Rekomendasi: *{$obat->supplier->nama_supplier}*";
                     if ($obat->supplier->kontak) {
                         $supplierInfo .= " ({$obat->supplier->kontak})";
                     }
@@ -255,10 +256,6 @@ class StokService
      */
     public function generateDraftPesananRop(Obat $obat, int $userId = 0): ?Pesanan
     {
-        if (! $obat->supplier_id) {
-            return null;
-        }
-
         $sedangDipesan = DetailPesanan::where('obat_id', $obat->id)
             ->whereHas('pesanan', function ($q) {
                 $q->whereIn('status', ['draft', 'diproses', 'dikirim']);
@@ -270,8 +267,8 @@ class StokService
         }
 
         $pesananDraft = DB::transaction(function () use ($obat, $userId) {
-            $draft = Pesanan::where('supplier_id', $obat->supplier_id)
-                ->where('status', 'draft')
+            $draft = Pesanan::where('status', 'draft')
+                ->whereNull('supplier_id')
                 ->latest('id')
                 ->lockForUpdate()
                 ->first();
@@ -281,7 +278,7 @@ class StokService
 
                 $draft = Pesanan::create([
                     'kode_pesanan'  => $kodePesanan,
-                    'supplier_id'   => $obat->supplier_id,
+                    'supplier_id'   => null,
                     'user_id'       => $userId ?: null,
                     'tanggal_pesan' => today(),
                     'status'        => 'draft',

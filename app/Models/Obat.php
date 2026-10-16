@@ -14,7 +14,6 @@ class Obat extends Model
 
     protected $fillable = [
         'kode_obat',
-        'supplier_id',
         'nama_obat',
         'kategori',
         'satuan_beli',       // Satuan saat beli dari supplier (Box, Dus, Botol)
@@ -148,7 +147,14 @@ class Obat extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->hasOneThrough(
+            Supplier::class,
+            ObatBatch::class,
+            'obat_id',
+            'id',
+            'id',
+            'supplier_id'
+        )->latest('obat_batch.id');
     }
 
     /**

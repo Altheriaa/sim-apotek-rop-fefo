@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('pesanan', function (Blueprint $table) {
             $table->id();
             $table->string('kode_pesanan')->unique();
-            $table->foreignId('supplier_id')->constrained('supplier');
+            $table->foreignId('supplier_id')->nullable()->constrained('supplier')->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->date('tanggal_pesan');
             $table->enum('status', ['draft', 'diproses', 'dikirim', 'selesai', 'batal'])->default('draft');

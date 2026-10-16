@@ -55,28 +55,31 @@ class PesananController extends Controller
 
     public function create()
     {
-        $obats    = Obat::with('supplier')->orderBy('nama_obat')->get();
-        $obatJson = $obats->map(function ($o) {
+        $suppliers = Supplier::orderBy('nama_supplier')->get();
+        $obats     = Obat::with(['batches' => fn ($q) => $q->latest('id')])->orderBy('nama_obat')->get();
+        $obatJson  = $obats->map(function ($o) {
+            $lastBatch = $o->batches->first();
             return [
-                'id'            => $o->id,
-                'kode'          => $o->kode_obat,
-                'nama'          => $o->nama_obat,
-                'satuan_beli'   => $o->satuan_beli,
-                'supplier_id'   => $o->supplier_id,
-                'supplier_nama' => $o->supplier ? $o->supplier->nama_supplier : 'Belum ditentukan',
+                'id'             => $o->id,
+                'kode'           => $o->kode_obat,
+                'nama'           => $o->nama_obat,
+                'satuan_beli'    => $o->satuan_beli,
+                'estimasi_harga' => $lastBatch ? (float) $lastBatch->harga_beli_satuan : 0,
             ];
         })->values()->toJson();
 
         return view('pages.pesanan.create', [
-            'title'    => 'Buat Pesanan Baru',
-            'obats'    => $obats,
-            'obatJson' => $obatJson,
+            'title'     => 'Buat Pesanan Baru',
+            'suppliers' => $suppliers,
+            'obats'     => $obats,
+            'obatJson'  => $obatJson,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'supplier_id'          => 'nullable|exists:supplier,id',
             'tanggal_pesan'        => 'required|date',
             'catatan'              => 'nullable|string|max:500',
             'items'                => 'required|array|min:1',
@@ -85,77 +88,91 @@ class PesananController extends Controller
         ]);
 
         $obatIds = collect($validated['items'])->pluck('obat_id')->unique();
-        $obats   = Obat::with('supplier')->whereIn('id', $obatIds)->get()->keyBy('id');
+        $obats   = Obat::with(['batches' => fn ($q) => $q->latest('id')])->whereIn('id', $obatIds)->get()->keyBy('id');
 
-        // Pastikan setiap obat yang dipesan memiliki data supplier
-        foreach ($validated['items'] as $item) {
-            $obat = $obats[$item['obat_id']] ?? null;
-            if (! $obat || ! $obat->supplier_id) {
-                return back()->withInput()->withErrors([
-                    'items' => "Obat '" . ($obat->nama_obat ?? 'Pilihan') . "' belum memiliki supplier terkait. Silakan atur supplier pada Data Obat terlebih dahulu.",
+        $pesanan = DB::transaction(function () use ($validated, $obats) {
+            $kodePesanan = Pesanan::generateKodePesanan($validated['tanggal_pesan'] ?? null);
+
+            $pesanan = Pesanan::create([
+                'kode_pesanan'  => $kodePesanan,
+                'supplier_id'   => $validated['supplier_id'] ?? null,
+                'user_id'       => auth()->id(),
+                'tanggal_pesan' => $validated['tanggal_pesan'],
+                'status'        => 'draft',
+                'catatan'       => $validated['catatan'] ?? 'Pesanan manual',
+            ]);
+
+            foreach ($validated['items'] as $item) {
+                $obat          = $obats[$item['obat_id']];
+                $lastBatch     = $obat->batches->first();
+                $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
+
+                DetailPesanan::create([
+                    'pesanan_id'     => $pesanan->id,
+                    'obat_id'        => $item['obat_id'],
+                    'jumlah_pesan'   => $item['jumlah_pesan'],
+                    'estimasi_harga' => $estimasiHarga,
                 ]);
             }
-        }
 
-        // Kelompokkan item berdasarkan supplier_id dari obat
-        $groupedBySupplier = collect($validated['items'])->groupBy(function ($item) use ($obats) {
-            return $obats[$item['obat_id']]->supplier_id;
+            return $pesanan;
         });
 
-        $createdPesananList = DB::transaction(function () use ($groupedBySupplier, $validated, $obats) {
-            $list = [];
-            foreach ($groupedBySupplier as $supplierId => $items) {
-                $kodePesanan = Pesanan::generateKodePesanan($validated['tanggal_pesan'] ?? null);
-
-                $pesanan = Pesanan::create([
-                    'kode_pesanan'  => $kodePesanan,
-                    'supplier_id'   => $supplierId,
-                    'user_id'       => auth()->id(),
-                    'tanggal_pesan' => $validated['tanggal_pesan'],
-                    'status'        => 'draft',
-                    'catatan'       => $validated['catatan'] ?? 'Pesanan manual',
-                ]);
-
-                foreach ($items as $item) {
-                    $obat          = $obats[$item['obat_id']];
-                    $lastBatch     = $obat->batches()->latest('id')->first();
-                    $estimasiHarga = $lastBatch ? $lastBatch->harga_beli_satuan : 0;
-
-                    DetailPesanan::create([
-                        'pesanan_id'     => $pesanan->id,
-                        'obat_id'        => $item['obat_id'],
-                        'jumlah_pesan'   => $item['jumlah_pesan'],
-                        'estimasi_harga' => $estimasiHarga,
-                    ]);
-                }
-
-                $list[] = $pesanan;
-            }
-
-            return $list;
-        });
-
-        $createdCount = count($createdPesananList);
-        $lastPesanan = end($createdPesananList);
-
-        if ($createdCount === 1 && $lastPesanan) {
-            return redirect()->route('pesanan.show', $lastPesanan->id)
-                ->with('success', 'Pesanan draft berhasil dibuat. Anda dapat langsung mencetak atau mengunduh Surat Pesanan untuk supplier.');
-        }
-
-        $message = "Berhasil membuat {$createdCount} pesanan (dikelompokkan otomatis per supplier).";
-
-        return redirect()->route('pesanan.index')->with('success', $message);
+        return redirect()->route('pesanan.show', $pesanan->id)
+            ->with('success', 'Surat Pesanan (PO) berhasil dibuat.');
     }
 
     public function show(Pesanan $pesanan)
     {
         $pesanan->load(['supplier', 'user', 'detailPesanan.obat']);
+        $suppliers = Supplier::orderBy('nama_supplier')->get();
 
         return view('pages.pesanan.show', [
-            'title'   => 'Detail Pesanan #' . $pesanan->id,
-            'pesanan' => $pesanan,
+            'title'     => 'Detail Pesanan #' . $pesanan->id,
+            'pesanan'   => $pesanan,
+            'suppliers' => $suppliers,
         ]);
+    }
+
+    /**
+     * Ganti supplier pada pesanan berstatus draft
+     */
+    public function updateSupplier(Request $request, Pesanan $pesanan)
+    {
+        if (! $pesanan->isDraft()) {
+            return back()->with('error', 'Hanya pesanan berstatus draft yang dapat diganti supplier-nya.');
+        }
+
+        $validated = $request->validate([
+            'supplier_id' => 'required|exists:supplier,id',
+        ]);
+
+        $pesanan->update(['supplier_id' => $validated['supplier_id']]);
+
+        return back()->with('success', 'Supplier pesanan berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus satu item obat dari pesanan draft
+     */
+    public function hapusItem(Pesanan $pesanan, DetailPesanan $detail)
+    {
+        if (! $pesanan->isDraft()) {
+            return back()->with('error', 'Hanya item pada pesanan berstatus draft yang dapat dihapus.');
+        }
+
+        if ($detail->pesanan_id !== $pesanan->id) {
+            abort(404);
+        }
+
+        $detail->delete();
+
+        if ($pesanan->detailPesanan()->count() === 0) {
+            $pesanan->delete();
+            return redirect()->route('pesanan.index')->with('success', 'Pesanan dihapus karena seluruh item telah dihapus.');
+        }
+
+        return back()->with('success', 'Item obat berhasil dihapus dari pesanan draft.');
     }
 
     /**
@@ -164,8 +181,12 @@ class PesananController extends Controller
     public function updateStatus(Request $request, Pesanan $pesanan)
     {
         $validated = $request->validate([
-            'status' => 'required|in:draft,diproses,dikirim,selesai',
+            'status' => 'required|in:draft,diproses,dikirim,selesai,batal',
         ]);
+
+        if (in_array($validated['status'], ['diproses', 'dikirim', 'selesai']) && ! $pesanan->supplier_id) {
+            return back()->with('error', 'Silakan pilih supplier terlebih dahulu sebelum mengubah status pesanan ke ' . ucfirst($validated['status']) . '.');
+        }
 
         $pesanan->update(['status' => $validated['status']]);
 
@@ -243,6 +264,10 @@ class PesananController extends Controller
      */
     public function cetakPdf(Request $request, Pesanan $pesanan)
     {
+        if (! $pesanan->supplier_id) {
+            return back()->with('error', 'Silakan tentukan supplier terlebih dahulu sebelum mencetak Surat Pesanan.');
+        }
+
         $pesanan->load(['supplier', 'user', 'detailPesanan.obat']);
 
         $logoPath = public_path('images/Logo Apotek Tabah Farma.png');

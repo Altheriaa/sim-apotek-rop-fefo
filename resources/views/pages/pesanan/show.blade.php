@@ -32,7 +32,7 @@
     @if(session('error'))
         <x-common.flash-alert type="error" :message="session('error')" />
     @endif
-    @if($errors->any())
+    @if(isset($errors) && $errors->any())
         <div class="rounded-lg bg-error-50 p-4 text-error-800 border border-error-200 dark:bg-error-900/20 dark:text-error-400 dark:border-error-800/30">
             <ul class="list-disc pl-5 text-sm">
                 @foreach($errors->all() as $error)
@@ -63,10 +63,30 @@
                         <p class="font-medium text-gray-800 dark:text-white/90">{{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->format('d F Y') }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Supplier</p>
-                        <p class="font-medium text-gray-800 dark:text-white/90">{{ $pesanan->supplier->nama_supplier ?? '-' }}</p>
-                        @if($pesanan->supplier && $pesanan->supplier->kontak)
-                            <p class="text-xs text-gray-400">{{ $pesanan->supplier->kontak }}</p>
+                        <div class="flex items-center justify-between mb-1">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Supplier</p>
+                            @if($pesanan->isDraft())
+                                <button type="button" onclick="document.getElementById('modalGantiSupplier').classList.remove('hidden')"
+                                    class="text-xs font-semibold px-2 py-0.5 rounded transition {{ $pesanan->supplier_id ? 'text-brand-600 dark:text-brand-400 hover:text-brand-700 hover:underline' : 'bg-brand-500 text-white hover:bg-brand-600 shadow-theme-xs' }} inline-flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    {{ $pesanan->supplier_id ? 'Ganti Supplier' : 'Pilih Supplier' }}
+                                </button>
+                            @endif
+                        </div>
+                        @if($pesanan->supplier)
+                            <p class="font-medium text-gray-800 dark:text-white/90">{{ $pesanan->supplier->nama_supplier }}</p>
+                            @if($pesanan->supplier->kontak)
+                                <p class="text-xs text-gray-400">{{ $pesanan->supplier->kontak }}</p>
+                            @endif
+                        @else
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40">
+                                    Belum Dipilih
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-0.5">Tentukan supplier sebelum memproses pesanan.</p>
                         @endif
                     </div>
                     <div>
@@ -104,6 +124,9 @@
                                 <th class="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Obat</th>
                                 <th class="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-right">Jumlah Pesan</th>
                                 <th class="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-right">Est. Harga</th>
+                                @if($pesanan->isDraft())
+                                    <th class="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-center w-16">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -123,10 +146,24 @@
                                             -
                                         @endif
                                     </td>
+                                    @if($pesanan->isDraft())
+                                        <td class="px-4 py-3 text-center">
+                                            <form action="{{ route('pesanan.hapusItem', [$pesanan->id, $detail->id]) }}" method="POST"
+                                                onsubmit="return confirm('Hapus item obat dari draft pesanan?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="p-1 rounded text-gray-400 hover:text-error-500 transition" title="Hapus Item">
+                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-4 py-6 text-center text-gray-400">Tidak ada item pesanan.</td>
+                                    <td colspan="{{ $pesanan->isDraft() ? 4 : 3 }}" class="px-4 py-6 text-center text-gray-400">Tidak ada item pesanan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -323,16 +360,60 @@
 
                             <div class="rounded-lg bg-blue-50 p-3 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/30">
                                 <p class="text-xs text-blue-700 dark:text-blue-400">
-                                    <b>Info:</b> Ubah status ke <b>Dikirim</b> agar tombol
-                                    <b>Terima Pesanan</b> muncul saat barang tiba.
+                                    <b>Info:</b> Ubah status ke <b>Dikirim</b> agar tombol <b>Terima Pesanan</b> muncul saat barang tiba.
                                 </p>
                             </div>
                         </div>
                     </form>
                 </div>
             @endif
-
         </div>
     </div>
 </div>
+
+    @if($pesanan->isDraft())
+        <!-- Modal Ganti Supplier -->
+        <div id="modalGantiSupplier" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden p-4">
+            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-dark border border-gray-100 dark:border-gray-800">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white/90">Ganti Supplier Pesanan</h3>
+                    <button type="button" onclick="document.getElementById('modalGantiSupplier').classList.add('hidden')"
+                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <form action="{{ route('pesanan.updateSupplier', $pesanan->id) }}" method="POST" class="mt-4 space-y-4">
+                    @csrf
+                    @method('PATCH')
+                    <div>
+                        <label for="modal_supplier_id" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Pilih Supplier Baru
+                        </label>
+                        <select id="modal_supplier_id" name="supplier_id" required
+                            class="h-11 w-full rounded-lg border border-gray-200 bg-transparent px-3 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-500 transition cursor-pointer">
+                            <option value="" disabled {{ $pesanan->supplier_id ? '' : 'selected' }} class="dark:bg-gray-900">Pilih Supplier...</option>
+                            @foreach($suppliers as $s)
+                                <option value="{{ $s->id }}" {{ $pesanan->supplier_id == $s->id ? 'selected' : '' }} class="dark:bg-gray-900">
+                                    {{ $s->nama_supplier }} {{ $s->kontak ? '(' . $s->kontak . ')' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-gray-400">Seluruh item dalam surat pesanan ini akan dialihkan ke supplier yang dipilih.</p>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" onclick="document.getElementById('modalGantiSupplier').classList.add('hidden')"
+                            class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 transition">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 @endsection

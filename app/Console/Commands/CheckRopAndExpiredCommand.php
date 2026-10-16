@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class CheckRopAndExpiredCommand extends Command
 {
-    protected $signature = 'stok:check-rop-expired';
+    protected $signature = 'stok:check';
 
     protected $description = 'Cek ROP dan obat mendekati kadaluwarsa, kirim notifikasi WA jika perlu';
 

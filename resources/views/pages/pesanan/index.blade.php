@@ -131,7 +131,13 @@
                                     {{ \Carbon\Carbon::parse($pesanan->tanggal_pesan)->format('d M Y') }}
                                 </td>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 align-top">
-                                    {{ $pesanan->supplier->nama_supplier ?? '-' }}
+                                    @if($pesanan->supplier)
+                                        {{ $pesanan->supplier->nama_supplier }}
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40">
+                                            Belum Dipilih
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 align-top">
                                     <div class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1 min-w-[280px]">
