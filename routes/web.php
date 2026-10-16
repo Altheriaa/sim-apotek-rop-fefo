@@ -31,9 +31,7 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard (semua role)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ─────────────────────────────────────────────────────────────────
-    // 1. SEMUA ROLE (admin, karyawan, owner)
-    // ─────────────────────────────────────────────────────────────────
+    // SEMUA ROLE (admin, karyawan, owner)
     Route::middleware(['role:admin,karyawan,owner'])->group(function () {
 
         // Manajemen User
@@ -61,9 +59,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('obat-masuk', ObatMasukController::class)->only(['index', 'show']);
     });
 
-    // ─────────────────────────────────────────────────────────────────
-    // 2. KHUSUS ADMIN & KARYAWAN (Transaksi Kasir POS)
-    // ─────────────────────────────────────────────────────────────────
+    // KHUSUS ADMIN & KARYAWAN (Transaksi Kasir POS)
     Route::middleware(['role:admin,karyawan'])->group(function () {
 
         // Manajemen Supplier
@@ -79,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
         Route::post('/kasir', [KasirController::class, 'store'])->name('kasir.store');
 
-         // Transfer ke Rak — pindahkan stok dari gudang ke display rak (FEFO)
+        // Transfer ke Rak — pindahkan stok dari gudang ke display rak (FEFO)
         Route::get('/transfer-rak', [TransferRakController::class, 'index'])->name('transfer-rak.index');
         Route::get('/transfer-rak/create', [TransferRakController::class, 'create'])->name('transfer-rak.create');
         Route::post('/transfer-rak', [TransferRakController::class, 'store'])->name('transfer-rak.store');
@@ -92,9 +88,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/obat/{obat}', [ObatController::class, 'destroy'])->whereNumber('obat')->name('obat.destroy');
     });
 
-    // ─────────────────────────────────────────────────────────────────
-    // 2. KHUSUS ADMIN & OWNER (Master Data, ROP, Laporan, Pengguna)
-    // ─────────────────────────────────────────────────────────────────
+    // KHUSUS ADMIN & OWNER (Master Data, ROP, Laporan, Pengguna)
     Route::middleware(['role:admin,owner'])->group(function () {
 
         // Pemesanan (ROP)
@@ -120,9 +114,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/obat-keluar', [ObatKeluarController::class, 'store'])->name('obat-keluar.store');
     });
 
-    // ─────────────────────────────────────────────────────────────────
-    // 4. KHUSUS ADMIN
-    // ─────────────────────────────────────────────────────────────────
+    // KHUSUS ADMIN
     Route::middleware(['role:admin'])->group(function () {
 
         // Manajemen user

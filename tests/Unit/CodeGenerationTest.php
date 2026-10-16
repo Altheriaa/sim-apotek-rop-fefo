@@ -23,7 +23,6 @@ class CodeGenerationTest extends TestCase
 
         $user = User::factory()->create();
 
-        // 1. Initial code
         $code1 = Pesanan::generateKodePesanan('2026-10-02');
         $this->assertEquals('PO-20261002-0001', $code1);
 
@@ -35,7 +34,6 @@ class CodeGenerationTest extends TestCase
             'status'        => 'draft',
         ]);
 
-        // 2. Second code
         $code2 = Pesanan::generateKodePesanan('2026-10-02');
         $this->assertEquals('PO-20261002-0002', $code2);
 
@@ -59,10 +57,8 @@ class CodeGenerationTest extends TestCase
             'status'        => 'draft',
         ]);
 
-        // Simulate deleting order 2 (this caused count() to become 2 in production!)
         $pesanan2->delete();
 
-        // Next generated code must be 0004, NOT 0003!
         $code4 = Pesanan::generateKodePesanan('2026-10-02');
         $this->assertEquals('PO-20261002-0004', $code4);
     }
@@ -107,10 +103,8 @@ class CodeGenerationTest extends TestCase
             'kembalian'         => 0,
         ]);
 
-        // Delete transaction 2
         $p2->delete();
 
-        // Next code must be 0004
         $trx4 = Penjualan::generateNoTransaksi('2026-10-02');
         $this->assertEquals('TRX-20261002-0004', $trx4);
     }
