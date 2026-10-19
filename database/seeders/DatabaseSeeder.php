@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Supplier::create([
-            'nama_supplier' => '⁠PT. BINA SEHAT HOSLAB',
+            'nama_supplier' => 'PT. BINA SEHAT HOSLAB',
             'alamat'        => 'JL. Williem Iskandar, Komp. MMT C, Blok L34-L35',
             'kontak'        => '061-6611943',
         ]);
@@ -62,7 +62,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Supplier::create([
-            'nama_supplier' => '⁠PT. LAMLO PHARMACY',
+            'nama_supplier' => 'PT. LAMLO PHARMACY',
             'alamat'        => 'JL. Teuku Fakinah, No. 07, Lam Blang Trieng, Darul Imarah, Aceh Besar',
             'kontak'        => '0651-6302638',
         ]);
