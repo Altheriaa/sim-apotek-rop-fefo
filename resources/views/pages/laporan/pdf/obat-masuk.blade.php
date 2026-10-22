@@ -3,357 +3,98 @@
 <head>
     <meta charset="utf-8">
     <title>Laporan Obat Masuk - Apotek Tabah Farma</title>
-    <style>
-        @page {
-            margin: 12mm 15mm 15mm 15mm;
-            size: a4 landscape;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 9.5pt;
-            color: #1e293b;
-            line-height: 1.35;
-        }
-
-        /* ── Kop Surat ── */
-        .kop-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-bottom: 3px double #0f172a;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-
-        .kop-table td {
-            vertical-align: middle;
-            border: none;
-            padding: 0;
-        }
-
-        .kop-logo {
-            width: 75px;
-            text-align: left;
-        }
-
-        .kop-logo img {
-            max-height: 60px;
-            max-width: 70px;
-        }
-
-        .kop-text {
-            text-align: center;
-            padding-right: 75px; /* balance logo on left */
-        }
-
-        .kop-title {
-            font-size: 16pt;
-            font-weight: bold;
-            color: #0f172a;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-
-        .kop-sub {
-            font-size: 9pt;
-            color: #334155;
-            margin-bottom: 2px;
-        }
-
-        .kop-meta {
-            font-size: 8pt;
-            color: #64748b;
-        }
-
-        /* ── Title & Filter Header ── */
-        .report-header {
-            text-align: center;
-            margin-bottom: 14px;
-        }
-
-        .report-title {
-            font-size: 13pt;
-            font-weight: bold;
-            color: #0f172a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 3px;
-        }
-
-        .report-period {
-            font-size: 9pt;
-            color: #475569;
-        }
-
-        .report-filter {
-            font-size: 8pt;
-            color: #2563eb;
-            font-style: italic;
-            margin-top: 2px;
-        }
-
-        /* ── Summary Stats Box ── */
-        .summary-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 8px 0;
-            margin-bottom: 14px;
-        }
-
-        .summary-card {
-            background-color: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            padding: 8px 12px;
-            text-align: center;
-            width: 33.33%;
-        }
-
-        .summary-label {
-            font-size: 8pt;
-            color: #64748b;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-
-        .summary-value {
-            font-size: 11pt;
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        .summary-value.highlight {
-            color: #166534;
-        }
-
-        /* ── Data Table ── */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 16px;
-        }
-
-        .data-table th,
-        .data-table td {
-            border: 1px solid #cbd5e1;
-            padding: 6px 7px;
-            font-size: 8.5pt;
-        }
-
-        .data-table th {
-            background-color: #f1f5f9;
-            color: #1e293b;
-            font-weight: bold;
-            text-align: left;
-            text-transform: uppercase;
-            font-size: 8pt;
-            letter-spacing: 0.3px;
-        }
-
-        .data-table tbody tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        .data-table tfoot th,
-        .data-table tfoot td {
-            background-color: #e2e8f0;
-            font-weight: bold;
-            color: #0f172a;
-            border-top: 2px solid #94a3b8;
-        }
-
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
-        .font-mono { font-family: monospace; font-size: 9pt; }
-        .nowrap { white-space: nowrap; }
-
-        /* ── Footer & Signatures ── */
-        .footer-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            page-break-inside: avoid;
-        }
-
-        .footer-table td {
-            vertical-align: top;
-            border: none;
-            padding: 0;
-            font-size: 9pt;
-        }
-
-        .signature-box {
-            text-align: center;
-            width: 260px;
-            float: right;
-        }
-
-        .signature-space {
-            height: 55px;
-        }
-
-        .signature-name {
-            font-weight: bold;
-            text-decoration: underline;
-            color: #0f172a;
-        }
-
-        .signature-role {
-            font-size: 8.5pt;
-            color: #64748b;
-        }
-
-        .meta-info {
-            font-size: 8pt;
-            color: #64748b;
-            line-height: 1.4;
-        }
-    </style>
+    @include('pages.laporan.pdf.partials.style')
 </head>
 <body>
+    @include('pages.laporan.pdf.partials.kop', ['namaLaporan' => 'Laporan Obat Masuk'])
 
-    {{-- Kop Surat Resmi --}}
-    <table class="kop-table">
-        <tr>
-            <td class="kop-logo">
-                @if(!empty($logoBase64))
-                    <img src="{{ $logoBase64 }}" alt="Logo Apotek">
-                @endif
-            </td>
-            <td class="kop-text">
-                <div class="kop-title">APOTEK TABAH FARMA</div>
-                <div class="kop-sub">Jl. H. Ilyas No. 72, Blangpidie, Kabupaten Aceh Barat Daya, Aceh</div>
-                <div class="kop-meta">SIA: 503/024/SIA/DPMTSP/2023 &bull; SIPA: 19920815/SIPA/2022 &bull; Telp / WhatsApp: 0852-6028-0909</div>
-            </td>
-        </tr>
-    </table>
-
-    {{-- Judul Laporan --}}
-    <div class="report-header">
-        <div class="report-title">Laporan Obat Masuk (Logistik Gudang)</div>
-        <div class="report-period">
+    <div class="judul">
+        <h1>Laporan Obat Masuk</h1>
+        <p>
             @if($tanggalDari && $tanggalSampai)
-                Periode: <strong>{{ \Carbon\Carbon::parse($tanggalDari)->format('d/m/Y') }}</strong> s/d <strong>{{ \Carbon\Carbon::parse($tanggalSampai)->format('d/m/Y') }}</strong>
+                Periode {{ \Carbon\Carbon::parse($tanggalDari)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($tanggalSampai)->format('d/m/Y') }}
             @else
-                Periode: <strong>Semua Tanggal</strong>
+                Semua tanggal
             @endif
-        </div>
+        </p>
         @if(!empty($search))
-            <div class="report-filter">Filter kata kunci: "{{ $search }}"</div>
+            <p class="kecil">Filter: kata kunci "{{ $search }}"</p>
         @endif
     </div>
 
-    {{-- Ringkasan Statistik --}}
-    <table class="summary-table">
+    <table class="ringkasan">
         <tr>
-            <td class="summary-card">
-                <div class="summary-label">Total Batch Masuk</div>
-                <div class="summary-value">{{ number_format($totalBatch, 0, ',', '.') }} Batch</div>
-            </td>
-            <td class="summary-card">
-                <div class="summary-label">Total Supplier Terkait</div>
-                <div class="summary-value">{{ number_format($totalSupplier, 0, ',', '.') }} Supplier</div>
-            </td>
-            <td class="summary-card">
-                <div class="summary-label">Total Nilai Pembelian (Beli)</div>
-                <div class="summary-value highlight">Rp {{ number_format($totalNilaiBeli, 0, ',', '.') }}</div>
-            </td>
+            <td class="label">Jumlah batch masuk</td>
+            <td class="nilai">{{ number_format($totalBatch, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td class="label">Jumlah supplier</td>
+            <td class="nilai">{{ number_format($totalSupplier, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nilai pembelian</td>
+            <td class="nilai">Rp {{ number_format($totalNilaiBeli, 0, ',', '.') }}</td>
         </tr>
     </table>
 
-    {{-- Tabel Rincian Data --}}
-    <table class="data-table">
+    <table class="data">
         <thead>
             <tr>
-                <th style="width: 25px;" class="text-center">No</th>
-                <th style="width: 70px;">Tgl. Masuk</th>
-                <th style="width: 95px;">No. Batch</th>
+                <th class="c" style="width: 24px;">No</th>
+                <th style="width: 65px;">Tgl. Masuk</th>
+                <th style="width: 90px;">No. Batch</th>
                 <th>Nama Obat</th>
-                <th style="width: 75px;">Kategori</th>
+                <th style="width: 80px;">Kategori</th>
                 <th style="width: 120px;">Supplier</th>
-                <th style="width: 65px;" class="text-center">Tgl. ED</th>
-                <th style="width: 70px;" class="text-right">Jumlah</th>
-                <th style="width: 80px;" class="text-right">Harga Satuan</th>
-                <th style="width: 95px;" class="text-right">Subtotal Beli</th>
+                <th class="c" style="width: 65px;">Tgl. ED</th>
+                <th class="r" style="width: 70px;">Jumlah</th>
+                <th class="r" style="width: 80px;">Harga Satuan</th>
+                <th class="r" style="width: 90px;">Subtotal</th>
             </tr>
         </thead>
         <tbody>
-            @php 
-                $grandTotalQty = 0;
+            @php
+                $grandTotalQty  = 0;
                 $grandTotalBeli = 0;
             @endphp
             @forelse($data as $index => $row)
                 @php
-                    $qty = (int) $row->stok_gudang;
+                    $qty         = (int) $row->stok_gudang;
                     $hargaSatuan = (float) ($row->harga_beli_satuan ?? 0);
-                    $subtotal = (float) ($row->harga_beli && $row->harga_beli > 0 ? $row->harga_beli : ($qty * $hargaSatuan));
-                    $grandTotalQty += $qty;
+                    $subtotal    = (float) ($row->harga_beli && $row->harga_beli > 0 ? $row->harga_beli : ($qty * $hargaSatuan));
+                    $grandTotalQty  += $qty;
                     $grandTotalBeli += $subtotal;
                 @endphp
                 <tr>
-                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td class="c">{{ $index + 1 }}</td>
                     <td class="nowrap">{{ \Carbon\Carbon::parse($row->tanggal_masuk)->format('d/m/Y') }}</td>
-                    <td class="font-mono">{{ $row->nomor_batch ?? '-' }}</td>
-                    <td>
-                        <strong>{{ $row->obat->nama_obat ?? '-' }}</strong>
-                    </td>
+                    <td class="mono">{{ $row->nomor_batch ?? '-' }}</td>
+                    <td class="b">{{ $row->obat->nama_obat ?? '-' }}</td>
                     <td>{{ $row->obat->kategori ?? '-' }}</td>
                     <td>{{ $row->supplier->nama_supplier ?? '-' }}</td>
-                    <td class="text-center nowrap">{{ $row->tanggal_kadaluwarsa ? \Carbon\Carbon::parse($row->tanggal_kadaluwarsa)->format('d/m/Y') : '-' }}</td>
-                    <td class="text-right font-bold">{{ number_format($qty, 0, ',', '.') }} {{ $row->obat->satuan_beli ?? '' }}</td>
-                    <td class="text-right">Rp {{ number_format($hargaSatuan, 0, ',', '.') }}</td>
-                    <td class="text-right font-bold">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                    <td class="c nowrap">{{ $row->tanggal_kadaluwarsa ? \Carbon\Carbon::parse($row->tanggal_kadaluwarsa)->format('d/m/Y') : '-' }}</td>
+                    <td class="r nowrap">{{ number_format($qty, 0, ',', '.') }} {{ $row->obat->satuan_beli ?? '' }}</td>
+                    <td class="r nowrap">Rp {{ number_format($hargaSatuan, 0, ',', '.') }}</td>
+                    <td class="r nowrap">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10" class="text-center" style="padding: 20px; color: #64748b;">
-                        Tidak ada data obat masuk pada periode / filter yang dipilih.
-                    </td>
+                    <td colspan="10" class="kosong">Tidak ada obat masuk pada periode atau filter ini.</td>
                 </tr>
             @endforelse
         </tbody>
         @if($data->count() > 0)
             <tfoot>
                 <tr>
-                    <td colspan="7" class="text-right uppercase"><strong>Grand Total:</strong></td>
-                    <td class="text-right"><strong>{{ number_format($grandTotalQty, 0, ',', '.') }}</strong></td>
+                    <td colspan="7" class="r">Total</td>
+                    <td class="r">{{ number_format($grandTotalQty, 0, ',', '.') }}</td>
                     <td></td>
-                    <td class="text-right"><strong>Rp {{ number_format($grandTotalBeli, 0, ',', '.') }}</strong></td>
+                    <td class="r nowrap">Rp {{ number_format($grandTotalBeli, 0, ',', '.') }}</td>
                 </tr>
             </tfoot>
         @endif
     </table>
 
-    {{-- Bagian Tanda Tangan & Footer --}}
-    <table class="footer-table">
-        <tr>
-            <td style="width: 60%;">
-                <div class="meta-info">
-                    <strong>Catatan:</strong><br>
-                    &bull; Laporan ini dicetak secara resmi dari Sistem Informasi Manajemen Apotek Tabah Farma.<br>
-                    &bull; Waktu Cetak: {{ now()->format('d/m/Y H:i:s') }} WIB<br>
-                    &bull; Petugas Pencetak: {{ auth()->user()->nama_user ?? 'Administrator' }}
-                </div>
-            </td>
-            <td style="width: 40%;">
-                <div class="signature-box">
-                    <div>Blangpidie, {{ now()->format('d/m/Y') }}</div>
-                    <div>Penanggung Jawab Gudang / Apoteker,</div>
-                    <div class="signature-space"></div>
-                    <div class="signature-name">( __________________________ )</div>
-                    <div class="signature-role">Apoteker Pengelola Apotek (APA)</div>
-                </div>
-            </td>
-        </tr>
-    </table>
-
+    @include('pages.laporan.pdf.partials.ttd')
 </body>
 </html>
