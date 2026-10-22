@@ -141,6 +141,11 @@ class MenuHelper
                         'path' => '/laporan/transfer-rak',
                     ],
                     [
+                        'name' => 'Laporan Kadaluwarsa',
+                        'icon' => 'alert-triangle',
+                        'path' => '/laporan/kadaluwarsa',
+                    ],
+                    [
                         'name' => 'Laporan Disposal',
                         'icon' => 'trash',
                         'path' => '/laporan/disposal',
@@ -201,6 +206,7 @@ class MenuHelper
             'shop'        => '<i class="ti ti-shopping-bag"></i>',
             'building-warehouse' => '<i class="ti ti-building-warehouse"></i>',
             'trash'              => '<i class="ti ti-trash text-lg"></i>',
+            'alert-triangle'     => '<i class="ti ti-alert-triangle text-lg"></i>',
         ];
 
         return $icons[$iconName] ?? '<i class="ti ti-circle text-lg"></i>';

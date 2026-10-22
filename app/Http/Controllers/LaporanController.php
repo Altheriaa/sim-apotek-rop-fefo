@@ -245,7 +245,7 @@ class LaporanController extends Controller
         return $pdf->stream('laporan-disposal-' . date('Ymd_His') . '.pdf');
     }
 
-    // Laporan Stok Obat (Gudang + rak)
+    // Laporan Stok Obat (Gudang + rak vs ROP)
     public function stokObat(Request $request)
     {
         $query = Obat::withSum('batches as stok_gudang_total', 'stok_gudang')
@@ -260,56 +260,139 @@ class LaporanController extends Controller
             });
         }
 
-        if ($request->filled('status_rop') && $request->status_rop === 'kritis') {
-            // rop_dinamis dihitung di PHP, tidak bisa di SQL langsung.
-            // Preload total penjualan 30 hari dalam satu query untuk menghindari N+1.
-            $penjualanPerObat = \App\Models\DetailPenjualan::query()
-                ->whereHas('penjualan', fn ($q) =>
-                    $q->where('tanggal_transaksi', '>=', now()->subDays(30))
-                )
-                ->selectRaw('obat_id, SUM(jumlah) as total_terjual')
-                ->groupBy('obat_id')
-                ->pluck('total_terjual', 'obat_id');
+        // Ambil penjualan 30 hari untuk kalkulasi ROP akurat
+        $penjualanPerObat = \App\Models\DetailPenjualan::query()
+            ->whereHas('penjualan', fn ($q) =>
+                $q->where('tanggal_transaksi', '>=', now()->subDays(30))
+            )
+            ->selectRaw('obat_id, SUM(jumlah) as total_terjual')
+            ->groupBy('obat_id')
+            ->pluck('total_terjual', 'obat_id');
 
-            $allData = $query->orderBy('nama_obat')->get();
-            $allData = $allData->filter(function ($obat) use ($penjualanPerObat) {
-                $d = round(($penjualanPerObat[$obat->id] ?? 0) / 30, 2);
-                $l = (int) ($obat->lead_time_hari ?? 3);
-                $isiPerKemasan = max((int) $obat->isi_per_kemasan, 1);
+        $allData = $query->orderBy('nama_obat')->get();
 
-                $ropDinamis = $d > 0
-                    ? (int) ceil(($d * $l) / $isiPerKemasan)
-                    : (int) $obat->rop_minimum;
+        // Hitung status ROP untuk setiap obat
+        $allData = $allData->map(function ($obat) use ($penjualanPerObat) {
+            $d = round(($penjualanPerObat[$obat->id] ?? 0) / 30, 2);
+            $l = (int) ($obat->lead_time_hari ?? 3);
+            $isiPerKemasan = max((int) $obat->isi_per_kemasan, 1);
 
-                $stokGudang = (int) ($obat->stok_gudang_total ?? 0);
-                $stokRak    = (int) ($obat->stok_rak_total ?? 0);
-                $stokTotal  = ($stokGudang * $isiPerKemasan) + $stokRak;
+            $ropDinamis = $d > 0
+                ? (int) ceil(($d * $l) / $isiPerKemasan)
+                : (int) $obat->rop_minimum;
 
-                return $ropDinamis > 0 && $stokTotal <= ($ropDinamis * $isiPerKemasan);
-            })->values();
+            $stokGudang = (int) ($obat->stok_gudang_total ?? 0);
+            $stokRak    = (int) ($obat->stok_rak_total ?? 0);
+            $stokTotal  = ($stokGudang * $isiPerKemasan) + $stokRak;
+            $batasRop   = $ropDinamis * $isiPerKemasan;
 
-            $page    = $request->get('page', 1);
-            $perPage = 20;
-            $data    = new \Illuminate\Pagination\LengthAwarePaginator(
-                $allData->forPage($page, $perPage),
-                $allData->count(),
-                $perPage,
-                $page,
-                ['path' => $request->url(), 'query' => $request->query()]
-            );
+            $obat->is_kritis = ($ropDinamis > 0 && $stokTotal <= $batasRop);
+            $obat->rop_kalkulasi = $ropDinamis;
+            $obat->total_apotek_satuan_jual = $stokTotal;
 
-            return view('pages.laporan.stok-obat', [
-                'title' => 'Laporan Stok Obat',
-                'data'  => $data,
-            ]);
+            return $obat;
+        });
+
+        // Hitung total ringkasan
+        $totalObat   = $allData->count();
+        $totalKritis = $allData->where('is_kritis', true)->count();
+        $totalAman   = $totalObat - $totalKritis;
+
+        // Filter status ROP jika ada
+        if ($request->filled('status_rop')) {
+            if ($request->status_rop === 'kritis') {
+                $allData = $allData->where('is_kritis', true)->values();
+            } elseif ($request->status_rop === 'aman') {
+                $allData = $allData->where('is_kritis', false)->values();
+            }
         }
 
-        $data = $query->orderBy('nama_obat')->paginate(20)->withQueryString();
+        $page    = $request->get('page', 1);
+        $perPage = 20;
+        $data    = new \Illuminate\Pagination\LengthAwarePaginator(
+            $allData->forPage($page, $perPage),
+            $allData->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return view('pages.laporan.stok-obat', [
-            'title' => 'Laporan Stok Obat',
-            'data'  => $data,
+            'title'       => 'Laporan Stok Obat',
+            'data'        => $data,
+            'totalObat'   => $totalObat,
+            'totalKritis' => $totalKritis,
+            'totalAman'   => $totalAman,
         ]);
+    }
+
+    public function stokObatPdf(Request $request)
+    {
+        $query = Obat::withSum('batches as stok_gudang_total', 'stok_gudang')
+            ->withSum('batches as stok_rak_total', 'stok_rak');
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_obat', 'like', "%{$search}%")
+                  ->orWhere('kode_obat', 'like', "%{$search}%")
+                  ->orWhere('kategori', 'like', "%{$search}%");
+            });
+        }
+
+        $penjualanPerObat = \App\Models\DetailPenjualan::query()
+            ->whereHas('penjualan', fn ($q) =>
+                $q->where('tanggal_transaksi', '>=', now()->subDays(30))
+            )
+            ->selectRaw('obat_id, SUM(jumlah) as total_terjual')
+            ->groupBy('obat_id')
+            ->pluck('total_terjual', 'obat_id');
+
+        $data = $query->orderBy('nama_obat')->get();
+
+        $data = $data->map(function ($obat) use ($penjualanPerObat) {
+            $d = round(($penjualanPerObat[$obat->id] ?? 0) / 30, 2);
+            $l = (int) ($obat->lead_time_hari ?? 3);
+            $isiPerKemasan = max((int) $obat->isi_per_kemasan, 1);
+
+            $ropDinamis = $d > 0
+                ? (int) ceil(($d * $l) / $isiPerKemasan)
+                : (int) $obat->rop_minimum;
+
+            $stokGudang = (int) ($obat->stok_gudang_total ?? 0);
+            $stokRak    = (int) ($obat->stok_rak_total ?? 0);
+            $stokTotal  = ($stokGudang * $isiPerKemasan) + $stokRak;
+            $batasRop   = $ropDinamis * $isiPerKemasan;
+
+            $obat->is_kritis = ($ropDinamis > 0 && $stokTotal <= $batasRop);
+            $obat->rop_kalkulasi = $ropDinamis;
+            $obat->total_apotek_satuan_jual = $stokTotal;
+
+            return $obat;
+        });
+
+        if ($request->filled('status_rop')) {
+            if ($request->status_rop === 'kritis') {
+                $data = $data->where('is_kritis', true)->values();
+            } elseif ($request->status_rop === 'aman') {
+                $data = $data->where('is_kritis', false)->values();
+            }
+        }
+
+        $logoPath   = public_path('images/Logo Apotek Tabah Farma.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('pages.laporan.pdf.stok-obat', [
+            'data'        => $data,
+            'statusRop'   => $request->status_rop,
+            'search'      => $request->search,
+            'totalObat'   => $data->count(),
+            'totalKritis' => $data->where('is_kritis', true)->count(),
+            'totalAman'   => $data->where('is_kritis', false)->count(),
+            'logoBase64'  => $logoBase64,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-stok-obat-' . date('Ymd_His') . '.pdf');
     }
 
    
@@ -406,5 +489,127 @@ class LaporanController extends Controller
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('laporan-penjualan-' . date('Ymd_His') . '.pdf');
+    }
+
+    // Laporan Obat Kadaluwarsa & Mendekati ED (Display Rak & Gudang)
+    public function kadaluwarsa(Request $request)
+    {
+        $query = ObatBatch::with(['obat', 'supplier'])
+            ->where(function ($q) {
+                $q->where('stok_rak', '>', 0)
+                  ->orWhere('stok_gudang', '>', 0);
+            });
+
+        // Filter Lokasi
+        if ($request->lokasi === 'rak') {
+            $query->where('stok_rak', '>', 0);
+        } elseif ($request->lokasi === 'gudang') {
+            $query->where('stok_gudang', '>', 0);
+        }
+
+        // Filter Status ED
+        if ($request->status_ed === 'expired') {
+            $query->where('tanggal_kadaluwarsa', '<', now()->toDateString());
+        } elseif ($request->status_ed === 'expiring_30') {
+            $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(30)->toDateString()]);
+        } elseif ($request->status_ed === 'expiring_90') {
+            $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(90)->toDateString()]);
+        } elseif ($request->status_ed === 'expiring_180') {
+            $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(183)->toDateString()]);
+        } else {
+            // Default: tampilkan yang sudah expired ATAU mendekati ED (<= 183 hari / 6 bulan)
+            $query->where('tanggal_kadaluwarsa', '<=', now()->addDays(183)->toDateString());
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_batch', 'like', "%{$search}%")
+                  ->orWhereHas('obat', fn ($oq) => $oq->where('nama_obat', 'like', "%{$search}%"))
+                  ->orWhereHas('supplier', fn ($sq) => $sq->where('nama_supplier', 'like', "%{$search}%"));
+            });
+        }
+
+        // FEFO: Tanggal ED paling lama lewat / paling dekat ditampilkan di atas
+        $data = $query->orderBy('tanggal_kadaluwarsa', 'asc')->paginate(15)->withQueryString();
+
+        // Ringkasan Statistik Stok Aktif
+        $baseBatch = ObatBatch::where(function ($q) {
+            $q->where('stok_rak', '>', 0)->orWhere('stok_gudang', '>', 0);
+        });
+
+        $expiredDiRak = (clone $baseBatch)->where('stok_rak', '>', 0)
+            ->where('tanggal_kadaluwarsa', '<', now()->toDateString())->count();
+
+        $expiredDiGudang = (clone $baseBatch)->where('stok_gudang', '>', 0)
+            ->where('tanggal_kadaluwarsa', '<', now()->toDateString())->count();
+
+        $expiring30 = (clone $baseBatch)
+            ->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(30)->toDateString()])->count();
+
+        $expiring180 = (clone $baseBatch)
+            ->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(183)->toDateString()])->count();
+
+        return view('pages.laporan.kadaluwarsa', [
+            'title'           => 'Laporan Obat Kadaluwarsa & Mendekati ED',
+            'data'            => $data,
+            'expiredDiRak'    => $expiredDiRak,
+            'expiredDiGudang' => $expiredDiGudang,
+            'expiring30'      => $expiring30,
+            'expiring180'     => $expiring180,
+        ]);
+    }
+
+    public function kadaluwarsaPdf(Request $request)
+    {
+        $query = ObatBatch::with(['obat', 'supplier'])
+            ->where(function ($q) {
+                $q->where('stok_rak', '>', 0)
+                  ->orWhere('stok_gudang', '>', 0);
+            });
+
+        if ($request->lokasi === 'rak') {
+            $query->where('stok_rak', '>', 0);
+        } elseif ($request->lokasi === 'gudang') {
+            $query->where('stok_gudang', '>', 0);
+        }
+
+        if ($request->status_ed === 'expired') {
+            $query->where('tanggal_kadaluwarsa', '<', now()->toDateString());
+        } elseif ($request->status_ed === 'expiring_30') {
+            $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(30)->toDateString()]);
+        } elseif ($request->status_ed === 'expiring_90') {
+            $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(90)->toDateString()]);
+        } elseif ($request->status_ed === 'expiring_180') {
+            $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(183)->toDateString()]);
+        } else {
+            $query->where('tanggal_kadaluwarsa', '<=', now()->addDays(183)->toDateString());
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_batch', 'like', "%{$search}%")
+                  ->orWhereHas('obat', fn ($oq) => $oq->where('nama_obat', 'like', "%{$search}%"))
+                  ->orWhereHas('supplier', fn ($sq) => $sq->where('nama_supplier', 'like', "%{$search}%"));
+            });
+        }
+
+        $data = $query->orderBy('tanggal_kadaluwarsa', 'asc')->get();
+
+        $logoPath   = public_path('images/Logo Apotek Tabah Farma.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('pages.laporan.pdf.kadaluwarsa', [
+            'data'       => $data,
+            'lokasi'     => $request->lokasi,
+            'statusEd'   => $request->status_ed,
+            'search'     => $request->search,
+            'totalBatch' => $data->count(),
+            'logoBase64' => $logoBase64,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-obat-kadaluwarsa-' . date('Ymd_His') . '.pdf');
     }
 }

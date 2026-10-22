@@ -49,7 +49,7 @@
                                         data-satuan-beli="{{ $batch->obat->satuan_beli }}"
                                         data-satuan-jual="{{ $batch->obat->satuan_jual }}"
                                         data-expired="{{ $isExpired ? '1' : '0' }}"
-                                        {{ old('obat_batch_id') == $batch->id ? 'selected' : '' }}>
+                                        {{ (old('obat_batch_id', request('batch_id')) == $batch->id) ? 'selected' : '' }}>
                                     {{ $label }}
                                 </option>
                             @endforeach

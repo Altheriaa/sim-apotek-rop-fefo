@@ -106,7 +106,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/laporan/transfer-rak/pdf', [LaporanController::class, 'transferRakPdf'])->name('laporan.transfer-rak.pdf');
         Route::get('/laporan/disposal', [LaporanController::class, 'disposal'])->name('laporan.disposal');
         Route::get('/laporan/disposal/pdf', [LaporanController::class, 'disposalPdf'])->name('laporan.disposal.pdf');
+        Route::get('/laporan/kadaluwarsa', [LaporanController::class, 'kadaluwarsa'])->name('laporan.kadaluwarsa');
+        Route::get('/laporan/kadaluwarsa/pdf', [LaporanController::class, 'kadaluwarsaPdf'])->name('laporan.kadaluwarsa.pdf');
         Route::get('/laporan/stok-obat', [LaporanController::class, 'stokObat'])->name('laporan.stok-obat');
+        Route::get('/laporan/stok-obat/pdf', [LaporanController::class, 'stokObatPdf'])->name('laporan.stok-obat.pdf');
         Route::get('/laporan/penjualan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
         Route::get('/laporan/penjualan/pdf', [LaporanController::class, 'penjualanPdf'])->name('laporan.penjualan.pdf');
 
