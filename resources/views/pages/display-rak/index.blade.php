@@ -122,7 +122,7 @@
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Stok Rak</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Min. Rak</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Stok Gudang</th>
-                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Status</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Status Rak</th>
                             @if (Auth::user()->isAdmin() || Auth::user()->isAdmin())  
                                 <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Aksi</th>
                             @endif

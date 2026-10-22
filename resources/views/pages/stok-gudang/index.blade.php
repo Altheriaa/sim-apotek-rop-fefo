@@ -16,18 +16,50 @@
         </div>
 
         {{-- Stats --}}
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-theme-xs dark:border-gray-800 dark:bg-gray-dark">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Total Batch Aktif</p>
-                <p class="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $totalBatch }}</p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Batch Aktif</p>
+                        <p class="mt-1 text-2xl font-bold text-gray-800 dark:text-white/90">{{ $totalBatch }}</p>
+                    </div>
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 dark:bg-brand-900/20">
+                        <i class="ti ti-packages text-2xl text-brand-500"></i>
+                    </div>
+                </div>
             </div>
             <div class="rounded-xl border border-warning-200 bg-warning-50 p-5 shadow-theme-xs dark:border-warning-800/30 dark:bg-warning-900/10">
-                <p class="text-sm text-warning-600 dark:text-warning-400">Mendekati Kadaluwarsa</p>
-                <p class="mt-1 text-2xl font-bold text-warning-700 dark:text-warning-300">{{ $expiringBatch }}</p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-warning-600 dark:text-warning-400">Stok Kritis (≤ ROP)</p>
+                        <p class="mt-1 text-2xl font-bold text-warning-700 dark:text-warning-300">{{ $kritisBatch }}</p>
+                    </div>
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-warning-100 dark:bg-warning-900/30">
+                        <i class="ti ti-alert-triangle text-2xl text-warning-500"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-xl border border-warning-200 bg-warning-50 p-5 shadow-theme-xs dark:border-warning-800/30 dark:bg-warning-900/10">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-warning-600 dark:text-warning-400">Mendekati Kadaluwarsa</p>
+                        <p class="mt-1 text-2xl font-bold text-warning-700 dark:text-warning-300">{{ $expiringBatch }}</p>
+                    </div>
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-warning-100 dark:bg-warning-900/30">
+                        <i class="ti ti-clock-hour-4 text-2xl text-warning-500"></i>
+                    </div>
+                </div>
             </div>
             <div class="rounded-xl border border-error-200 bg-error-50 p-5 shadow-theme-xs dark:border-error-800/30 dark:bg-error-900/10">
-                <p class="text-sm text-error-600 dark:text-error-400">Sudah Kadaluwarsa</p>
-                <p class="mt-1 text-2xl font-bold text-error-700 dark:text-error-300">{{ $expiredBatch }}</p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-error-600 dark:text-error-400">Sudah Kadaluwarsa</p>
+                        <p class="mt-1 text-2xl font-bold text-error-700 dark:text-error-300">{{ $expiredBatch }}</p>
+                    </div>
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-error-100 dark:bg-error-900/30">
+                        <i class="ti ti-calendar-x text-2xl text-error-500"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -55,9 +87,25 @@
                             <select name="status_ed" onchange="this.form.submit()"
                                 class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 transition duration-150 cursor-pointer">
                                 <option value="">Semua Status ED</option>
-                                <option value="safe" {{ request('status_ed') === 'safe' ? 'selected' : '' }}>Aman (> 30 hari)</option>
-                                <option value="expiring" {{ request('status_ed') === 'expiring' ? 'selected' : '' }}>Mendekati ED (≤ 30 hari)</option>
+                                <option value="safe" {{ request('status_ed') === 'safe' ? 'selected' : '' }}>Aman (> 6 bulan)</option>
+                                <option value="expiring" {{ request('status_ed') === 'expiring' ? 'selected' : '' }}>Mendekati ED (≤ 6 bulan)</option>
                                 <option value="expired" {{ request('status_ed') === 'expired' ? 'selected' : '' }}>Sudah Kadaluwarsa</option>
+                            </select>
+                            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </span>
+                        </div>
+
+                        {{-- Status Stok Gudang Filter --}}
+                        <div class="relative w-full sm:w-56">
+                            <select name="status_stok" onchange="this.form.submit()"
+                                class="h-10 w-full appearance-none rounded-lg border border-gray-200 bg-gray-50/50 pl-3.5 pr-9 text-sm text-gray-700 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200 transition duration-150 cursor-pointer">
+                                <option value="">Semua Status Stok</option>
+                                <option value="kritis" {{ request('status_stok') === 'kritis' ? 'selected' : '' }}>Kritis (≤ ROP)</option>
+                                <option value="aman" {{ request('status_stok') === 'aman' ? 'selected' : '' }}>Aman (> ROP)</option>
+                                <option value="habis" {{ request('status_stok') === 'habis' ? 'selected' : '' }}>Habis (0)</option>
                             </select>
                             <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -73,7 +121,7 @@
                             class="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition duration-150">
                             Filter
                         </button>
-                        @if(request()->hasAny(['search', 'status_ed']))
+                        @if(request()->hasAny(['search', 'status_ed', 'status_stok']))
                             <a href="{{ route('stok-gudang.index') }}"
                                 class="h-10 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition duration-150"
                                 title="Reset Filter">
@@ -100,7 +148,8 @@
                             </th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Stok Gudang</th>
                             <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Stok Rak</th>
-                            <th class="px-18 py-3 text-sm font-medium text-gray-500 dark:text-gray-400">Status ED</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Status ED</th>
+                            <th class="px-5 py-3 text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Status Stok Gudang</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +158,11 @@
                                 $ed        = $batch->tanggal_kadaluwarsa;
                                 $isExpired = $ed->isPast();
                                 $isNear    = !$isExpired && $ed->lte(now()->addDays(183));
+
+                                $stokGudang = (int) $batch->stok_gudang;
+                                $rop        = (int) ($batch->obat->rop_minimum ?? 2);
+                                $isKosong   = $stokGudang === 0;
+                                $isKritis   = !$isKosong && $stokGudang <= $rop;
                             @endphp
                             <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
                                 <td class="px-5 py-4 text-sm text-gray-500">
@@ -130,15 +184,30 @@
                                     @if($isExpired)
                                         <span class="inline-flex items-center rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-semibold text-error-700 dark:bg-error-900/30 dark:text-error-400">Expired</span>
                                     @elseif($isNear)
-                                        <span class="inline-flex items-center rounded-full bg-warning-100 px-2.5 py-0.5 text-xs font-semibold text-warning-700 dark:bg-warning-900/30 dark:text-warning-400">Near Expired Date</span>
+                                        <span class="inline-flex items-center rounded-full bg-warning-100 px-2.5 py-0.5 text-xs font-semibold text-warning-700 dark:bg-warning-900/30 dark:text-warning-400">Mendekati ED</span>
                                     @else
-                                        <span class="inline-flex items-center rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">Stock Aman</span>
+                                        <span class="inline-flex items-center rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">ED Aman</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 text-center">
+                                    @if($isKosong)
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-semibold text-error-700 dark:bg-error-900/30 dark:text-error-400">
+                                            Kosong
+                                        </span>
+                                    @elseif($isKritis)
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-warning-100 px-2.5 py-0.5 text-xs font-semibold text-warning-700 dark:bg-warning-900/30 dark:text-warning-400" title="Stok gudang batch ini ({{ $stokGudang }}) ≤ batas ROP ({{ $rop }})">
+                                            Kritis
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">
+                                            Aman
+                                        </span>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="10" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     Tidak ada batch stok gudang yang ditemukan.
                                 </td>
                             </tr>

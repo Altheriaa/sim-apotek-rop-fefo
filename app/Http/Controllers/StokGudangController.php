@@ -10,8 +10,20 @@ class StokGudangController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ObatBatch::with(['obat', 'supplier'])
-            ->where('stok_gudang', '>', 0); // Hanya batch yang masih ada di gudang
+        $query = ObatBatch::with(['obat', 'supplier']);
+
+        // Filter status_stok
+        if ($request->status_stok === 'habis') {
+            $query->where('stok_gudang', 0);
+        } elseif ($request->status_stok === 'kritis') {
+            $query->where('stok_gudang', '>', 0)
+                  ->whereRaw('stok_gudang <= (SELECT COALESCE(rop_minimum, 2) FROM obat WHERE obat.id = obat_batch.obat_id)');
+        } elseif ($request->status_stok === 'aman') {
+            $query->whereRaw('stok_gudang > (SELECT COALESCE(rop_minimum, 2) FROM obat WHERE obat.id = obat_batch.obat_id)');
+        } else {
+            // Default: hanya batch yang masih ada di gudang
+            $query->where('stok_gudang', '>', 0);
+        }
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -36,16 +48,20 @@ class StokGudangController extends Controller
         $batches = $query->orderBy('tanggal_kadaluwarsa', 'asc')->paginate(15)->withQueryString();
 
         // Ringkasan stok
-        $totalBatch      = ObatBatch::where('stok_gudang', '>', 0)->count();
-        $expiredBatch    = ObatBatch::where('stok_gudang', '>', 0)->where('tanggal_kadaluwarsa', '<', now())->count();
-        $expiringBatch   = ObatBatch::where('stok_gudang', '>', 0)
+        $totalBatch    = ObatBatch::where('stok_gudang', '>', 0)->count();
+        $kritisBatch   = ObatBatch::where('stok_gudang', '>', 0)
+            ->whereRaw('stok_gudang <= (SELECT COALESCE(rop_minimum, 2) FROM obat WHERE obat.id = obat_batch.obat_id)')
+            ->count();
+        $expiredBatch  = ObatBatch::where('stok_gudang', '>', 0)->where('tanggal_kadaluwarsa', '<', now())->count();
+        $expiringBatch = ObatBatch::where('stok_gudang', '>', 0)
             ->whereBetween('tanggal_kadaluwarsa', [now(), now()->addDays(183)])->count();
 
         return view('pages.stok-gudang.index', [
-            'title'        => 'Stok Gudang (FEFO)',
-            'batches'      => $batches,
-            'totalBatch'   => $totalBatch,
-            'expiredBatch' => $expiredBatch,
+            'title'         => 'Stok Gudang (FEFO)',
+            'batches'       => $batches,
+            'totalBatch'    => $totalBatch,
+            'kritisBatch'   => $kritisBatch,
+            'expiredBatch'  => $expiredBatch,
             'expiringBatch' => $expiringBatch,
         ]);
     }
