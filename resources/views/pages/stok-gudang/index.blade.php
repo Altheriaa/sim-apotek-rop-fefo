@@ -108,7 +108,7 @@
                             @php
                                 $ed        = $batch->tanggal_kadaluwarsa;
                                 $isExpired = $ed->isPast();
-                                $isNear    = !$isExpired && $ed->lte(now()->addDays(30));
+                                $isNear    = !$isExpired && $ed->lte(now()->addDays(183));
                             @endphp
                             <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/20">
                                 <td class="px-5 py-4 text-sm text-gray-500">
