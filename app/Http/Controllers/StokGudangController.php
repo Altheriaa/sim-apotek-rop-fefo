@@ -39,7 +39,7 @@ class StokGudangController extends Controller
         $totalBatch      = ObatBatch::where('stok_gudang', '>', 0)->count();
         $expiredBatch    = ObatBatch::where('stok_gudang', '>', 0)->where('tanggal_kadaluwarsa', '<', now())->count();
         $expiringBatch   = ObatBatch::where('stok_gudang', '>', 0)
-            ->whereBetween('tanggal_kadaluwarsa', [now(), now()->addDays(30)])->count();
+            ->whereBetween('tanggal_kadaluwarsa', [now(), now()->addDays(183)])->count();
 
         return view('pages.stok-gudang.index', [
             'title'        => 'Stok Gudang (FEFO)',
