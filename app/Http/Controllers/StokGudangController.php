@@ -26,9 +26,9 @@ class StokGudangController extends Controller
             if ($request->status_ed === 'expired') {
                 $query->where('tanggal_kadaluwarsa', '<', now()->toDateString());
             } elseif ($request->status_ed === 'expiring') {
-                $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(30)->toDateString()]);
+                $query->whereBetween('tanggal_kadaluwarsa', [now()->toDateString(), now()->addDays(183)->toDateString()]);
             } elseif ($request->status_ed === 'safe') {
-                $query->where('tanggal_kadaluwarsa', '>', now()->addDays(30)->toDateString());
+                $query->where('tanggal_kadaluwarsa', '>', now()->addDays(183)->toDateString());
             }
         }
 
